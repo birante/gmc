@@ -1,0 +1,49 @@
+@theme {
+  --color-terracotta: #C1440E;
+  --color-ochre:      #D4870A;
+  --color-earth:      #2C1206;
+  --color-forest:     #1A5C38;
+  --color-cream:      #FBF3E2;
+  --color-sand:       #EDD9A3;
+  --color-gold:       #F0A500;
+  --font-display: 'Playfair Display', serif;
+  --font-body:    'Inter', sans-serif;
+}
+
+/* Kente-inspired rainbow stripe */
+.kente-strip {
+  background: repeating-linear-gradient(
+    90deg,
+    #C1440E  0px, #C1440E  12px,
+    #F0A500 12px, #F0A500 24px,
+    #1A5C38 24px, #1A5C38 36px,
+    #2C1206 36px, #2C1206 48px,
+    #D4870A 48px, #D4870A 60px,
+    #FBF3E2 60px, #FBF3E2 72px
+  );
+}
+
+/* Hero: dark earth+forest gradient overlay on background image */
+.hero-overlay {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(44, 18, 6, 0.93) 0%,
+      rgba(26, 92, 56, 0.82) 55%,
+      rgba(44, 18, 6, 0.90) 100%
+    ),
+    url('https://picsum.photos/1920/1080?random=99') center / cover no-repeat;
+}
+
+/* Reusable skill pill */
+.skill-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.75rem;
+  border-radius: 9999px;
+}
+
+html {
+  scroll-behavior: smooth;
+}

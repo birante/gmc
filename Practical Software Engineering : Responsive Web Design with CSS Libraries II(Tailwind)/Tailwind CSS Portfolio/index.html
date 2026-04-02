@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Birante SY | Développeur Full-Stack · Dakar</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-cream text-earth font-body">
+
+    <!-- ===== HEADER ===== -->
+    <header class="sticky top-0 z-50 bg-earth">
+      <div class="kente-strip h-2"></div>
+      <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="#home" class="font-display text-2xl font-bold text-gold">
+          Birante<span class="text-terracotta">.dev</span>
+        </a>
+
+        <!-- Hamburger -->
+        <button id="menu-btn"
+          class="md:hidden text-cream text-3xl leading-none hover:text-gold transition-colors"
+          aria-label="Menu">&#9776;</button>
+
+        <!-- Desktop nav -->
+        <ul class="hidden md:flex items-center gap-8">
+          <li><a href="#home"     class="text-cream/80 hover:text-gold font-medium transition-colors">Accueil</a></li>
+          <li><a href="#skills"   class="text-cream/80 hover:text-gold font-medium transition-colors">Compétences</a></li>
+          <li><a href="#projects" class="text-cream/80 hover:text-gold font-medium transition-colors">Projets</a></li>
+          <li>
+            <a href="#contact" class="bg-terracotta hover:bg-ochre text-cream font-semibold px-5 py-2 rounded-full transition-colors">
+              Contact
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Mobile nav -->
+      <div id="mobile-nav" class="hidden bg-earth border-t border-gold/20 md:hidden">
+        <ul class="flex flex-col px-6 py-4 gap-4">
+          <li><a href="#home"     class="text-cream/80 hover:text-gold block transition-colors">Accueil</a></li>
+          <li><a href="#skills"   class="text-cream/80 hover:text-gold block transition-colors">Compétences</a></li>
+          <li><a href="#projects" class="text-cream/80 hover:text-gold block transition-colors">Projets</a></li>
+          <li><a href="#contact"  class="text-cream/80 hover:text-gold block transition-colors">Contact</a></li>
+        </ul>
+      </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section id="home" class="relative min-h-[72vh] md:min-h-[82vh] flex items-center overflow-hidden">
+      <div class="hero-overlay absolute inset-0 z-0"></div>
+
+      <div class="relative z-10 w-full max-w-6xl mx-auto px-6 py-16 md:py-20 grid md:grid-cols-2 gap-10 md:gap-14 items-center">
+        <!-- Text -->
+        <div>
+          <span class="text-ochre tracking-[0.25em] uppercase text-sm font-semibold block mb-4">
+            Développeur Full-Stack · Dakar, Sénégal
+          </span>
+          <h1 class="font-display text-5xl md:text-7xl font-bold text-cream leading-[1.1] mb-6">
+            Bonjour,<br />je suis<br /><span class="text-gold">Birante SY</span>
+          </h1>
+          <p class="text-cream/70 text-lg leading-relaxed mb-10 max-w-md">
+            Software developer from Africa ✨ — je construis des applications web
+            modernes avec passion, depuis Dakar.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="#projects"
+              class="bg-terracotta hover:bg-ochre text-cream font-bold px-8 py-4 rounded-full transition-all shadow-lg hover:-translate-y-0.5">
+              Voir mes projets →
+            </a>
+            <a href="#contact"
+              class="border-2 border-gold text-gold hover:bg-gold hover:text-earth font-bold px-8 py-4 rounded-full transition-all">
+              Me contacter
+            </a>
+          </div>
+        </div>
+
+        <!-- Avatar -->
+        <div class="flex justify-center">
+          <div class="relative">
+            <img
+              src="https://avatars.githubusercontent.com/u/24479155?v=4"
+              alt="Birante SY"
+              class="w-44 h-44 md:w-60 md:h-60 rounded-full object-cover border-4 border-gold shadow-2xl"
+            />
+            <div class="absolute -inset-4 rounded-full border-2 border-dashed border-terracotta/50 animate-spin"
+              style="animation-duration:18s;"></div>
+            <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-gold rounded-full border-4 border-earth flex items-center justify-center text-earth font-bold text-xs">✦</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kente-strip absolute bottom-0 left-0 right-0 h-3 z-10"></div>
+    </section>
+
+    <!-- ===== SKILLS ===== -->
+    <section id="skills" class="py-24 bg-sand">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-terracotta tracking-[0.2em] uppercase text-sm font-semibold">Mon expertise</span>
+          <h2 class="font-display text-4xl md:text-5xl font-bold text-earth mt-2 mb-4">Compétences</h2>
+          <div class="flex justify-center items-center gap-1.5 mt-4">
+            <div class="h-1 w-4 bg-terracotta rounded-full"></div>
+            <div class="h-1 w-12 bg-ochre rounded-full"></div>
+            <div class="h-1 w-4 bg-forest rounded-full"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Front-End -->
+          <div class="bg-cream rounded-2xl p-8 shadow-md border-t-4 border-terracotta hover:-translate-y-1.5 transition-transform">
+            <div class="text-5xl mb-5">🎨</div>
+            <h3 class="font-display text-xl font-bold text-earth mb-5">Front-End</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-tag bg-terracotta/10 text-terracotta">HTML5</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">CSS3</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">JavaScript</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">TypeScript</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">Angular</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">Vue.js</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">Nuxt.js</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">Tailwind CSS</span>
+              <span class="skill-tag bg-terracotta/10 text-terracotta">Bootstrap</span>
+            </div>
+          </div>
+
+          <!-- Back-End -->
+          <div class="bg-cream rounded-2xl p-8 shadow-md border-t-4 border-forest hover:-translate-y-1.5 transition-transform">
+            <div class="text-5xl mb-5">⚙️</div>
+            <h3 class="font-display text-xl font-bold text-earth mb-5">Back-End</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-tag bg-forest/10 text-forest">Node.js</span>
+              <span class="skill-tag bg-forest/10 text-forest">Express.js</span>
+              <span class="skill-tag bg-forest/10 text-forest">Ruby on Rails</span>
+              <span class="skill-tag bg-forest/10 text-forest">PHP / CakePHP</span>
+              <span class="skill-tag bg-forest/10 text-forest">PostgreSQL</span>
+              <span class="skill-tag bg-forest/10 text-forest">GraphQL</span>
+              <span class="skill-tag bg-forest/10 text-forest">REST API</span>
+            </div>
+          </div>
+
+          <!-- Outils -->
+          <div class="bg-cream rounded-2xl p-8 shadow-md border-t-4 border-ochre hover:-translate-y-1.5 transition-transform">
+            <div class="text-5xl mb-5">🛠️</div>
+            <h3 class="font-display text-xl font-bold text-earth mb-5">Outils</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="skill-tag bg-ochre/10 text-ochre">Git / GitHub</span>
+              <span class="skill-tag bg-ochre/10 text-ochre">VS Code</span>
+              <span class="skill-tag bg-ochre/10 text-ochre">Crystal</span>
+              <span class="skill-tag bg-ochre/10 text-ochre">Elasticsearch</span>
+              <span class="skill-tag bg-ochre/10 text-ochre">Linux</span>
+              <span class="skill-tag bg-ochre/10 text-ochre">Agile / Scrum</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PROJECTS ===== -->
+    <section id="projects" class="py-24 bg-cream">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <span class="text-terracotta tracking-[0.2em] uppercase text-sm font-semibold">Mon travail</span>
+          <h2 class="font-display text-4xl md:text-5xl font-bold text-earth mt-2 mb-4">Projets</h2>
+          <div class="flex justify-center items-center gap-1.5 mt-4">
+            <div class="h-1 w-4 bg-terracotta rounded-full"></div>
+            <div class="h-1 w-12 bg-ochre rounded-full"></div>
+            <div class="h-1 w-4 bg-forest rounded-full"></div>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <!-- Project 1 -->
+          <article class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div class="overflow-hidden h-52">
+              <img src="https://picsum.photos/seed/blog-angular/600/400" alt="Blog Angular"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="p-6">
+              <div class="flex flex-wrap gap-2 mb-3">
+                <span class="text-xs font-semibold bg-terracotta/10 text-terracotta px-2 py-0.5 rounded">Angular</span>
+                <span class="text-xs font-semibold bg-forest/10 text-forest px-2 py-0.5 rounded">TypeScript</span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-earth mb-2">Blog Angular</h3>
+              <p class="text-earth/60 text-sm leading-relaxed mb-5">
+                Application de type blog réalisée avec Angular — gestion de posts,
+                navigation et composants dynamiques.
+              </p>
+              <a href="https://github.com/birante/application-de-type-blog-angular" target="_blank" rel="noopener"
+                class="text-sm font-semibold text-terracotta hover:text-ochre transition-colors">Voir sur GitHub →</a>
+            </div>
+          </article>
+
+          <!-- Project 2 -->
+          <article class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div class="overflow-hidden h-52">
+              <img src="https://picsum.photos/seed/starternodejs/600/400" alt="StarterNodeJS"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="p-6">
+              <div class="flex flex-wrap gap-2 mb-3">
+                <span class="text-xs font-semibold bg-terracotta/10 text-terracotta px-2 py-0.5 rounded">Vue.js</span>
+                <span class="text-xs font-semibold bg-ochre/10 text-ochre px-2 py-0.5 rounded">Nuxt.js</span>
+                <span class="text-xs font-semibold bg-forest/10 text-forest px-2 py-0.5 rounded">Node.js</span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-earth mb-2">StarterNodeJS</h3>
+              <p class="text-earth/60 text-sm leading-relaxed mb-5">
+                Starter kit full-stack avec Vue.js, Nuxt.js et Express.js — prêt
+                à l'emploi pour des projets web modernes.
+              </p>
+              <a href="https://github.com/birante/starternodejs" target="_blank" rel="noopener"
+                class="text-sm font-semibold text-terracotta hover:text-ochre transition-colors">Voir sur GitHub →</a>
+            </div>
+          </article>
+
+          <!-- Project 3 -->
+          <article class="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+            <div class="overflow-hidden h-52">
+              <img src="https://picsum.photos/seed/gomycode/600/400" alt="GMC GOMYCODE"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="p-6">
+              <div class="flex flex-wrap gap-2 mb-3">
+                <span class="text-xs font-semibold bg-terracotta/10 text-terracotta px-2 py-0.5 rounded">HTML/CSS</span>
+                <span class="text-xs font-semibold bg-forest/10 text-forest px-2 py-0.5 rounded">Bootstrap</span>
+                <span class="text-xs font-semibold bg-ochre/10 text-ochre px-2 py-0.5 rounded">Tailwind</span>
+              </div>
+              <h3 class="font-display text-xl font-bold text-earth mb-2">GMC · GOMYCODE</h3>
+              <p class="text-earth/60 text-sm leading-relaxed mb-5">
+                Projets et exercices réalisés lors de la formation GOMYCODE —
+                UI/UX, responsive design, et intégration web.
+              </p>
+              <a href="https://github.com/birante/gmc" target="_blank" rel="noopener"
+                class="text-sm font-semibold text-terracotta hover:text-ochre transition-colors">Voir sur GitHub →</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACT ===== -->
+    <section id="contact" class="py-24 bg-earth relative overflow-hidden">
+      <div class="kente-strip absolute top-0 left-0 right-0 h-3"></div>
+
+      <div class="max-w-2xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <span class="text-ochre tracking-[0.2em] uppercase text-sm font-semibold">Travaillons ensemble</span>
+          <h2 class="font-display text-4xl md:text-5xl font-bold text-cream mt-2 mb-3">Contact</h2>
+          <p class="text-cream/60">Une idée, un projet ? Écrivez-moi à <span class="text-gold">birantesy@gmail.com</span></p>
+        </div>
+
+        <form class="space-y-6" onsubmit="handleSubmit(event)">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-cream/80 text-sm font-medium mb-2" for="name">Nom complet</label>
+              <input id="name" name="name" type="text" required placeholder="Votre nom"
+                class="w-full bg-white/10 text-cream placeholder-cream/40 border border-gold/30 focus:border-gold focus:outline-none rounded-xl px-4 py-3 transition-colors" />
+            </div>
+            <div>
+              <label class="block text-cream/80 text-sm font-medium mb-2" for="email">Email</label>
+              <input id="email" name="email" type="email" required placeholder="vous@exemple.com"
+                class="w-full bg-white/10 text-cream placeholder-cream/40 border border-gold/30 focus:border-gold focus:outline-none rounded-xl px-4 py-3 transition-colors" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-cream/80 text-sm font-medium mb-2" for="message">Message</label>
+            <textarea id="message" name="message" rows="6" required placeholder="Décrivez votre projet..."
+              class="w-full bg-white/10 text-cream placeholder-cream/40 border border-gold/30 focus:border-gold focus:outline-none rounded-xl px-4 py-3 resize-none transition-colors"></textarea>
+          </div>
+          <button type="submit" id="submit-btn"
+            class="w-full bg-terracotta hover:bg-ochre text-cream font-bold py-4 rounded-full text-lg transition-all hover:-translate-y-0.5 shadow-lg">
+            Envoyer le message ✦
+          </button>
+        </form>
+      </div>
+
+      <div class="kente-strip absolute bottom-0 left-0 right-0 h-3"></div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-earth/95 border-t border-gold/10 py-10">
+      <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+
+        <!-- Brand -->
+        <a href="#home" class="font-display text-2xl font-bold text-gold">
+          Birante<span class="text-terracotta">.dev</span>
+        </a>
+
+        <!-- Social icons -->
+        <div class="flex gap-5">
+          <a href="https://github.com/birante" target="_blank" rel="noopener" class="text-cream/50 hover:text-gold transition-colors" aria-label="GitHub">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="https://twitter.com/sybirante" target="_blank" rel="noopener" class="text-cream/50 hover:text-gold transition-colors" aria-label="Twitter / X">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Copyright -->
+        <p class="text-cream/40 text-sm">© 2026 Birante SY · Dakar, Sénégal</p>
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      document.getElementById('menu-btn').addEventListener('click', () => {
+        document.getElementById('mobile-nav').classList.toggle('hidden');
+      });
+
+      // Contact form feedback
+      function handleSubmit(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submit-btn');
+        btn.textContent = '✓ Message envoyé !';
+        btn.classList.replace('bg-terracotta', 'bg-forest');
+        btn.classList.remove('hover:bg-ochre');
+        setTimeout(() => {
+          btn.textContent = 'Envoyer le message ✦';
+          btn.classList.replace('bg-forest', 'bg-terracotta');
+          btn.classList.add('hover:bg-ochre');
+          e.target.reset();
+        }, 3000);
+      }
+    </script>
+
+  </body>
+</html>

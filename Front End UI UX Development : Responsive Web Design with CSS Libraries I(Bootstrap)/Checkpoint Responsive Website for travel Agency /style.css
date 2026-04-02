@@ -1,0 +1,234 @@
+/* ============================================================
+   Teranga — Restaurant Sénégalais à Dakar
+   Couleurs inspirées du drapeau : vert #00853F, jaune #FDEF42, rouge #E31B23
+   ============================================================ */
+
+:root {
+  --teranga: #00853F;        /* vert sénégalais */
+  --teranga-dark: #006830;
+  --teranga-gold: #e8a020;   /* jaune chaud / épices */
+  --teranga-red: #c0392b;    /* accent rouge */
+  --dark: #1a1a1a;
+  --bg-warm: #fdf8f0;        /* crème chaud */
+  --font-serif: 'Georgia', 'Times New Roman', serif;
+}
+
+/* ---- Base ---- */
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #333;
+}
+
+/* ---- Utilitaires couleur ---- */
+.text-teranga { color: var(--teranga) !important; }
+.bg-light-warm { background-color: var(--bg-warm); }
+
+/* ---- Navbar ---- */
+.navbar-teranga {
+  background-color: rgba(0, 40, 20, 0.97);
+  backdrop-filter: blur(10px);
+  padding: 0.9rem 0;
+  border-bottom: 2px solid var(--teranga-gold);
+}
+
+.navbar-teranga .brand-logo {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--teranga-gold) !important;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+.navbar-teranga .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  margin: 0 0.4rem;
+  transition: color 0.3s;
+}
+
+.navbar-teranga .nav-link:hover {
+  color: var(--teranga-gold) !important;
+}
+
+.navbar-teranga .navbar-toggler {
+  border-color: var(--teranga-gold);
+}
+
+.navbar-teranga .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28232%2C160%2C32%2C1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* ---- Hero ---- */
+.hero-section {
+  position: relative;
+  height: 100vh;
+  background-image: url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1600&h=900&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 53, 30, 0.75) 0%, rgba(0, 0, 0, 0.60) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-tagline {
+  color: var(--teranga-gold);
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+/* ---- Boutons ---- */
+.btn-teranga {
+  background-color: var(--teranga);
+  color: #fff;
+  border: 2px solid var(--teranga);
+  padding: 0.7rem 2rem;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.btn-teranga:hover,
+.btn-teranga:focus {
+  background-color: var(--teranga-dark);
+  border-color: var(--teranga-dark);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 133, 63, 0.4);
+}
+
+/* ---- Titres de section ---- */
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  color: var(--dark);
+  position: relative;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 55px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--teranga), var(--teranga-gold));
+}
+
+.section-title-left::after {
+  left: 0;
+  transform: none;
+}
+
+/* ---- Cartes Menu ---- */
+.menu-card {
+  border-radius: 12px !important;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.menu-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(0, 133, 63, 0.18) !important;
+}
+
+.menu-card .card-img-top {
+  height: 215px;
+  object-fit: cover;
+  transition: transform 0.4s;
+}
+
+.menu-card:hover .card-img-top {
+  transform: scale(1.04);
+}
+
+.price-badge {
+  background-color: var(--teranga);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+/* ---- Section À propos ---- */
+.about-section {
+  background-color: #f4faf6;
+}
+
+.stat-box {
+  background-color: #fff;
+  border: 1px solid #d4ead8;
+}
+
+.stat-number {
+  font-family: var(--font-serif);
+  color: var(--teranga);
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+/* ---- Formulaire de contact ---- */
+.contact-form {
+  background-color: #fff;
+}
+
+.form-control,
+.form-select {
+  border: 1.5px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--teranga);
+  box-shadow: 0 0 0 0.2rem rgba(0, 133, 63, 0.2);
+}
+
+/* ---- Footer ---- */
+.footer-section {
+  background-color: #021a0c;
+  border-top: 3px solid var(--teranga);
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: var(--teranga-gold);
+  letter-spacing: 1px;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #aaa;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.social-icon:hover {
+  background-color: var(--teranga);
+  color: #fff;
+  transform: translateY(-2px);
+}

@@ -1,0 +1,233 @@
+/*
+	Theme principal: Senegal (vert, jaune, rouge)
+	Ce fichier complete Bootstrap avec une identite visuelle locale.
+*/
+:root {
+	--senegal-green: #00853f;
+	--senegal-yellow: #fdd116;
+	--senegal-red: #e31b23;
+	--ink-dark: #1f2a24;
+	--sand-light: #fff7df;
+	--card-bg: #ffffff;
+	--shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	color: var(--ink-dark);
+	background:
+		radial-gradient(circle at 20% 20%, rgba(253, 209, 22, 0.22), transparent 40%),
+		radial-gradient(circle at 80% 15%, rgba(227, 27, 35, 0.16), transparent 35%),
+		linear-gradient(160deg, #fffef8 0%, #f7f3e7 100%);
+	font-family: "Bricolage Grotesque", sans-serif;
+	line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+.brand-mark {
+	font-family: "Merriweather", serif;
+}
+
+.hero-section {
+	background:
+		linear-gradient(120deg, rgba(0, 133, 63, 0.93), rgba(0, 133, 63, 0.85)),
+		linear-gradient(20deg, rgba(253, 209, 22, 0.38), rgba(227, 27, 35, 0.24));
+	color: #fff;
+	position: relative;
+	overflow: hidden;
+}
+
+.hero-section::after {
+	content: "";
+	position: absolute;
+	inset: auto -120px -120px auto;
+	width: 360px;
+	height: 360px;
+	border-radius: 50%;
+	background: rgba(253, 209, 22, 0.2);
+	filter: blur(4px);
+}
+
+.custom-navbar {
+	background: rgba(0, 0, 0, 0.08);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+}
+
+.brand-mark {
+	font-weight: 700;
+	color: #fff;
+	font-size: 1.35rem;
+}
+
+.brand-mark:hover,
+.brand-mark:focus {
+	color: var(--senegal-yellow);
+}
+
+.nav-link {
+	color: #fff;
+	font-weight: 600;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+	color: var(--senegal-yellow);
+}
+
+.btn-shop {
+	background: var(--senegal-yellow);
+	color: #1d1d1d;
+	border: none;
+	font-weight: 700;
+	transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.btn-shop:hover,
+.btn-shop:focus {
+	background: #ffdf4d;
+	color: #111;
+	transform: translateY(-2px);
+	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+}
+
+.hero-label {
+	display: inline-block;
+	background: rgba(255, 255, 255, 0.14);
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	padding: 0.35rem 0.75rem;
+	border-radius: 999px;
+	font-size: 0.9rem;
+	margin-bottom: 1rem;
+}
+
+.hero-title {
+	font-size: clamp(2rem, 3.8vw, 3.4rem);
+	line-height: 1.15;
+	margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+	max-width: 54ch;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-card {
+	background: rgba(255, 255, 255, 0.14);
+	border: 1px solid rgba(255, 255, 255, 0.35);
+	border-radius: 1rem;
+	-webkit-backdrop-filter: blur(5px);
+	backdrop-filter: blur(5px);
+}
+
+.offer-badge {
+	background: rgba(0, 0, 0, 0.16);
+	border-radius: 0.75rem;
+	padding: 0.75rem 1rem;
+}
+
+.products-section {
+	padding-top: 4.5rem;
+	padding-bottom: 4.5rem;
+}
+
+.section-heading h2 {
+	font-size: clamp(1.7rem, 3vw, 2.4rem);
+	color: #14251d;
+}
+
+.section-heading p {
+	color: #4b5a53;
+}
+
+.product-card {
+	background: var(--card-bg);
+	border-radius: 1rem;
+	overflow: hidden;
+	box-shadow: var(--shadow-soft);
+	border: 2px solid transparent;
+	transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.product-card:hover {
+	transform: translateY(-6px);
+	border-color: rgba(0, 133, 63, 0.5);
+}
+
+.product-image {
+	width: 100%;
+	height: 220px;
+	object-fit: cover;
+}
+
+.product-content {
+	padding: 1.15rem;
+}
+
+.product-content h3 {
+	font-size: 1.15rem;
+	margin-bottom: 0.55rem;
+}
+
+.product-content p {
+	color: #4f5853;
+	font-size: 0.95rem;
+	min-height: 72px;
+}
+
+.about-section {
+	background: linear-gradient(180deg, rgba(253, 209, 22, 0.25), rgba(255, 255, 255, 0.5));
+}
+
+.about-text {
+	max-width: 65ch;
+	color: #3e4f47;
+}
+
+.site-footer {
+	background: #1a1d1b;
+	color: #f3f3f3;
+	font-size: 0.93rem;
+}
+
+/* Ajustements mobiles */
+@media (max-width: 991.98px) {
+	.custom-navbar {
+		background: rgba(0, 0, 0, 0.2);
+	}
+
+	.navbar-collapse {
+		background: rgba(255, 255, 255, 0.12);
+		border-radius: 0.75rem;
+		padding: 0.75rem;
+		margin-top: 0.75rem;
+	}
+}
+
+@media (max-width: 767.98px) {
+	.hero-section {
+		text-align: center;
+	}
+
+	.hero-subtitle {
+		margin-inline: auto;
+	}
+
+	.hero-card {
+		text-align: left;
+	}
+
+	.product-image {
+		height: 200px;
+	}
+
+	.product-content p {
+		min-height: 0;
+	}
+}

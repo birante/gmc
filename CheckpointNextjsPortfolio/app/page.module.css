@@ -1,0 +1,87 @@
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.avatarWrapper {
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #4f46e5;
+  padding: 4px;
+}
+
+.avatar {
+  border-radius: 50%;
+  display: block;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin: 0;
+}
+
+.accent {
+  color: #4f46e5;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #4b5563;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 500px;
+}
+
+.skill {
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: transform 0.15s;
+}
+
+.primaryBtn {
+  background: #4f46e5;
+  color: white;
+}
+
+.secondaryBtn {
+  background: white;
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+.primaryBtn:hover,
+.secondaryBtn:hover {
+  transform: translateY(-2px);
+}

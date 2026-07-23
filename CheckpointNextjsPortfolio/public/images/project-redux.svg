@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <rect width="400" height="225" fill="#764abc"/>
+  <circle cx="200" cy="112" r="55" fill="none" stroke="white" stroke-width="6"/>
+  <text x="50%" y="52%" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="700" fill="white" dominant-baseline="middle">Redux</text>
+  <text x="50%" y="88%" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="white" opacity="0.85">To-Do App</text>
+</svg>

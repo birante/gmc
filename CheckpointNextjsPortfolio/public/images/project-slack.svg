@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <rect width="400" height="225" fill="#4a154b"/>
+  <text x="50%" y="52%" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="700" fill="white" dominant-baseline="middle">Slack Bot</text>
+  <text x="50%" y="88%" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="white" opacity="0.85">Bolt.js · Node.js</text>
+</svg>

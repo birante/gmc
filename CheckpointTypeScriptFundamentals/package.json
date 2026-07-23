@@ -1,0 +1,22 @@
+{
+  "name": "checkpointtypescriptfundamentals",
+  "version": "1.0.0",
+  "description": "A simple Slack bot that responds to /hello and logs channel messages.",
+  "main": "bot.js",
+  "type": "module",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "node --watch bot.js"
+  },
+  "keywords": [
+    "slack",
+    "bolt",
+    "bot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@slack/bolt": "^5.0.0",
+    "dotenv": "^17.4.2"
+  }
+}

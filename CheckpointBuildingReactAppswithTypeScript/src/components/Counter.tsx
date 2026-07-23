@@ -4,23 +4,30 @@
 // Conversion notes:
 //   1. Class components take TWO generic type parameters:
 //        Component<Props, State>
-//      Since this Counter takes no props, we declare `CounterProps`
-//      as an empty object type. `CounterState` describes the local
-//      state — here just `{ count: number }`.
-//   2. State is declared with an explicit type annotation
-//      (`state: CounterState = { count: 0 }`) so TypeScript knows
-//      the shape even before it sees the initializer.
+//      This Counter takes no props, so `CounterProps` is typed as
+//      `Record<string, never>` (an object with no allowed keys).
+//      This is preferred over `interface CounterProps {}` — an
+//      empty interface is treated as `any` object and defeats
+//      the purpose of TypeScript.
+//   2. `CounterState` describes the local state (`{ count: number }`).
+//      State is declared with an explicit annotation so TypeScript
+//      knows the shape even before it sees the initializer.
 //   3. Class field methods (e.g. `increment = () => {}`) preserve
-//      the `this` binding — no manual `.bind(this)` needed.
-//   4. We use the callback form of `setState((prev) => ...)`.
-//      This is a small improvement over the original: it avoids
-//      relying on the possibly-stale `this.state.count` when
-//      React batches state updates.
+//      the `this` binding — no manual `.bind(this)` needed in the
+//      constructor.
+//   4. The click handler uses the callback form of
+//      `setState((prev) => ...)`. This is safer than
+//      `setState({ count: this.state.count + 1 })` — React may
+//      batch multiple updates, and the callback form guarantees we
+//      read the freshest value.
+//   5. The `onClick` handler is typed as
+//      `React.MouseEvent<HTMLButtonElement>` — this lets TypeScript
+//      catch mistakes like calling `.value` on the event target.
 // ─────────────────────────────────────────────────────────────
 
-import { Component } from "react";
+import { Component, type MouseEvent } from "react";
 
-interface CounterProps {}
+type CounterProps = Record<string, never>;
 
 interface CounterState {
   count: number;
@@ -31,7 +38,7 @@ class Counter extends Component<CounterProps, CounterState> {
     count: 0,
   };
 
-  increment = (): void => {
+  handleIncrement = (_event: MouseEvent<HTMLButtonElement>): void => {
     this.setState((prev) => ({ count: prev.count + 1 }));
   };
 
@@ -39,7 +46,7 @@ class Counter extends Component<CounterProps, CounterState> {
     return (
       <div>
         <p>Count: {this.state.count}</p>
-        <button onClick={this.increment}>Increment</button>
+        <button onClick={this.handleIncrement}>Increment</button>
       </div>
     );
   }

@@ -81,7 +81,9 @@ class Counter extends Component {
 **After (TypeScript):**
 
 ```tsx
-interface CounterProps {}
+import { Component, type MouseEvent } from "react";
+
+type CounterProps = Record<string, never>;
 interface CounterState {
   count: number;
 }
@@ -89,7 +91,7 @@ interface CounterState {
 class Counter extends Component<CounterProps, CounterState> {
   state: CounterState = { count: 0 };
 
-  increment = (): void => {
+  handleIncrement = (_event: MouseEvent<HTMLButtonElement>): void => {
     this.setState((prev) => ({ count: prev.count + 1 }));
   };
 
@@ -102,9 +104,16 @@ class Counter extends Component<CounterProps, CounterState> {
 - `Component` takes two generic type parameters:
   `Component<Props, State>`. Passing `CounterProps` and `CounterState`
   tells TypeScript what `this.props` and `this.state` look like.
+- `CounterProps` is typed as `Record<string, never>` rather than an
+  empty interface `{}`. An empty interface matches *any* object and
+  effectively disables prop-checking — `Record<string, never>` says
+  "no props allowed" and catches accidental prop passes.
 - Declared `CounterState` so `this.state.count` is a known `number`.
-- Kept `increment` as an arrow class field (so `this` is auto-bound)
-  and added the explicit `: void` return annotation.
+- Kept `handleIncrement` as an arrow class field so `this` is
+  auto-bound — no `.bind(this)` needed in a constructor.
+- The click handler is typed as
+  `MouseEvent<HTMLButtonElement>` — TypeScript now knows the shape
+  of the event object at that call site.
 - Switched to the callback form of `setState((prev) => …)` — safer
   when React batches updates.
 

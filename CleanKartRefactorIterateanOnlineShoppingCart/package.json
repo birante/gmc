@@ -1,0 +1,13 @@
+{
+  "name": "cleankart",
+  "version": "1.0.0",
+  "description": "Iteratively refactor a messy shopping cart into a clean, patterned codebase.",
+  "type": "module",
+  "scripts": {
+    "start": "node final/src/index.js",
+    "messy": "node v0-messy/shop.js",
+    "test":  "node final/tests/run.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

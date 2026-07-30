@@ -1,0 +1,13 @@
+{
+  "name": "lms-core-components-js",
+  "version": "1.0.0",
+  "description": "Library Management System — core components in JS: ES modules, DI, Factory/Strategy/Observer.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node tests/run.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

@@ -1,0 +1,12 @@
+{
+  "name": "checkpoint-recursion",
+  "version": "1.0.0",
+  "description": "Palindrome checker — recursion checkpoint.",
+  "type": "module",
+  "main": "palindrome.js",
+  "scripts": {
+    "start": "node palindrome.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

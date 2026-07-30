@@ -1,0 +1,12 @@
+{
+  "name": "smart-library-management-system",
+  "version": "1.0.0",
+  "description": "OOD checkpoint: library management system using Singleton, Factory and Observer patterns.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

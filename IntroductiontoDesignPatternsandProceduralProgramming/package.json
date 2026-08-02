@@ -1,0 +1,13 @@
+{
+  "name": "intro-design-patterns-procedural",
+  "version": "1.0.0",
+  "description": "Procedural shopping cart in JS, then the same cart refactored with the Module pattern.",
+  "type": "module",
+  "scripts": {
+    "procedural": "node procedural.js",
+    "module":     "node module-pattern.js",
+    "start":      "node module-pattern.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

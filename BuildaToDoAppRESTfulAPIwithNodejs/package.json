@@ -1,0 +1,16 @@
+{
+  "name": "todo-restful-api",
+  "version": "1.0.0",
+  "description": "To-Do CRUD REST API built with Node.js core modules only — no Express, no third-party libs.",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test":  "node tests/smoke.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

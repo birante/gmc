@@ -1,0 +1,17 @@
+{
+  "name": "checkpoint-async-js",
+  "version": "1.0.0",
+  "description": "Async/await patterns in JavaScript — 5 tasks: iteration, awaiting, error handling, chaining, concurrent + parallel calls.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start":  "node src/index.js",
+    "task01": "node src/task01.js",
+    "task02": "node src/task02.js",
+    "task03": "node src/task03.js",
+    "task04": "node src/task04.js",
+    "task05": "node src/task05.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

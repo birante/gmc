@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simple weather app — fetches live weather data from Open-Meteo (no API key required).">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-condition="clear">
+  <main class="app">
+    <header class="app__header">
+      <h1>Weather</h1>
+      <p class="app__subtitle">Type a city name to see live conditions.</p>
+    </header>
+
+    <form class="search" id="searchForm" novalidate>
+      <label class="visually-hidden" for="cityInput">City name</label>
+      <input
+        id="cityInput"
+        type="text"
+        name="city"
+        placeholder="e.g. Dakar, Paris, Tokyo"
+        autocomplete="off"
+        autocapitalize="words"
+        required
+      >
+      <button type="submit" id="searchBtn">Search</button>
+    </form>
+
+    <section id="status" class="status" role="status" aria-live="polite" hidden></section>
+
+    <section id="result" class="result" aria-live="polite" hidden>
+      <h2 id="location" class="result__location"></h2>
+      <p id="timestamp" class="result__timestamp"></p>
+
+      <div class="result__temp">
+        <span id="temperature" class="result__temperature"></span>
+        <span class="result__unit">&deg;C</span>
+      </div>
+
+      <p id="description" class="result__description"></p>
+
+      <ul class="details">
+        <li class="details__item">
+          <span class="details__label">Feels like</span>
+          <span id="feels" class="details__value"></span>
+        </li>
+        <li class="details__item">
+          <span class="details__label">Humidity</span>
+          <span id="humidity" class="details__value"></span>
+        </li>
+        <li class="details__item">
+          <span class="details__label">Wind</span>
+          <span id="wind" class="details__value"></span>
+        </li>
+        <li class="details__item">
+          <span class="details__label">Precipitation</span>
+          <span id="precip" class="details__value"></span>
+        </li>
+      </ul>
+    </section>
+
+    <footer class="app__footer">
+      Data from
+      <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>
+      &middot; no API key required
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

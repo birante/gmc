@@ -1,0 +1,16 @@
+{
+  "name": "first-node-app",
+  "version": "1.0.0",
+  "description": "Node.js checkpoint: built-in (fs), local (reportGenerator), third-party (nodemailer) modules.",
+  "main": "main.js",
+  "scripts": {
+    "task1": "node readFile.js",
+    "task2": "node main.js",
+    "task3": "node emailSender.js"
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.15"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

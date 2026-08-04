@@ -1,0 +1,38 @@
+<%- include('partials/head') %>
+<%- include('partials/nav') %>
+
+<main class="page">
+  <h1>Contact Us</h1>
+  <p class="lead">Drop us a line during working hours &mdash; we usually reply the same day.</p>
+
+  <div class="contact">
+    <section class="contact__details">
+      <h2>Studio</h2>
+      <address>
+        Rue de Thiong 12<br>
+        Dakar, Senegal
+      </address>
+      <p><strong>Email:</strong> <a href="mailto:hello@acme.studio">hello@acme.studio</a></p>
+      <p><strong>Phone:</strong> +221 33 000 00 00</p>
+    </section>
+
+    <form class="contact__form" action="#" method="post" novalidate>
+      <label>
+        Your name
+        <input name="name" type="text" required>
+      </label>
+      <label>
+        Your email
+        <input name="email" type="email" required>
+      </label>
+      <label>
+        How can we help?
+        <textarea name="message" rows="5" required></textarea>
+      </label>
+      <button type="submit">Send</button>
+      <p class="contact__note">This form is a demo &mdash; nothing is actually sent.</p>
+    </form>
+  </div>
+</main>
+
+<%- include('partials/footer') %>

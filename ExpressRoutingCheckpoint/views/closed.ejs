@@ -1,0 +1,15 @@
+<%- include('partials/head') %>
+
+<main class="page page--closed">
+  <h1>We are closed right now</h1>
+  <p class="lead">
+    Acme Studio is only reachable
+    <strong>Monday to Friday, from 09:00 to 17:00</strong>.
+    Please come back during working hours.
+  </p>
+  <% if (currentTime) { %>
+    <p class="muted">Server time: <%= currentTime %></p>
+  <% } %>
+</main>
+
+<%- include('partials/footer') %>

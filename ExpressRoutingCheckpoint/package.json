@@ -1,0 +1,16 @@
+{
+  "name": "express-routing-checkpoint",
+  "version": "1.0.0",
+  "description": "Express app with three routed pages (Home, Services, Contact), an EJS layout, and a working-hours middleware.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev":   "node app.js"
+  },
+  "dependencies": {
+    "ejs":     "^3.1.10",
+    "express": "^4.19.2"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

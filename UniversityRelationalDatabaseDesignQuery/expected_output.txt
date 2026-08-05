@@ -1,0 +1,72 @@
+==> Building schema
+==> Inserting sample data
+==> Running queries
+marker      
+------------
+-- Q1 --    
+student_id    name                  email                   age   
+------------  --------------------  ----------------------  ------
+1             Alice Ba              alice.ba@edu.sn         20    
+2             Bob Ndiaye            bob.ndiaye@edu.sn       22    
+marker      
+------------
+-- Q2 --    
+course_id     title                 credits                 instru
+------------  --------------------  ----------------------  ------
+1             Database Systems      4                       Dr. Fa
+                                                            tou Sa
+                                                            rr    
+
+2             Calculus I            3                       Prof. 
+                                                            Amadou
+                                                             Diop 
+
+3             Quantum Mechanics     5                       Dr. Aw
+                                                            a Fall
+marker      
+------------
+-- Q3 --    
+student_id    name                  email                 
+------------  --------------------  ----------------------
+3             Charlie Sy            charlie.sy@edu.sn     
+marker      
+------------
+-- Q4 (befor
+e) --       
+student_id    name                  email                 
+------------  --------------------  ----------------------
+1             Alice Ba              alice.ba@edu.sn       
+marker      
+------------
+-- Q4 (after
+)  --       
+student_id    name                  email                 
+------------  --------------------  ----------------------
+1             Alice Ba              alice.ba@alumni.edu.sn
+marker      
+------------
+-- Q5 (befor
+e) --       
+course_id     title               
+------------  --------------------
+1             Database Systems    
+2             Calculus I          
+3             Quantum Mechanics   
+marker      
+------------
+-- Q5 (after
+)  --       
+course_id     title               
+------------  --------------------
+1             Database Systems    
+2             Calculus I          
+marker      
+------------
+-- enrollmen
+ts after Q5 
+--          
+student_id    course_id             grade                 
+------------  --------------------  ----------------------
+1             1                     A                     
+1             2                     B                     
+2             1                     B+                    

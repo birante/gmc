@@ -1,0 +1,99 @@
+
+----- 1) All contacts -----
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e95'),
+  lastName: 'Ben',
+  firstName: 'Moris',
+  email: 'ben@gmail.com',
+  age: 26
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e96'),
+  lastName: 'Kefi',
+  firstName: 'Seif',
+  email: 'kefi@gmail.com',
+  age: 15
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e97'),
+  lastName: 'Emilie',
+  firstName: 'brouge',
+  email: 'emilie.b@gmail.com',
+  age: 40
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e98'),
+  lastName: 'Alex',
+  firstName: 'brown',
+  age: 4
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e99'),
+  lastName: 'Denzel',
+  firstName: 'Washington',
+  age: 3
+}
+
+----- 2) One contact by _id -----
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e95'),
+  lastName: 'Ben',
+  firstName: 'Moris',
+  email: 'ben@gmail.com',
+  age: 26
+}
+
+----- 3) Contacts with age > 18 -----
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e95'),
+  lastName: 'Ben',
+  firstName: 'Moris',
+  email: 'ben@gmail.com',
+  age: 26
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e97'),
+  lastName: 'Emilie',
+  firstName: 'brouge',
+  email: 'emilie.b@gmail.com',
+  age: 40
+}
+
+----- 4) Age > 18 AND name contains 'ah' -----
+(no matches)
+
+----- 5) Update Kefi Seif -> Kefi Anis -----
+matched: 1, modified: 1
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e96'),
+  lastName: 'Kefi',
+  firstName: 'Anis',
+  email: 'kefi@gmail.com',
+  age: 15
+}
+
+----- 6) Delete contacts with age < 5 -----
+deleted: 2
+
+----- 7) All contacts (after delete) -----
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e95'),
+  lastName: 'Ben',
+  firstName: 'Moris',
+  email: 'ben@gmail.com',
+  age: 26
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e96'),
+  lastName: 'Kefi',
+  firstName: 'Anis',
+  email: 'kefi@gmail.com',
+  age: 15
+}
+{
+  _id: ObjectId('6a734481a3ecbd5d14083e97'),
+  lastName: 'Emilie',
+  firstName: 'brouge',
+  email: 'emilie.b@gmail.com',
+  age: 40
+}

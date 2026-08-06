@@ -1,0 +1,16 @@
+{
+  "name": "mongoose-nodejs-vs-mongodb",
+  "version": "1.0.0",
+  "description": "Guided Mongoose CRUD exercises against MongoDB Atlas (or any MongoDB).",
+  "main": "myApp.js",
+  "scripts": {
+    "start": "node demo.js",
+    "test":  "node demo.js"
+  },
+  "dependencies": {
+    "dotenv":    "^16.4.5",
+    "mongoose":  "^6.12.9"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

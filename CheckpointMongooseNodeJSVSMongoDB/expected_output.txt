@@ -1,0 +1,15 @@
+(node:70336) [MONGOOSE] DeprecationWarning: Mongoose: the `strictQuery` option will be switched back to `false` by default in Mongoose 7. Use `mongoose.set('strictQuery', false);` if you want to prepare for this change. Or use `mongoose.set('strictQuery', true);` to suppress this warning.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+1) createAndSavePerson -> Alice Diop 6a74fa3ebd52927c5b954af0
+2) createManyPeople   -> inserted 4
+3) findPeopleByName   -> 2 Marys
+4) findOneByFood      -> Alice Diop likes pizza
+5) findPersonById     -> Alice Diop
+6) findEditThenSave   -> Alice Diop now likes pizza, pasta, hamburger
+7) findAndUpdate      -> Bob's age is now 20
+8) removeById         -> removed Alice Diop
+(node:70336) [MONGODB DRIVER] Warning: collection.remove is deprecated. Use deleteOne, deleteMany, or bulkWrite instead.
+9) removeManyPeople   -> deletedCount=2
+10) queryChain        -> 2 result(s)
+    - Bob, age hidden=true
+    - Charlie, age hidden=true

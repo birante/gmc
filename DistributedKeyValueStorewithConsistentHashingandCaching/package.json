@@ -1,0 +1,13 @@
+{
+  "name": "distributed-kv-store",
+  "version": "1.0.0",
+  "description": "In-process simulation of a distributed key-value store using consistent hashing, replication, LRU/TTL caching, and node join/leave/failure semantics.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test":  "node tests/run.js"
+  },
+  "author": "Birante SY",
+  "license": "MIT"
+}

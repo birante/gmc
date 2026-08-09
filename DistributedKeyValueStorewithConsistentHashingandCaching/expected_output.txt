@@ -1,0 +1,71 @@
+
+===== 1) Build a 3-node cluster (replication factor = 2) =====
+nodes: [ 'node-A', 'node-B', 'node-C' ]
+
+===== 2) PUT six users =====
+  put user:101 -> 2 replica(s) on [node-C, node-A]
+  put user:102 -> 2 replica(s) on [node-C, node-A]
+  put user:103 -> 2 replica(s) on [node-A, node-C]
+  put user:104 -> 2 replica(s) on [node-C, node-A]
+  put user:105 -> 2 replica(s) on [node-A, node-C]
+  put user:106 -> 2 replica(s) on [node-C, node-B]
+
+===== 3) GET each user (first pass = misses, second = cache hits) =====
+
+--- first pass — served by node replicas ---
+  get user:101 -> {"name":"Alice"}  [source: node:node-C]
+  get user:102 -> {"name":"Bob"}  [source: node:node-C]
+  get user:103 -> {"name":"Charlie"}  [source: node:node-A]
+  get user:104 -> {"name":"Diana"}  [source: node:node-C]
+  get user:105 -> {"name":"Eve"}  [source: node:node-A]
+  get user:106 -> {"name":"Frank"}  [source: node:node-C]
+
+--- second pass — served by cache ---
+  get user:101 -> [source: cache]
+  get user:102 -> [source: cache]
+  get user:103 -> [source: cache]
+  get user:104 -> [source: cache]
+  get user:105 -> [source: cache]
+  get user:106 -> [source: cache]
+
+cache stats: hits=6 misses=6
+
+===== 4) Add node-D — minimal data movement =====
+before: [{"id":"node-A","alive":true,"keyCount":5},{"id":"node-B","alive":true,"keyCount":1},{"id":"node-C","alive":true,"keyCount":6}]
+after:  [{"id":"node-A","alive":true,"keyCount":3},{"id":"node-B","alive":true,"keyCount":1},{"id":"node-C","alive":true,"keyCount":5},{"id":"node-D","alive":true,"keyCount":3}]
+rebalance ops: 6 (expect ~= (K * R) / N = 3 baseline)
+
+===== 5) Fail node-A — reads should still succeed via replicas =====
+  6 / 6 users still reachable with node-A dead
+
+--- Now also fail node-B (only C and D left) ---
+  user:101 -> ok (via node:node-D)
+  user:102 -> ok (via node:node-C)
+  user:103 -> ok (via node:node-C)
+  user:104 -> ok (via node:node-C)
+  user:105 -> ok (via node:node-D)
+  user:106 -> ok (via node:node-C)
+
+availability report: 6 ok, 0 lost.
+(with rf=2 and vnodes across 4 nodes, 2 failures often still leave a live replica for every key)
+
+--- Contrast — rf=1 would lose keys under the same failure ---
+  rf=1, 2 of 4 nodes down -> 3 of 6 users unavailable (limited availability)
+
+===== 6) Recover node-A + node-B, then decommission node-D gracefully =====
+decommission moved: 6 operations
+nodes now: [ 'node-A', 'node-B', 'node-C' ]
+stats: [{"id":"node-A","alive":true,"keyCount":5},{"id":"node-B","alive":true,"keyCount":1},{"id":"node-C","alive":true,"keyCount":6}]
+
+--- Verify every user is reachable again ---
+  get user:101 -> [source: node:node-C]
+  get user:102 -> [source: node:node-C]
+  get user:103 -> [source: node:node-A]
+  get user:104 -> [source: node:node-C]
+  get user:105 -> [source: node:node-A]
+  get user:106 -> [source: node:node-C]
+
+===== 7) TTL cache demo =====
+ttl.get('user:101') immediate -> {"name":"Alice"}
+ttl.get('user:101') after 120ms -> null
+ttl stats: hits=1 misses=1

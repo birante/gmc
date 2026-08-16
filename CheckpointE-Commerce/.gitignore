@@ -16,6 +16,18 @@ ecom/.kamal/secrets
 ecom/.kamal/secrets.preprod
 ecom/.kamal/secrets*
 
+# Third-party runtime configs that carry API keys / tokens in Yoonema.
+# GitHub push-protection flagged real secrets in these files — keep out.
+ecom/config/active_agent.yml       # contains OpenAI API keys
+
+# Production ops docs that ship real Docker PATs / DB passwords inline.
+# The docs are useful internally but must not be published.
+ecom/docs/DIFF_CONFIG_PRODUCTION.md
+ecom/docs/MODIFICATIONS_PRODUCTION.md
+ecom/docs/README_MODIFICATIONS.md
+ecom/docs/CORRECTIONS_APPLIQUEES.md
+ecom/docs/MIGRATION_PRODUCTION.md
+
 # Env / dotenv variants
 ecom/.env
 ecom/.env.*
@@ -31,6 +43,9 @@ ecom/storage/*
 !ecom/storage/.keep
 ecom/public/uploads/
 ecom/coverage/
+
+# Claude Code — per-machine local settings, not shared config
+ecom/.claude/settings.local.json
 
 # Node
 ecom/node_modules/

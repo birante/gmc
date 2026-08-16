@@ -1,0 +1,7 @@
+<% content_for :title, "Tags" %>
+<h1 class="text-2xl font-semibold mb-6">Tags</h1>
+<div class="flex flex-wrap gap-2">
+  <% @tags.each do |t| %>
+    <%= link_to "##{t.name}", tag_path(t), class: "px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-slate-700 hover:bg-slate-50" %>
+  <% end %>
+</div>

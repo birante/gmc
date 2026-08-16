@@ -1,0 +1,15 @@
+<% content_for :title, "Categories" %>
+<div class="flex items-baseline justify-between mb-6">
+  <h1 class="text-2xl font-semibold">Categories</h1>
+  <% if user_signed_in? && current_user.can_moderate? %>
+    <%= link_to "+ New category", new_category_path, class: "px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-500" %>
+  <% end %>
+</div>
+<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+  <% @categories.each do |c| %>
+    <%= link_to category_path(c), class: "rounded-xl bg-white border border-gray-200 p-5 hover:shadow-md" do %>
+      <div class="font-semibold text-slate-900"><%= c.name %></div>
+      <div class="text-xs text-slate-500 mt-1"><%= c.description || "No description." %></div>
+    <% end %>
+  <% end %>
+</div>

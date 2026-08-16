@@ -1,0 +1,57 @@
+<% content_for :title, "EduCMS — Educational Content Management System" %>
+
+<section class="rounded-2xl bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white p-10 sm:p-14 mb-10 shadow-lg">
+  <p class="uppercase text-xs tracking-widest text-indigo-100 mb-2">EduCMS</p>
+  <h1 class="text-4xl sm:text-5xl font-bold leading-tight tracking-tight">A content management system for educational institutions.</h1>
+  <p class="mt-4 max-w-2xl text-indigo-100 text-lg">Role-based access, drafts and publishing, categories & tags, media, comments and analytics — built on Rails 8.</p>
+  <div class="mt-6 flex flex-wrap gap-3">
+    <%= link_to "Browse posts", posts_path, class: "inline-flex items-center px-4 py-2 rounded-lg bg-white text-indigo-700 font-medium hover:bg-indigo-50" %>
+    <%= link_to "Read the API",  "/api/v1/posts",  class: "inline-flex items-center px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20" %>
+  </div>
+</section>
+
+<% if @featured_posts.any? %>
+<section class="mb-10">
+  <h2 class="text-xl font-semibold mb-4">Featured</h2>
+  <div class="grid gap-6 sm:grid-cols-3">
+    <% @featured_posts.each do |p| %>
+      <%= link_to post_path(p), class: "block rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition" do %>
+        <div class="text-xs text-indigo-600 uppercase tracking-wider mb-1"><%= p.category&.name || "Uncategorised" %></div>
+        <div class="font-semibold text-slate-900 line-clamp-2"><%= p.title %></div>
+        <p class="mt-2 text-sm text-slate-500 line-clamp-3"><%= p.excerpt_or_snippet %></p>
+      <% end %>
+    <% end %>
+  </div>
+</section>
+<% end %>
+
+<section class="mb-10">
+  <div class="flex items-baseline justify-between mb-4">
+    <h2 class="text-xl font-semibold">Latest posts</h2>
+    <%= link_to "See all →", posts_path, class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+  </div>
+  <% if @recent_posts.any? %>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <% @recent_posts.each do |p| %>
+        <%= link_to post_path(p), class: "block rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition" do %>
+          <div class="text-xs text-slate-500 mb-1"><%= p.published_at&.strftime("%b %-d, %Y") %> · <%= p.reading_time %> min read</div>
+          <div class="font-semibold text-slate-900 line-clamp-2"><%= p.title %></div>
+          <p class="mt-2 text-sm text-slate-500 line-clamp-3"><%= p.excerpt_or_snippet %></p>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-slate-500 text-sm">No published posts yet. <%= link_to "Sign in", new_user_session_path, class: "underline" %> to add one.</p>
+  <% end %>
+</section>
+
+<% if @categories.any? %>
+<section>
+  <h2 class="text-xl font-semibold mb-4">Categories</h2>
+  <div class="flex flex-wrap gap-2">
+    <% @categories.each do |c| %>
+      <%= link_to c.name, category_path(c), class: "px-3 py-1.5 rounded-full bg-white border border-gray-200 text-sm text-slate-700 hover:bg-slate-50" %>
+    <% end %>
+  </div>
+</section>
+<% end %>

@@ -1,0 +1,72 @@
+<%= form_with(model: medium, class: "contents") do |form| %>
+  <% if medium.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(medium.errors.count, "error") %> prohibited this medium from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% medium.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :filename %>
+    <%= form.text_field :filename, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:filename].none?, "border-red-400 focus:outline-red-600": medium.errors[:filename].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :original_name %>
+    <%= form.text_field :original_name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:original_name].none?, "border-red-400 focus:outline-red-600": medium.errors[:original_name].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :file_path %>
+    <%= form.text_field :file_path, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:file_path].none?, "border-red-400 focus:outline-red-600": medium.errors[:file_path].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :file_type %>
+    <%= form.text_field :file_type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:file_type].none?, "border-red-400 focus:outline-red-600": medium.errors[:file_type].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :file_size %>
+    <%= form.number_field :file_size, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:file_size].none?, "border-red-400 focus:outline-red-600": medium.errors[:file_size].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :mime_type %>
+    <%= form.text_field :mime_type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:mime_type].none?, "border-red-400 focus:outline-red-600": medium.errors[:mime_type].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :uploaded_by_id %>
+    <%= form.text_field :uploaded_by_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:uploaded_by_id].none?, "border-red-400 focus:outline-red-600": medium.errors[:uploaded_by_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :alt_text %>
+    <%= form.text_field :alt_text, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:alt_text].none?, "border-red-400 focus:outline-red-600": medium.errors[:alt_text].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :caption %>
+    <%= form.textarea :caption, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:caption].none?, "border-red-400 focus:outline-red-600": medium.errors[:caption].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :width %>
+    <%= form.number_field :width, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:width].none?, "border-red-400 focus:outline-red-600": medium.errors[:width].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :height %>
+    <%= form.number_field :height, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": medium.errors[:height].none?, "border-red-400 focus:outline-red-600": medium.errors[:height].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

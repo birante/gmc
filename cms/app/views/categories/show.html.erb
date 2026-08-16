@@ -1,0 +1,16 @@
+<% content_for :title, @category.name %>
+<h1 class="text-2xl font-semibold mb-2"><%= @category.name %></h1>
+<% if @category.description.present? %><p class="text-slate-600 mb-6"><%= @category.description %></p><% end %>
+<% if @posts.any? %>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <% @posts.each do |p| %>
+      <%= link_to post_path(p), class: "block rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md" do %>
+        <div class="font-semibold text-slate-900"><%= p.title %></div>
+        <p class="mt-1 text-sm text-slate-500"><%= p.excerpt_or_snippet(length: 120) %></p>
+      <% end %>
+    <% end %>
+  </div>
+  <div class="mt-6"><%= paginate @posts %></div>
+<% else %>
+  <p class="text-slate-500 text-sm">No posts in this category yet.</p>
+<% end %>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= content_for(:title) || "EduCMS — Educational Content Management System" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-gray-50 text-slate-900">
+    <header class="bg-white border-b border-gray-200">
+      <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+        <%= link_to root_path, class: "flex items-center gap-2 text-lg font-semibold tracking-tight" do %>
+          <span class="inline-block w-8 h-8 rounded-lg bg-indigo-600 text-white grid place-items-center">E</span>
+          EduCMS
+        <% end %>
+        <nav class="hidden sm:flex items-center gap-4 text-sm">
+          <%= link_to "Posts",      posts_path,      class: "text-slate-600 hover:text-slate-900" %>
+          <%= link_to "Categories", categories_path, class: "text-slate-600 hover:text-slate-900" %>
+          <%= link_to "Tags",       tags_path,       class: "text-slate-600 hover:text-slate-900" %>
+          <% if user_signed_in? %>
+            <%= link_to "Dashboard", dashboard_path, class: "text-slate-600 hover:text-slate-900" %>
+            <% if PostPolicy.new(current_user, Post.new).create? %>
+              <%= link_to "New post", new_post_path, class: "text-indigo-600 hover:text-indigo-700 font-medium" %>
+            <% end %>
+            <span class="text-slate-400">|</span>
+            <span class="text-slate-500 text-xs">
+              <%= current_user.full_name %>
+              <span class="inline-block ml-1 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 uppercase text-[10px] tracking-wider"><%= current_user.role %></span>
+            </span>
+            <%= button_to "Sign out", destroy_user_session_path, method: :delete, class: "text-slate-600 hover:text-slate-900 text-sm underline underline-offset-2 bg-transparent border-0 p-0" %>
+          <% else %>
+            <%= link_to "Sign in", new_user_session_path,      class: "text-slate-600 hover:text-slate-900" %>
+            <%= link_to "Sign up", new_user_registration_path, class: "px-3 py-1.5 rounded-md bg-indigo-600 text-white text-sm hover:bg-indigo-500" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <% if notice.present? %>
+      <div class="bg-emerald-50 text-emerald-800 border-b border-emerald-100">
+        <div class="mx-auto max-w-6xl px-4 py-2 text-sm"><%= notice %></div>
+      </div>
+    <% end %>
+    <% if alert.present? %>
+      <div class="bg-red-50 text-red-800 border-b border-red-100">
+        <div class="mx-auto max-w-6xl px-4 py-2 text-sm"><%= alert %></div>
+      </div>
+    <% end %>
+
+    <main class="mx-auto max-w-6xl px-4 py-8">
+      <%= yield %>
+    </main>
+
+    <footer class="mt-16 border-t border-gray-200 bg-white">
+      <div class="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500 flex flex-wrap gap-4 justify-between">
+        <div>EduCMS &middot; A Rails 8 CMS &middot; <%= Time.current.year %></div>
+        <div class="flex gap-3">
+          <%= link_to "API",    "/api/v1/posts",         class: "hover:text-slate-800" %>
+          <%= link_to "Health", rails_health_check_path, class: "hover:text-slate-800" %>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

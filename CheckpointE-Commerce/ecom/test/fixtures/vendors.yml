@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+<% password_digest = BCrypt::Password.create("password") %>
+
+one:
+  first_name: John
+  last_name: Vendor
+  phone_number: "701234568"
+  country_code: SN
+  email: johnvendor@example.com
+  password_digest: <%= password_digest %>
+  status: true
+
+two:
+  first_name: Jane
+  last_name: Vendor
+  phone_number: "5551234568"
+  country_code: US
+  email: janevendor@example.com
+  password_digest: <%= password_digest %>
+  status: true

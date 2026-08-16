@@ -1,0 +1,10 @@
+Bonjour <%= @vendor.first_name.presence || @vendor.email %>,
+
+Votre code de validation est : <%= @code %>
+
+Ce code expire dans <%= distance_of_time_in_words(Time.current, Time.current + Rails.application.config.vendor_otp.ttl_seconds) %>.
+
+Si vous n'avez pas demandé ce code, ignorez cet email.
+
+Merci,
+L'équipe

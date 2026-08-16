@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "aaapps - Espace Employés" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%# Analytics Scripts %>
+    <%= render "shared/analytics" %>
+    <%= render "shared/recaptcha" %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
+  </head>
+  <body class="min-h-screen bg-white">
+    <!-- Header mobile avec navigation -->
+    <div class="md:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-10">
+      <%= link_to root_path, class: "flex items-center text-gray-700 hover:text-[#551694] transition-colors" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span class="text-sm font-medium"><%= t('navigation.back_home') %></span>
+      <% end %>
+    </div>
+    <div class="flex min-h-screen flex-col md:min-h-screen md:flex-row">
+      <!-- Partie gauche (40%) - Contenu statique - Masquée sur mobile -->
+      <div class="hidden p-6 md:block md:w-[40%] md:min-h-screen">
+        <div class="flex flex-col bg-[#551694] rounded-4xl h-full">
+          <!-- Logo -->
+          <div class="mb-4 mt-6 px-6 pb-4">
+            <%= link_to root_path do %>
+              <%= image_tag "logo.svg", alt: "aa", class: "h-6 cursor-pointer hover:opacity-80 transition-opacity" %>
+            <% end %>
+          </div>
+          <!-- Bloc assistance -->
+          <div class="mb-4 px-6">
+            <h3 class="text-lg font-semibold text-white mb-2">Espace Employés</h3>
+            <div class="space-y-1 text-sm text-white">
+              <p class="text-[#D4E0FF]">Connectez-vous pour accéder à votre espace de travail</p>
+            </div>
+            <div class="mt-6 text-white rounded-lg">
+              <h4 class="font-medium mb-2"><%= t('assistance.title') %></h4>
+              <div class="space-y-1 text-sm text-white">
+                <p class="text-[#D4E0FF]"><%= t('assistance.hours') %></p>
+                <p class="underline"><%= t('assistance.phone') %></p>
+                <p class="underline"><%= t('assistance.email') %></p>
+              </div>
+            </div>
+          </div>
+          <!-- Image illustration -->
+          <div class="mb-6 flex justify-center self-end items-end m-0 p-0 w-[85%] h-[350px]">
+            <%= image_tag "registration-frame.svg", alt: "Illustration", class: "max-w-full h-auto w-full" %>
+          </div>
+          <!-- Boutons navigation -->
+          <div class="flex justify-between items-center px-6">
+            <%= link_to root_path, class: "flex items-center text-white text-sm" do %>
+              <svg class="w-4 h-4 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              <%= t('navigation.back_home') %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <!-- Partie droite (60% desktop, 100% mobile) - Contenu dynamique -->
+      <div class="w-full bg-white px-4 py-4 md:flex md:w-[60%] md:items-center md:justify-center md:overflow-y-auto md:px-8 md:py-8">
+        <div class="w-full max-w-2xl mx-auto pb-8 md:pb-10">
+          <%= yield %>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

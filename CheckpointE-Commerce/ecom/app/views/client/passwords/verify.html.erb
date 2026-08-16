@@ -1,0 +1,45 @@
+<%= render "shared/auth/auth_header",
+           title: t('client.passwords.verify.title'),
+           subtitle: t('client.passwords.verify.subtitle'),
+           extra: @masked_phone %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with url: client_verify_password_path, method: :post, local: true, data: { turbo: false } do %>
+    <div class="space-y-5">
+      <div class="flex flex-col items-center text-center" data-controller="otp">
+        <div class="flex w-full max-w-xs items-center justify-center gap-2 sm:gap-3">
+          <% Rails.application.config.user_otp[:length].to_i.times do |i| %>
+            <%= text_field_tag "otp_code_#{i}", nil,
+                autocomplete: "one-time-code",
+                maxlength: 1,
+                pattern: "[0-9]",
+                inputmode: "numeric",
+                data: { otp_target: "input", action: "input->otp#handleInput keydown->otp#handleKeydown paste->otp#handlePaste" },
+                class: "h-11 w-11 sm:h-12 sm:w-12 text-center text-lg font-semibold rounded-md border border-[#E9E9E9] bg-[#F9F9F9] focus:border-[#551694] focus:ring-2 focus:ring-[#551694]/20 focus:outline-none transition-colors" %>
+          <% end %>
+        </div>
+        <p class="mt-2 text-sm text-gray-600">
+          <%= t('client.passwords.verify.no_code') %>
+          <%= link_to t('client.passwords.verify.resend'),
+                      client_new_password_path,
+                      class: "text-[#551694] hover:text-[#451384] font-medium underline focus:outline-none focus-visible:no-underline" %>
+        </p>
+      </div>
+
+      <%= render "shared/auth/auth_alert", type: :notice, message: flash[:notice] %>
+      <%= render "shared/auth/auth_alert", type: :alert, message: flash[:alert] %>
+    </div>
+
+    <div class="mt-6">
+      <%= submit_tag t('client.passwords.verify.submit'),
+                     class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-gray-200 text-center">
+      <p class="text-sm text-gray-600">
+        <%= link_to t('client.passwords.verify.back_to_login'), new_client_session_path,
+                    class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+      </p>
+    </div>
+  <% end %>
+</div>

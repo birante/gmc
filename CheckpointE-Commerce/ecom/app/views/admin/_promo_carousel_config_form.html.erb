@@ -1,0 +1,79 @@
+<%= form_tag admin_promo_carousel_create_path(locale: I18n.locale), method: :post, class: "formtastic promo_carousel_config" do %>
+  <fieldset class="inputs">
+    <legend><span>Activation</span></legend>
+    <ol>
+      <li class="boolean input optional">
+        <%= label_tag 'promo_carousel_config[is_active]', 'Section active', class: 'label' %>
+        <%= check_box_tag 'promo_carousel_config[is_active]', '1', promo_section.is_active %>
+      </li>
+    </ol>
+  </fieldset>
+
+  <fieldset class="inputs">
+    <legend><span>Contenu de la promotion</span></legend>
+    <ol>
+      <li class="string input optional">
+        <%= label_tag 'promo_carousel_config[category_label]', 'Label catégorie (ex: EN PROMO)', class: 'label' %>
+        <%= text_field_tag 'promo_carousel_config[category_label]', settings["category_label"]&.value, placeholder: "EN PROMO" %>
+      </li>
+      <li class="string input optional">
+        <%= label_tag 'promo_carousel_config[title]', 'Titre principal (ex: Black Friday)', class: 'label' %>
+        <%= text_field_tag 'promo_carousel_config[title]', settings["title"]&.value, placeholder: "Black Friday" %>
+      </li>
+      <li class="text input optional">
+        <%= label_tag 'promo_carousel_config[subtitle]', 'Sous-titre / Description', class: 'label' %>
+        <%= text_area_tag 'promo_carousel_config[subtitle]', settings["subtitle"]&.value, placeholder: "Les meilleures offres de l'année", rows: 2 %>
+      </li>
+      <li class="string input optional">
+        <%= label_tag 'promo_carousel_config[discount_text]', 'Texte réduction (ex: Jusqu\'à -50%)', class: 'label' %>
+        <%= text_field_tag 'promo_carousel_config[discount_text]', settings["discount_text"]&.value, placeholder: "Jusqu'à -50%" %>
+      </li>
+      <li class="string input optional">
+        <%= label_tag 'promo_carousel_config[discount_suffix]', 'Suffixe réduction (ex: DE RÉDUCTION)', class: 'label' %>
+        <%= text_field_tag 'promo_carousel_config[discount_suffix]', settings["discount_suffix"]&.value, placeholder: "DE RÉDUCTION" %>
+      </li>
+    </ol>
+  </fieldset>
+
+  <fieldset class="inputs">
+    <legend><span>Countdown</span></legend>
+    <ol>
+      <li class="date input optional">
+        <%= label_tag 'promo_carousel_config[countdown_date]', 'Date de fin du countdown', class: 'label' %>
+        <% current_date = settings["countdown_date"]&.value.presence || (Date.today + 7.days).to_s %>
+        <%= date_field_tag 'promo_carousel_config[countdown_date]', current_date %>
+        <p class="inline-hints">Le countdown affichera le temps restant jusqu'à cette date</p>
+      </li>
+    </ol>
+  </fieldset>
+
+  <fieldset class="inputs">
+    <legend><span>Boutique et Produits</span></legend>
+    <ol>
+      <li class="select input optional">
+        <%= label_tag 'promo_carousel_config[shop_id]', 'Boutique officielle', class: 'label' %>
+        <%= select_tag 'promo_carousel_config[shop_id]', 
+            options_for_select(Shop.official_shops.map { |s| [s.name, s.id] }, current_shop_id > 0 ? current_shop_id : nil),
+            include_blank: "Sélectionner une boutique",
+            class: "select2" %>
+        <p class="inline-hints">Sélectionnez d'abord une boutique, puis choisissez les produits de cette boutique ci-dessous</p>
+      </li>
+      <li class="text input optional">
+        <%= label_tag 'promo_carousel_config[item_ids]', 'IDs des produits (séparés par des virgules)', class: 'label' %>
+        <%= text_area_tag 'promo_carousel_config[item_ids]', current_item_ids.join(", "), placeholder: "123, 456, 789", rows: 2 %>
+        <p class="inline-hints">Entrez les IDs des produits à afficher dans le carousel (ex: 123, 456, 789). Maximum recommandé: 8-12 produits</p>
+      </li>
+    </ol>
+  </fieldset>
+
+  <fieldset class="actions">
+    <ol>
+      <li class="action input_action">
+        <%= submit_tag "Enregistrer la configuration", class: "button primary" %>
+      </li>
+      <li class="cancel">
+        <%= link_to "Annuler", "#", onclick: "window.history.back(); return false;" %>
+      </li>
+    </ol>
+  </fieldset>
+<% end %>

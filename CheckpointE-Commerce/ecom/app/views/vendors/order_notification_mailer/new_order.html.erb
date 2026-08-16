@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Nouvelle commande reçue !</h1>
+    <p>Bonjour <%= @vendor.first_name.presence || @vendor.email %>,</p>
+    <p>Vous avez reçu une nouvelle commande pour votre boutique <strong><%= @shop.name %></strong>.</p>
+    <h2>Détails de la commande</h2>
+    <ul>
+      <li><strong>Numéro de commande :</strong> #<%= @order.order_number %></li>
+      <li><strong>Client :</strong> <%= @client.first_name %> <%= @client.last_name %></li>
+      <li><strong>Date :</strong> <%= @order.created_at.strftime("%d/%m/%Y à %H:%M") %></li>
+      <li><strong>Montant total :</strong> <%= @order_items.sum(&:total_price) %> <%= @order.currency&.symbol || @order.currency&.code %></li>
+    </ul>
+    <h2>Articles commandés</h2>
+    <ul>
+      <% @order_items.each do |item| %>
+        <li>
+          <%= item.item.name %>
+          (<%= item.quantity %> × <%= item.unit_price %> <%= @order.currency&.symbol || @order.currency&.code %>)
+          = <%= item.total_price %> <%= @order.currency&.symbol || @order.currency&.code %>
+        </li>
+      <% end %>
+    </ul>
+    <h2>Adresse de livraison</h2>
+    <p><%= @order.delivery_address %></p>
+    <p>Zone : <%= @order.delivery_zone&.name %></p>
+    <p>Créneau : <%= @order.delivery_slot&.name %></p>
+    <% if @order.notes.present? %>
+      <h2>Notes du client</h2>
+      <p><%= @order.notes %></p>
+    <% end %>
+    <p>
+      <a href="<%= url_for([:vendors, @order]) %>">Voir la commande dans votre tableau de bord</a>
+    </p>
+    <p>Merci,<br/>
+      L'équipe aa</p>
+  </body>
+</html>

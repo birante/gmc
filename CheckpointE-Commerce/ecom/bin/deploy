@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+# Même logique que aaapps : clé SSH + boot Postgres puis deploy
+ssh-add ~/.ssh/id_rsa_do_okemamy 2>/dev/null || true
+
+echo "→ Démarrage de l'accessory Postgres (si besoin)..."
+kamal accessory boot postgres
+echo "→ Attente 15s que Postgres accepte les connexions..."
+sleep 15
+exec kamal deploy "$@"

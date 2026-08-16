@@ -1,0 +1,137 @@
+<%# About Section - Compact %>
+<% primary_color = local_assigns[:primary_color] || "#551694" %>
+<div class="bg-white rounded-2xl p-6 md:p-8 border" style="border-color: <%= primary_color %>15;">
+  <h2 class="text-xl font-bold text-gray-900 mb-4">À propos</h2>
+
+    <%# Main content grid %>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+      <%# Left: Description (2/3) %>
+      <div class="lg:col-span-2 space-y-3">
+        <%# About card %>
+        <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all" style="border: 2px solid <%= primary_color %>1a;">
+          <h3 class="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+            <svg class="w-6 h-6" style="color: <%= primary_color %>;" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+            </svg>
+            Notre histoire
+          </h3>
+          <p class="text-gray-700 leading-relaxed text-sm mb-3">
+            <%= shop.description.present? ? shop.description : "Une boutique dédiée à la qualité et au service client. Nous vous proposons une sélection rigoureuse de produits pour garantir votre satisfaction." %>
+          </p>
+          <p class="text-gray-600 leading-relaxed text-sm">
+            Depuis nos débuts, nous nous engageons à offrir les meilleurs produits avec un service client exceptionnel. Chaque commande est traitée avec soin et attention.
+          </p>
+        </div>
+
+        <%# Mission & Values %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="rounded-lg p-4 shadow-sm hover:shadow-md transition-all" style="background-color: <%= primary_color %>08; border: 2px solid <%= primary_color %>20;">
+            <div class="w-9 h-9 text-white rounded-lg flex items-center justify-center mb-2 text-lg" style="background-color: <%= primary_color %>;">
+              🎯
+            </div>
+            <h4 class="font-semibold text-gray-900 mb-2">Notre mission</h4>
+            <p class="text-sm text-gray-700">Offrir les meilleurs produits au meilleur prix avec un service impeccable.</p>
+          </div>
+          <div class="rounded-lg p-4 shadow-sm hover:shadow-md transition-all bg-gradient-to-br from-green-50 to-green-50" style="border: 2px solid <%= primary_color %>30;">
+            <div class="w-9 h-9 text-white rounded-lg flex items-center justify-center mb-2 text-lg bg-green-600">
+              ✨
+            </div>
+            <h4 class="font-semibold text-gray-900 mb-2">Nos valeurs</h4>
+            <p class="text-sm text-gray-700">Qualité, transparence, intégrité et engagement envers nos clients.</p>
+          </div>
+        </div>
+      </div>
+
+      <%# Right: Quick info cards (1/3) %>
+      <div class="space-y-3">
+        <%# Verification badge %>
+        <div class="rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all bg-gradient-to-br from-green-50 to-green-50" style="border: 2px solid <%= primary_color %>25;">
+          <div class="w-10 h-10 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-base bg-green-600">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          </div>
+          <h4 class="font-semibold text-gray-900 mb-1">Vérifiée</h4>
+          <p class="text-sm text-gray-600">Boutique officielle certifiée</p>
+        </div>
+
+        <%# Operating hours %>
+        <div class="rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all bg-gradient-to-br from-blue-50 to-blue-50" style="border: 2px solid <%= primary_color %>20;">
+          <div class="w-10 h-10 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-base bg-blue-600">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd"/></svg>
+          </div>
+          <h4 class="font-semibold text-gray-900 mb-1">Ouvert</h4>
+          <p class="text-sm text-gray-600">Lun à Dim: 8h - 20h</p>
+        </div>
+
+        <%# Products count %>
+        <div class="rounded-lg p-4 text-center shadow-sm hover:shadow-md transition-all" style="background-color: <%= primary_color %>08; border: 2px solid <%= primary_color %>25;">
+          <div class="w-10 h-10 text-white rounded-full flex items-center justify-center mx-auto mb-2 text-base font-bold" style="background-color: <%= primary_color %>;">
+            <%= shop.available_items_count %>
+          </div>
+          <h4 class="font-semibold text-gray-900 mb-1">Produits</h4>
+          <p class="text-sm text-gray-600">Disponibles en stock</p>
+        </div>
+      </div>
+    </div>
+
+    <%# Contact & other info %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <%# Address %>
+      <% if shop.address.present? %>
+        <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all" style="border: 2px solid <%= primary_color %>15;">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center flex-shrink-0" style="background-color: #fee2e2; color: #dc2626;">
+              📍
+            </div>
+            <div class="min-w-0">
+              <h4 class="font-semibold text-gray-900 mb-1">Localisation</h4>
+              <p class="text-sm text-gray-600 leading-relaxed"><%= shop.address %></p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Phone %>
+      <% if shop.contacts.any? && shop.contacts.first.phone_number.present? %>
+        <% contact = shop.contacts.first %>
+        <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all" style="border: 2px solid <%= primary_color %>15;">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center flex-shrink-0" style="background-color: <%= primary_color %>15; color: <%= primary_color %>;">
+              📞
+            </div>
+            <div class="min-w-0">
+              <h4 class="font-semibold text-gray-900 mb-1">Contactez-nous</h4>
+              <a href="tel:+<%= contact.country_code %><%= contact.phone_number %>" class="text-sm font-semibold transition-colors hover:underline" style="color: <%= primary_color %>;"> +<%= contact.country_code %>  <%= contact.phone_number %></a>
+              <p class="text-xs text-gray-500 mt-1">24h/24, 7j/7</p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Categories %>
+      <% if shop.sectors.any? %>
+        <div class="bg-white rounded-lg p-4 shadow-sm hover:shadow-md transition-all" style="border: 2px solid <%= primary_color %>15;">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full text-lg flex items-center justify-center flex-shrink-0" style="background-color: #fef3c7; color: #f59e0b;">
+              🏷️
+            </div>
+            <div class="min-w-0 flex-1">
+              <h4 class="font-semibold text-gray-900 mb-2">Nos secteurs</h4>
+              <div class="flex flex-wrap gap-2">
+                <% shop.sectors.first(2).each do |sector| %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" style="background-color: <%= primary_color %>15; color: <%= primary_color %>;">
+                    <%= sector.name %>
+                  </span>
+                <% end %>
+                <% if shop.sectors.count > 2 %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    +<%= shop.sectors.count - 2 %>
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

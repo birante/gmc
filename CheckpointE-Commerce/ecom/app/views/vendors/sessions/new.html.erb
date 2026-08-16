@@ -1,0 +1,37 @@
+<%= render "shared/auth/auth_header", title: t('.title'), subtitle: t('.subtitle') %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with url: vendors_session_path, method: :post, local: true, data: { turbo: false } do |f| %>
+    <%= render "shared/auth/auth_alert", type: :alert, message: flash[:alert] %>
+    <%= render "shared/auth/auth_alert", type: :notice, message: flash[:notice] %>
+
+    <div class="space-y-5">
+      <%= render "shared/phone_field", form: f, label_text: t('.phone_number'), placeholder: t('.placeholders.phone_number'), show_label: true, required: true, autocomplete_value: "tel" %>
+      <%= render "shared/password_field", form: f, field_name: :password, label_text: t('.password'), placeholder: t('.placeholders.password'), autocomplete_value: "current-password", required: true %>
+    </div>
+
+    <div class="mt-6">
+      <%= f.submit t('.submit'), class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-gray-200 text-center space-y-3">
+      <p class="text-sm text-gray-600">
+        <%= link_to t('.forgot_password'), new_vendors_password_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+      </p>
+      <p class="text-sm text-gray-600">
+        <%= t('.no_account') %>
+        <%= link_to t('.signup'), new_vendors_registration_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+      </p>
+      <div class="pt-2 border-t border-gray-100">
+        <p class="text-sm text-gray-500">
+          <%= t('.client_space_prompt') %>
+          <%= link_to t('.client_space_link'), new_client_session_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+        </p>
+        <p class="text-sm text-gray-500 mt-2">
+          <%= t('.employee_space_prompt') %>
+          <%= link_to t('.employee_space_link'), new_employees_session_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>

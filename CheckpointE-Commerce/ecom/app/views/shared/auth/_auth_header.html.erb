@@ -1,0 +1,13 @@
+<%# En-tête commun auth : logo, titre, sous-titre — typo et espacement normalisés %>
+<div class="mb-8 flex flex-col items-center justify-center text-center">
+  <%= link_to root_path, class: "block mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 rounded" do %>
+    <%= image_tag "logo-2.svg", alt: "aa", class: "h-[24px] md:h-[26px] w-auto cursor-pointer hover:opacity-80 transition-opacity", loading: "eager", fetchpriority: "high", decoding: "async", width: 96, height: 26 %>
+  <% end %>
+  <h1 class="px-4 text-2xl font-bold text-gray-900 break-words"><%= title %></h1>
+  <% if subtitle.present? %>
+    <p class="mt-1 max-w-sm px-4 text-sm text-gray-600 break-words"><%= subtitle %></p>
+  <% end %>
+  <% if local_assigns[:extra].present? %>
+    <p class="mt-2 px-4 text-sm font-semibold text-gray-800 break-all"><%= extra %></p>
+  <% end %>
+</div>

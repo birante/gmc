@@ -1,0 +1,48 @@
+<%# Shop Banners - Bannières de la boutique avec style similaire à la page d'accueil %>
+<% if shop.shop_banners.any? %>
+  <section class="container mx-auto px-4 lg:px-[50px] py-6 md:py-8" aria-labelledby="shop-banners-heading">
+    <h2 id="shop-banners-heading" class="sr-only"><%= t('shops.banners.title', default: 'Bannières promotionnelles de la boutique') %></h2>
+    
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3.5" role="list">
+      <% shop.shop_banners.order(:position).each do |banner| %>
+        <article class="relative h-[140px] sm:h-[180px] lg:h-[215px] rounded-lg overflow-hidden group" role="listitem">
+          <% if banner.image.attached? %>
+            <%= storage_image_tag(banner.image,
+                variant_name: :banner,
+                alt: banner.title || "",
+                role: "presentation",
+                class: "absolute inset-0 w-full h-full object-cover",
+                width: 300,
+                height: 215) %>
+          <% else %>
+            <div class="absolute inset-0 w-full h-full" style="background: linear-gradient(135deg, <%= shop.primary_color || '#551694' %> 0%, <%= shop.secondary_color || '#8B5CF6' %> 100%);"></div>
+          <% end %>
+          
+          <!-- Content -->
+          <div class="relative h-full p-3 sm:p-4 lg:p-5 flex flex-col justify-between">
+            <% if banner.title.present? %>
+              <div>
+                <h3 class="text-white font-semibold text-sm sm:text-base lg:text-xl leading-tight tracking-tight max-w-[100px] sm:max-w-[130px] lg:max-w-[150px]">
+                  <%= banner.title %>
+                </h3>
+              </div>
+            <% end %>
+            
+            <% if banner.cta_text.present? && banner.cta_link.present? %>
+              <div>
+                <%= link_to banner.cta_link, 
+                    class: "inline-flex items-center gap-1 sm:gap-2 bg-white border border-gray-200 text-[#212529] font-bold text-[10px] sm:text-xs px-2 sm:px-3.5 py-1.5 sm:py-2.5 rounded-full hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2",
+                    "aria-label": banner.title || banner.cta_text do %>
+                  <span><%= banner.cta_text %></span>
+                  <svg class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rotate-180" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  </section>
+<% end %>

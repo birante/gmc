@@ -1,0 +1,21 @@
+<% content_for :active_tab, 'dashboard' %>
+
+<%# Catalogue : URLs employees_* (parcours complet dans le portail collaborateur).
+    Boutons CRUD produit affichés uniquement si can_manage_items?.
+    Gestion des collaborateurs : pas d'équivalent côté employee → liens vendor (la
+    branche est gardée par can_manage_employees_buttons = false pour la création). %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/dashboards/show",
+        items_index_path:       url_with_shop(employees_items_path, @current_shop),
+        item_path_for:          ->(item)  { url_with_shop(employees_item_path(item), @current_shop) },
+        orders_index_path_for:  ->()      { employees_orders_path(shop_id: @current_shop&.id) },
+        order_path_for:         ->(order) { employees_order_path(order, shop_id: @current_shop&.id) },
+        employees_index_path:   vendors_employees_path,
+        new_employee_path:      new_vendors_employee_path,
+        finances_path_for:      ->()      { url_with_shop(employees_finances_path, @current_shop) },
+        can_manage_items_buttons:     current_employee.can_manage_items?,
+        can_manage_employees_buttons: current_employee.can_manage_employees? %>
+  </main>
+</div>

@@ -1,0 +1,23 @@
+<% cart = current_cart_readonly %>
+<button type="button"
+        onclick="document.dispatchEvent(new CustomEvent('cart-sheet:open'))"
+        class="relative flex items-center gap-2 md:gap-3 cursor-pointer border-none bg-transparent p-0">
+  <div class="flex items-center gap-2 md:gap-3">
+    <div class="relative w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#EBEEF6] flex items-center justify-center transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 md:w-6 md:h-6" viewBox="0 0 14 14"><g fill="none" fill-rule="evenodd" clip-rule="evenodd"><path class="fill-[#55169430]" d="M4.251.753a.75.75 0 0 0-.746-.675H1.177a.75.75 0 1 0 0 1.5h1.65l.251 2.506l.002.052l.483 4.795a1.43 1.43 0 0 0 1.431 1.241h5.851a1.43 1.43 0 0 0 1.417-.973v-.002l1.239-3.724v-.001a1.43 1.43 0 0 0-.199-1.286a1.43 1.43 0 0 0-1.217-.6h-7.55z"/><path class="fill-[#551694]" d="M10.654 11.644a1.178 1.178 0 1 1 0 2.356a1.178 1.178 0 0 1 0-2.356m-5.146 0a1.178 1.178 0 1 1 0 2.356a1.178 1.178 0 0 1 0-2.356M10.248 7a.625.625 0 0 0-.624-.625H7a.625.625 0 0 0 0 1.25h2.624c.345 0 .624-.28.624-.625"/></g></svg>
+      <div class="absolute -bottom-1 -right-1 bg-red-500 text-white text-[10px] md:text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center font-bold">
+        <%= cart_items_count(cart) %>
+      </div>
+    </div>
+    <div class="flex flex-col">
+      <span class="text-[10px] md:text-xs text-[#666666] uppercase leading-none"><%= t('navigation.cart') %></span>
+      <p class="text-[#3F4254] font-bold uppercase p-0 m-0 text-[11px] md:text-sm leading-tight">
+        <% if cart && cart_items_count(cart) > 0 %>
+          <%= format_cart_amount(cart) %>
+        <% else %>
+          <span class="font-bold text-black">0 FCFA</span>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</button>

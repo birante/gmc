@@ -1,0 +1,23 @@
+<footer class="bg-white border-t border-gray-200 mt-auto">
+  <div class="px-4 sm:px-6 lg:px-12 xl:px-28 py-4">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs sm:text-sm">
+      <!-- Partie gauche : Copyright -->
+      <div class="text-gray-600 text-center sm:text-left">
+        <%= t('footer.copyright') %>
+        <span class="mx-2 hidden sm:inline">|</span>
+        <br class="sm:hidden" />
+        <%= link_to t('footer.terms'), terms_path, class: "hover:text-[#551694] transition-colors underline sm:no-underline" %>
+      </div>
+      
+      <!-- Partie droite : Support et statut -->
+      <div class="flex items-center gap-4">
+        <%= link_to t('footer.support'), "#", class: "text-gray-600 hover:text-[#551694] transition-colors font-medium" %>
+        <div class="flex items-center gap-1.5 bg-[#ECFFF5] px-2 py-1 rounded-md">
+          <span class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
+          <span class="text-green-600 font-medium rounded-md"><%= t('footer.online') %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+

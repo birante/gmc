@@ -1,0 +1,61 @@
+en:
+  seo:
+    site_name: "aa"
+    default_title: "E-commerce marketplace in Senegal - aa"
+    default_description: "aa, the Senegalese marketplace: local shops, official brands, fast delivery in Dakar and across Senegal."
+    default_keywords: "senegal e-commerce, dakar shops, local products, made in senegal, dakar delivery, senegal marketplace"
+    organization_description: "E-commerce marketplace in Senegal - Local shops and official brands"
+
+    home:
+      title: "E-commerce marketplace in Senegal - aa"
+      description: "aa, the #1 marketplace in Senegal: 1000+ products, local shops and official brands (Samsung, Hisense). Fast delivery in Dakar, secure payment."
+      keywords: "aa, senegal e-commerce, dakar marketplace, local shops, made in senegal, samsung senegal, dakar delivery"
+
+    shops:
+      index:
+        title: "Local shops & official brands - aa"
+        description: "Discover all aa partner shops: official brands and local Senegalese shops. Find your favorite products."
+      show:
+        title: "%{shop_name} - Online shop on aa"
+        description: "Discover all %{shop_name} products on aa. %{count} products available. Fast delivery in Senegal."
+      official:
+        title: "Official brands - aa"
+        description: "Shop with confidence from official partner brands on aa: Samsung, Hisense and more."
+      local:
+        title: "Local Senegalese shops - aa"
+        description: "Support local businesses! Discover Senegalese partner shops on aa. Made in Senegal."
+
+    items:
+      index:
+        title: "All products - aa"
+        description: "Browse our catalog: electronics, fashion, home and more. Fast delivery in Dakar."
+      show:
+        title: "%{item_name} - aa"
+        description: "%{item_description}"
+
+    categories:
+      title: "%{category_name} - aa"
+      description: "Discover all products in the %{category_name} category on aa. Fast delivery in Senegal."
+      products_count:
+        one: "%{count} product"
+        other: "%{count} products"
+    
+    terms:
+      title: "Terms of Use | aa"
+      description: "View the general terms of use for the aa marketplace."
+    
+    privacy:
+      title: "Privacy Policy | aa"
+      description: "Learn how aa protects your personal data and respects your privacy."
+
+  accessibility:
+    skip_to_content: "Skip to main content"
+    breadcrumb: "Breadcrumb"
+    home_content: "aa homepage content"
+    
+  breadcrumbs:
+    home: "Home"
+    shops: "Shops"
+    items: "Products"
+    categories: "Categories"
+

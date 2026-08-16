@@ -1,0 +1,23 @@
+one:
+  user: one
+  delivery_zone: one
+  delivery_slot: one
+  currency: usd
+  status: pending
+  total_amount: 10000.00
+  delivery_fee: 1500.00
+  final_amount: 11500.00
+  delivery_address: "123 Test Street, Test City"
+  notes: "Test order"
+
+two:
+  user: john
+  delivery_zone: two
+  delivery_slot: two
+  currency: usd
+  status: processing
+  total_amount: 5000.00
+  delivery_fee: 2000.00
+  final_amount: 7000.00
+  delivery_address: "456 Example Ave, Example City"
+  notes: "Another test order"

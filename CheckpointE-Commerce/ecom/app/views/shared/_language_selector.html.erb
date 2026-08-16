@@ -1,0 +1,58 @@
+<%
+  available_locales = [
+    { code: :fr, name: 'Français', flag: '🇫🇷', short: 'FR' },
+    { code: :en, name: 'English', flag: '🇬🇧', short: 'EN' }
+  ]
+  
+  current_locale_data = available_locales.find { |l| l[:code] == I18n.locale } || available_locales.first
+  
+  # Style variant: 'default' ou 'utility-bar' (pour la barre utilitaire)
+  variant = local_assigns[:variant] || 'default'
+  
+  # Préserver les paramètres de l'URL actuelle sauf locale
+  current_params = request.query_parameters.except(:locale)
+%>
+
+<div class="relative" data-controller="dropdown">
+  <% if variant == 'utility-bar' %>
+    <%# Style pour la barre utilitaire (design Figma) %>
+    <%= button_tag type: 'button',
+        data: { action: 'click->dropdown#toggle' },
+        class: "bg-[rgba(219,223,233,0.32)] border border-[rgba(228,231,233,0.9)] rounded-full px-3 py-[3px] flex items-center gap-1.5 cursor-pointer hover:bg-[rgba(219,223,233,0.5)] transition-colors" do %>
+      <span class="text-[#4B5675] font-medium text-xs"><%= current_locale_data[:short] %></span>
+      <svg class="w-[9px] h-[7px] text-[#4B5675]" viewBox="0 0 9 7" fill="currentColor">
+        <path d="M4.5 7L0 0h9L4.5 7z"/>
+      </svg>
+    <% end %>
+  <% else %>
+    <%# Style par défaut %>
+  <%= button_tag type: 'button',
+      data: { action: 'click->dropdown#toggle' },
+      class: "flex items-center gap-1 cursor-pointer text-gray-700 hover:text-[#551694]" do %>
+    <span><%= current_locale_data[:short] %></span>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+    <% end %>
+  <% end %>
+  
+  <div data-dropdown-target="menu" 
+       class="hidden absolute left-0 mt-2 w-40 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden">
+    <% available_locales.each do |locale_data| %>
+      <% 
+        # Construire l'URL avec la nouvelle locale et les paramètres préservés
+        locale_path = url_for(locale: locale_data[:code], params: current_params)
+      %>
+      <%= link_to locale_path,
+          class: "flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors #{I18n.locale == locale_data[:code] ? 'bg-[#551694]/5 text-[#551694] font-medium' : 'text-gray-700'}" do %>
+        <span class="text-base"><%= locale_data[:flag] %></span>
+        <span><%= locale_data[:name] %></span>
+        <% if I18n.locale == locale_data[:code] %>
+          <svg class="w-4 h-4 ml-auto text-[#551694]" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

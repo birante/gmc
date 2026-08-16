@@ -1,0 +1,4 @@
+<%# Section Produits - Cœur de la page (toujours présente, gérée par le controller) %>
+<section id="products-section" class="scroll-mt-20 pt-8">
+  <%= render "shops/products_section", items: local_assigns[:items] || @items, primary_color: (local_assigns[:primary_color] || shop_primary_color(shop)) %>
+</section>

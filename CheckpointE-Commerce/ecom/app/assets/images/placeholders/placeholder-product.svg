@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <rect width="400" height="400" fill="#e3e3ec" rx="10"/>
+  <rect x="20" y="20" width="360" height="360" fill="url(#grad-product)" rx="8"/>
+  <path stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="M160 140l39.2-39.2a4 4 0 015.6 0L244 140m-2-2l7.6-7.6a4 4 0 015.6 0L268 138m-24 24h.01M88 252h176a4 4 0 004-4V88a4 4 0 00-4-4H88a4 4 0 00-4 4v176a4 4 0 004 4z"/>
+  <defs>
+    <linearGradient id="grad-product" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f3f4f6"/>
+      <stop offset="100%" style="stop-color:#e5e7eb"/>
+    </linearGradient>
+  </defs>
+</svg>

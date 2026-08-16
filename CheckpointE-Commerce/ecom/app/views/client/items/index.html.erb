@@ -1,0 +1,351 @@
+<%# Page de catégorie avec sidebar de filtres et grille de produits %>
+<div class="container mx-auto px-4 lg:px-[50px] py-6 md:py-8">
+  <!-- Section Top Categories (always visible, choose sub_categories if present otherwise top categories) -->
+  <div class="mb-6 md:mb-8">
+    <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Top Categories</h2>
+    <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
+      <% cats = (@sub_categories.present? && @sub_categories.any?) ? @sub_categories : @top_categories %>
+      <% if cats.present? %>
+        <% cats.limit(8).each do |sub_cat| %>
+          <%= link_to client_items_path(category_id: @category&.id, sub_category_id: (sub_cat.respond_to?(:id) ? sub_cat.id : nil)), 
+              class: "flex-shrink-0 flex flex-col items-center gap-2 w-[120px] text-center group" do %>
+            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-[#551694]/10 transition-colors overflow-hidden">
+              <% if sub_cat.respond_to?(:icon) && sub_cat.icon.attached? %>
+                <%= storage_image_tag(sub_cat.icon, variant_name: :icon, alt: sub_cat.name, class: "w-12 h-12 object-contain group-hover:scale-110 transition-transform duration-300", width: 48, height: 48) %>
+              <% else %>
+                <svg class="w-10 h-10 text-gray-400 group-hover:text-[#551694] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              <% end %>
+            </div>
+            <span class="text-xs font-medium text-gray-700 group-hover:text-[#551694] transition-colors line-clamp-2"><%= sub_cat.name %></span>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Promo + Featured row -->
+  <div class="mb-6 md:mb-8">
+    <%# Bannières EnPromo et DÉPÉCHEZ-VOUS temporairement masquées %>
+    <div class="col-span-1">
+      <div class="bg-white rounded-lg p-4 border border-gray-100">
+        <h3 class="text-lg font-semibold mb-4">Nouveautés & En promotion</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <% @featured_items&.each do |item| %>
+            <% variant = item.default_variant || item.variants.first %>
+            <% next unless variant %>
+            <div class="bg-white rounded-lg border border-gray-200 p-3 flex flex-col items-start">
+              <%= link_to client_item_path(item), class: "w-full" do %>
+                <div class="h-28 w-full bg-[#e3e3ec] flex items-center justify-center mb-2 overflow-hidden">
+                  <% if item.has_image? %>
+                    <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-contain p-1", width: 400, height: 400) %>
+                  <% else %>
+                    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  <% end %>
+                </div>
+                <div class="text-sm font-medium text-gray-800 line-clamp-2"><%= item.name %></div>
+                <div class="text-sm text-gray-600"><%= number_to_currency(current_price_for(variant), unit: item.currency.symbol, precision: 0) %></div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouton Filtrer (mobile uniquement) -->
+  <div class="lg:hidden mb-4">
+    <button type="button"
+            id="mobile-filter-btn"
+            onclick="document.getElementById('filter-sidebar').classList.toggle('hidden')"
+            class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:border-[#551694] hover:text-[#551694] transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+      </svg>
+      Filtrer les articles
+    </button>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Sidebar filters (left column) -->
+    <aside id="filter-sidebar" class="hidden lg:block lg:w-80 flex-shrink-0">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:sticky lg:top-8">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-gray-900">Filtrer les articles</h2>
+          <button type="button"
+                  class="lg:hidden p-1 text-gray-400 hover:text-gray-600"
+                  onclick="document.getElementById('filter-sidebar').classList.add('hidden')"
+                  aria-label="Fermer les filtres">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <%= form_with url: client_items_path, method: :get, local: true, class: "space-y-6" do |form| %>
+          <%= form.hidden_field :category_id, value: params[:category_id] if params[:category_id].present? %>
+          <%= form.hidden_field :sub_category_id, value: params[:sub_category_id] if params[:sub_category_id].present? %>
+          
+          <!-- Filtre par marque -->
+          <% if @shops.present? %>
+            <div class="border-b border-gray-200 pb-4">
+              <details class="group" open>
+                <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+                  <span>Marque</span>
+                  <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                  </svg>
+                </summary>
+                <div class="space-y-2 mt-2 max-h-60 overflow-y-auto">
+                  <% @shops.each do |shop| %>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:text-[#551694]">
+                      <%= check_box_tag "shop_ids[]", shop.id, params[:shop_ids]&.include?(shop.id.to_s), class: "rounded border-gray-300 text-[#551694] focus:ring-[#551694]" %>
+                      <span><%= shop.name %></span>
+                      <span class="text-gray-400 text-xs">(<%= shop.available_items_count %>)</span>
+                    </label>
+                  <% end %>
+                </div>
+              </details>
+            </div>
+          <% end %>
+
+          <!-- Filtre par taille d'écran (pour TV & Vidéo) -->
+          <% if @category&.name&.include?("TV") || @category&.name&.include?("Vidéo") %>
+            <div class="border-b border-gray-200 pb-4">
+              <details class="group" open>
+                <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+                  <span>Taille d'écran</span>
+                  <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                  </svg>
+                </summary>
+                <div class="space-y-2 mt-2">
+                  <% ["32 Pouces", "40 Pouces", "43 Pouces", "50 Pouces", "55 Pouces", "65 Pouces"].each do |size| %>
+                    <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:text-[#551694]">
+                      <%= check_box_tag "sizes[]", size, params[:sizes]&.include?(size), class: "rounded border-gray-300 text-[#551694] focus:ring-[#551694]" %>
+                      <span><%= size %></span>
+                    </label>
+                  <% end %>
+                  <a href="#" class="text-xs text-[#551694] hover:underline">Afficher plus</a>
+                </div>
+              </details>
+            </div>
+          <% end %>
+
+          <!-- Filtre par intervalle de prix -->
+          <div class="border-b border-gray-200 pb-4">
+            <details class="group" open>
+              <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+                <span>Intervalle de prix</span>
+                <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+              </summary>
+              <div class="space-y-3 mt-2">
+                <div>
+                  <%= form.label :min_price, "Minimum", class: "block text-xs text-gray-600 mb-1" %>
+                  <%= form.number_field :min_price, value: params[:min_price], placeholder: "0 FCFA", class: "w-full rounded-lg border-gray-300 text-sm py-2 px-3 focus:border-[#551694] focus:ring-[#551694]" %>
+                </div>
+                <div>
+                  <%= form.label :max_price, "Maximum", class: "block text-xs text-gray-600 mb-1" %>
+                  <%= form.number_field :max_price, value: params[:max_price], placeholder: "500.000 FCFA", class: "w-full rounded-lg border-gray-300 text-sm py-2 px-3 focus:border-[#551694] focus:ring-[#551694]" %>
+                </div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Filtre par avis (placeholder pour l'instant) -->
+          <div class="border-b border-gray-200 pb-4">
+            <details class="group" open>
+              <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+                <span>Avis</span>
+                <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+              </summary>
+              <div class="space-y-2 mt-2">
+                <% [5, 4, 3, 2, 1].each do |rating| %>
+                  <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:text-[#551694]">
+                    <%= radio_button_tag "min_rating", rating, params[:min_rating] == rating.to_s, class: "border-gray-300 text-[#551694] focus:ring-[#551694]" %>
+                    <div class="flex items-center gap-1">
+                      <% rating.times do %>
+                        <svg class="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                        </svg>
+                      <% end %>
+                      <% (5 - rating).times do %>
+                        <svg class="w-4 h-4 text-gray-300" viewBox="0 0 20 20">
+                          <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+                        </svg>
+                      <% end %>
+                    </div>
+                    <span class="text-gray-400 text-xs">et plus</span>
+                  </label>
+                <% end %>
+              </div>
+            </details>
+            </div>
+
+          <!-- Boutons d'action -->
+          <div class="flex gap-2 pt-4">
+            <%= form.submit "FILTRER", class: "flex-1 bg-[#551694] text-white px-4 py-2 rounded-lg hover:bg-[#451384] transition-colors text-sm font-medium" %>
+            <%= link_to "RÉINITIALISER", client_items_path(category_id: params[:category_id], sub_category_id: params[:sub_category_id]), class: "flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium text-center" %>
+          </div>
+        <% end %>
+      </div>
+    </aside>
+
+    <!-- Contenu principal (droite) -->
+    <div class="flex-1 min-w-0">
+      <!-- En-tête avec titre et tri -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
+          <%= @category&.name || @sub_category&.name || "Tous les produits" %>
+        </h1>
+        
+        <div class="flex items-center gap-3">
+          <label for="sort" class="text-sm text-gray-600">Trier par:</label>
+          <%= form_with url: client_items_path, method: :get, local: true, class: "inline-block" do |form| %>
+            <%= form.hidden_field :category_id, value: params[:category_id] if params[:category_id].present? %>
+            <%= form.hidden_field :sub_category_id, value: params[:sub_category_id] if params[:sub_category_id].present? %>
+            <% if params[:shop_ids].present? %>
+              <% params[:shop_ids].each do |shop_id| %>
+                <%= hidden_field_tag "shop_ids[]", shop_id %>
+              <% end %>
+            <% end %>
+            <%= form.hidden_field :min_price, value: params[:min_price] if params[:min_price].present? %>
+            <%= form.hidden_field :max_price, value: params[:max_price] if params[:max_price].present? %>
+            <%= form.select :sort, 
+                options_for_select([
+                  ["Les plus pertinents", "relevance"],
+                  ["Prix croissant", "price_asc"],
+                  ["Prix décroissant", "price_desc"],
+                  ["Nouveautés", "newest"],
+                  ["Meilleures ventes", "bestsellers"]
+                ], params[:sort] || "relevance"),
+                {},
+                { 
+                  id: "sort",
+                  class: "rounded-lg border-gray-300 text-sm py-2 px-3 focus:border-[#551694] focus:ring-[#551694]",
+                  onchange: "this.form.submit()"
+                } %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Grille de produits -->
+      <% if @items.present? %>
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+          <% @items.each do |item| %>
+            <% variant = item.default_variant || item.variants.first %>
+            <% next unless variant %>
+            
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col group">
+              <%= link_to client_item_path(item), class: "block flex-1" do %>
+                <!-- Image produit -->
+                <div class="relative h-36 sm:h-48 bg-[#e3e3ec] flex items-center justify-center overflow-hidden">
+                  <% if item.has_image? %>
+                    <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-contain p-1 sm:p-2", width: 400, height: 400) %>
+                  <% else %>
+                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  <% end %>
+                  
+                  <!-- Badge de réduction -->
+                  <% discount_percent = discount_percentage_for(variant) %>
+                  <% if discount_percent > 0 %>
+                    <div class="absolute top-1.5 left-1.5 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded">
+                      <%= discount_percent %>%
+                    </div>
+                  <% end %>
+                  
+                </div>
+                
+                <!-- Informations produit -->
+                <div class="p-2 sm:p-4 flex-1 flex flex-col">
+                  <h3 class="font-medium text-xs sm:text-sm text-gray-900 mb-1 sm:mb-2 line-clamp-2 group-hover:text-[#551694] transition-colors leading-tight">
+                    <%= item.name %>
+                  </h3>
+                  
+                  <!-- Note -->
+                  <% if item.average_rating.present? %>
+                    <% rounded_rating = item.average_rating.round %>
+                    <div class="flex items-center gap-0.5 sm:gap-1 mb-1 sm:mb-2" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_rating) %>">
+                      <div class="flex items-center" aria-hidden="true">
+                        <% 5.times do |i| %>
+                          <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 <%= i < rounded_rating ? 'text-yellow-400 fill-current' : 'text-gray-300' %>" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                        <% end %>
+                      </div>
+                      <span class="text-[10px] sm:text-xs text-gray-500"><%= item.average_rating.round(1) %></span>
+                    </div>
+                  <% end %>
+                  
+                  <!-- Prix -->
+                  <div class="mt-auto">
+                    <div class="flex flex-wrap items-baseline gap-1 sm:gap-2 mb-2 sm:mb-3">
+                      <% current_price = current_price_for(variant) %>
+                      <% original_price = original_price_for(variant) %>
+                      <% discount_percent = discount_percentage_for(variant) %>
+                      <span class="text-sm sm:text-base font-bold text-gray-900 leading-none">
+                        <%= number_to_currency(current_price, unit: item.currency.symbol, precision: 0, separator: " ", delimiter: " ") %>
+                      </span>
+                      <% if discount_percent > 0 && original_price > current_price %>
+                        <span class="text-[10px] sm:text-sm text-gray-400 line-through leading-none">
+                          <%= number_to_currency(original_price, unit: item.currency.symbol, precision: 0, separator: " ", delimiter: " ") %>
+                        </span>
+                      <% end %>
+                    </div>
+                    
+                    <!-- Bouton Ajouter au panier -->
+                    <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "primary" %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Pagination -->
+        <% if @items.respond_to?(:current_page) && @items.total_pages > 1 %>
+        <div class="mt-8 flex justify-center items-center gap-2">
+          <% if @items.current_page > 1 %>
+            <%= link_to client_items_path(page: @items.current_page - 1, category_id: params[:category_id], sub_category_id: params[:sub_category_id], shop_ids: params[:shop_ids], min_price: params[:min_price], max_price: params[:max_price], sort: params[:sort]), 
+                class: "w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50" do %>
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            <% end %>
+          <% end %>
+          
+          <% start_page = [@items.current_page - 2, 1].max %>
+          <% end_page = [start_page + 5, @items.total_pages].min %>
+          <% (start_page..end_page).each do |page_num| %>
+            <%= link_to sprintf('%02d', page_num), 
+                client_items_path(page: page_num, category_id: params[:category_id], sub_category_id: params[:sub_category_id], shop_ids: params[:shop_ids], min_price: params[:min_price], max_price: params[:max_price], sort: params[:sort]),
+                class: "w-10 h-10 flex items-center justify-center rounded-lg border #{@items.current_page == page_num ? 'bg-[#551694] text-white border-[#551694]' : 'border-gray-300 hover:bg-gray-50'}" %>
+          <% end %>
+          
+          <% if @items.current_page < @items.total_pages %>
+            <%= link_to client_items_path(page: @items.current_page + 1, category_id: params[:category_id], sub_category_id: params[:sub_category_id], shop_ids: params[:shop_ids], min_price: params[:min_price], max_price: params[:max_price], sort: params[:sort]), 
+                class: "w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50" do %>
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            <% end %>
+          <% end %>
+        </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-12">
+          <p class="text-gray-500 text-lg">Aucun produit disponible pour le moment.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,88 @@
+<%# Partial partagé : Analytics commandes (vendor + employees) %>
+<%# Variables d'instance attendues : @orders_by_status, @orders_by_day, @revenue_by_day, @average_order_value %>
+
+<!-- KPIs Commandes -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white rounded-lg shadow p-6">
+    <p class="text-sm text-gray-600">Total Commandes</p>
+    <p class="text-3xl font-bold text-gray-900"><%= @orders_by_status.values.sum %></p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <p class="text-sm text-gray-600">Revenu Total</p>
+    <p class="text-3xl font-bold text-[#551694]">
+      <%= number_to_currency(@revenue_by_day.values.sum, unit: "FCFA", format: "%n %u", precision: 0) %>
+    </p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <p class="text-sm text-gray-600">Panier Moyen</p>
+    <p class="text-3xl font-bold text-[#551694]">
+      <%= number_to_currency(@average_order_value, unit: "FCFA", format: "%n %u", precision: 0) %>
+    </p>
+  </div>
+</div>
+
+<!-- Graphiques -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <!-- Commandes par jour -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Commandes par Jour</h3>
+    <% if @orders_by_day.any? && @orders_by_day.values.sum > 0 %>
+      <%= area_chart @orders_by_day, thousands: ",", colors: ["#551694"], height: "250px",
+          library: {
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+              x: { grid: { display: false } }
+            }
+          } %>
+    <% else %>
+      <div class="h-[250px] flex flex-col items-center justify-center bg-gray-50 rounded">
+        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucune commande sur cette période</p>
+        <p class="text-xs text-gray-500 text-center px-4">Les commandes de vos clients apparaîtront ici une fois qu'elles seront passées.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Revenu par jour -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Revenu par Jour</h3>
+    <% if @revenue_by_day.any? && @revenue_by_day.values.sum > 0 %>
+      <%= area_chart @revenue_by_day, thousands: ",", prefix: "FCFA ", colors: ["#551694"], height: "250px",
+          library: {
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+              x: { grid: { display: false } }
+            }
+          } %>
+    <% else %>
+      <div class="h-[250px] flex flex-col items-center justify-center bg-gray-50 rounded">
+        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucun revenu sur cette période</p>
+        <p class="text-xs text-gray-500 text-center px-4">Les revenus générés par vos commandes apparaîtront ici.</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Répartition par statut -->
+<div class="bg-white rounded-lg shadow p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Commandes par Statut</h3>
+  <% if @orders_by_status.any? && @orders_by_status.values.sum > 0 %>
+    <%= pie_chart @orders_by_status, donut: true, thousands: ",", height: "300px",
+        colors: ["#551694", "#7c1fc4", "#9d4edd", "#c77dff", "#e0aaff"] %>
+  <% else %>
+    <div class="h-[300px] flex flex-col items-center justify-center bg-gray-50 rounded">
+      <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+      <p class="text-sm font-medium text-gray-900 mb-1">Aucune commande sur cette période</p>
+      <p class="text-xs text-gray-500 text-center px-4">La répartition des commandes par statut apparaîtra ici.</p>
+    </div>
+  <% end %>
+</div>

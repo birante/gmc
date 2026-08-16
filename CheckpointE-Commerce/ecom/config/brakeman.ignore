@@ -1,0 +1,28 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 105,
+      "fingerprint": "4e4b373690a1dc1ed118a7a285f295e2f75e461738be684ab1d2e11e44ba7e65",
+      "check_name": "PermitAttributes",
+      "message": "Potentially dangerous key allowed for mass assignment",
+      "file": "app/controllers/vendors/employees_controller.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:employee).permit(:email, :password, :password_confirmation, :first_name, :last_name, :country_code, :phone_number, :role, :shop_ids => ([]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Vendors::EmployeesController",
+        "method": "employee_params"
+      },
+      "user_input": ":role",
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": ""
+    }
+  ],
+  "brakeman_version": "7.1.2"
+}

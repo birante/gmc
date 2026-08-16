@@ -1,0 +1,39 @@
+<% verification_target = @pending_phone.presence || @pending_email %>
+<%= render "shared/auth/auth_header", title: t('.title'), subtitle: t('.subtitle'), extra: verification_target %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with url: vendors_verification_path, method: :post, local: true do %>
+    <%= hidden_field_tag :email, @pending_email if @pending_email.present? %>
+
+    <%= render "shared/auth/auth_alert", type: :notice, message: flash[:notice] %>
+    <%= render "shared/auth/auth_alert", type: :alert, message: flash[:alert] %>
+
+    <div class="space-y-5">
+      <div class="flex flex-col items-center text-center" data-controller="otp">
+        <div class="flex w-full max-w-xs items-center justify-center gap-2 sm:gap-3">
+          <% 4.times do |i| %>
+            <%= text_field_tag "otp_code_#{i}", nil,
+                autocomplete: "one-time-code",
+                maxlength: 1,
+                pattern: "[0-9]",
+                inputmode: "numeric",
+                data: { otp_target: "input", action: "input->otp#handleInput keydown->otp#handleKeydown paste->otp#handlePaste" },
+                class: "h-11 w-11 sm:h-12 sm:w-12 text-center text-lg font-semibold rounded-md border border-[#E9E9E9] bg-[#F9F9F9] focus:border-[#551694] focus:ring-2 focus:ring-[#551694]/20 focus:outline-none transition-colors" %>
+          <% end %>
+        </div>
+        <p class="mt-2 text-sm text-gray-600">
+          <%= t('.no_code') %>
+          <%= button_tag t('.resend'), type: :submit, formaction: resend_vendors_verification_path, formmethod: :post, formnovalidate: true, class: "text-[#551694] hover:text-[#451384] font-medium underline focus:outline-none focus-visible:no-underline" %>
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <%= submit_tag t('.submit'), class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+
+    <div class="mt-6">
+      <%= render "vendors/shared/progress_bar", current_step: 2 %>
+    </div>
+  <% end %>
+</div>

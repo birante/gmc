@@ -1,0 +1,105 @@
+<%# Composant réutilisable: Bouton Ajouter au Panier / Sélecteur de quantité
+    Paramètres:
+    - item (requis): L'article à ajouter
+    - variant (requis): La variante sélectionnée
+    - size: 'sm', 'md' (défaut), 'lg'
+    - full_width: true/false (défaut: true)
+    - show_icon: true/false (défaut: true)
+    - style: 'primary' (défaut), 'outline'
+    Si le produit est déjà dans le panier (qty > 0), affiche un sélecteur − [qty] +.
+    À 0, on réaffiche le bouton "Ajouter au panier" (via Turbo Stream).
+%>
+
+<% variant ||= item&.default_variant || item&.variants&.first %>
+<% size ||= 'md' %>
+<% full_width = true if full_width.nil? %>
+<% show_icon = true if show_icon.nil? %>
+<% style ||= 'primary' %>
+
+<% cart = defined?(current_cart_readonly) ? current_cart_readonly : nil %>
+<% cart_item = cart&.cart_items&.find_by(item: item, item_variant: variant) %>
+<% show_selector = variant && variant.stock_quantity > 0 && cart_item.present? && cart_item.quantity > 0 %>
+
+<div id="add-to-cart-<%= item.id %>-<%= variant&.id %>" class="<%= 'w-full' if full_width %>" onclick="event.stopPropagation();">
+  <% if variant && variant.stock_quantity > 0 %>
+    <% if show_selector %>
+      <% max_quantity = [variant.stock_quantity.to_i, cart_item.quantity].max %>
+      <div data-controller="cart-quantity"
+           data-cart-quantity-max-value="<%= max_quantity %>"
+           data-cart-quantity-current-value="<%= cart_item.quantity %>">
+        <%= form_with url: client_cart_item_path(cart_item), method: :patch, class: "flex items-center justify-center gap-2 w-full", data: { turbo: true, 'cart-quantity-target': 'form' } do |form| %>
+          <%= form.hidden_field :quantity, value: 1, data: { 'cart-quantity-target': 'hidden' } %>
+          <%= form.hidden_field :size, value: size %>
+          <%= form.hidden_field :style, value: style %>
+          <%= form.hidden_field :show_icon, value: show_icon %>
+          <button type="button"
+                  class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-2 border-[#551694] bg-white text-[#551694] hover:bg-[#551694] hover:text-white active:bg-[#6a1fa8] flex items-center justify-center transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  data-action="click->cart-quantity#decrease"
+                  data-cart-quantity-target="decrease"
+                  aria-label="<%= t('storefront.products.decrease_quantity', default: 'Réduire la quantité') %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path>
+            </svg>
+          </button>
+          <span class="min-w-[2rem] text-center text-base font-semibold text-gray-900" data-cart-quantity-target="display"><%= cart_item.quantity %></span>
+          <input type="hidden"
+                 value="<%= cart_item.quantity %>"
+                 data-cart-quantity-target="input"
+                 data-current="<%= cart_item.quantity %>" />
+          <button type="button"
+                  class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-2 border-[#551694] bg-white text-[#551694] hover:bg-[#551694] hover:text-white active:bg-[#6a1fa8] flex items-center justify-center transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  data-action="click->cart-quantity#increase"
+                  data-cart-quantity-target="increase"
+                  aria-label="<%= t('storefront.products.increase_quantity', default: 'Augmenter la quantité') %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </button>
+        <% end %>
+      </div>
+    <% else %>
+      <%= form_with url: client_cart_items_path, method: :post, class: "w-full", data: { turbo: true } do |form| %>
+        <%= form.hidden_field :item_id, value: item.id %>
+        <%= form.hidden_field :item_variant_id, value: variant.id %>
+        <%= form.hidden_field :quantity, value: 1 %>
+        <%= form.hidden_field :size, value: size %>
+        <%= form.hidden_field :style, value: style %>
+        
+        <% 
+          button_classes = "w-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium flex items-center justify-center gap-2"
+          
+          case size
+          when 'sm'
+            button_classes += " px-3 py-2.5 text-sm rounded-md"
+          when 'lg'
+            button_classes += " px-9 py-5 text-lg rounded-lg"
+          else # md
+            button_classes += " px-7 py-3.5 text-base rounded-lg"
+          end
+          
+          case style
+          when 'outline'
+            button_classes += " border-2 text-[var(--btn-primary-color)] border-[var(--btn-primary-color)] hover:bg-[var(--btn-primary-color)] hover:text-white focus:ring-[var(--btn-primary-color)]"
+            style_attr = "--btn-primary-color: var(--primary-color, #551694);"
+          else # primary
+            button_classes += " text-white shadow-md hover:shadow-lg focus:ring-[var(--btn-primary-color)]"
+            style_attr = "--btn-primary-color: var(--primary-color, #551694); background-color: var(--btn-primary-color);"
+          end
+        %>
+        
+        <%= button_tag type: "submit", class: button_classes, style: style_attr, onclick: "event.stopPropagation();" do %>
+          <span><%= t('storefront.products.add_to_cart_button', default: 'Ajouter au panier') %></span>
+          <% if show_icon %>
+            <svg class="<%= size == 'lg' ? 'w-7 h-7' : size == 'sm' ? 'w-4 h-4' : 'w-5 h-5' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <button disabled class="<%= 'w-full' if full_width %> bg-gray-300 text-gray-500 px-7 py-3.5 rounded-lg cursor-not-allowed text-base font-medium flex items-center justify-center gap-2">
+      <span><%= t('storefront.products.out_of_stock', default: 'Rupture de stock') %></span>
+    </button>
+  <% end %>
+</div>

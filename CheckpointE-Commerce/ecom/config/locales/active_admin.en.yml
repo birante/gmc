@@ -1,0 +1,159 @@
+en:
+  active_admin:
+    # Resource titles
+    shops: "Shops"
+    items: "Products"
+    vendors: "Vendors"
+    orders: "Orders"
+    order_items: "Order Items"
+    employees: "Employees"
+    users: "Users"
+    payments: "Payments"
+    payment_methods: "Payment Methods"
+    delivery_zones: "Delivery Zones"
+    delivery_slots: "Delivery Slots"
+    delivery_categories: "Delivery Categories"
+    delivery_prices: "Delivery Prices"
+    currencies: "Currencies"
+    sectors: "Sectors"
+    product_categories: "Product Categories"
+    product_sub_categories: "Sub-categories"
+    social_platforms: "Social Platforms"
+    addresses: "Addresses"
+    
+    # Common columns
+    columns:
+      id: "ID"
+      created_at: "Created at"
+      updated_at: "Updated at"
+      name: "Name"
+      description: "Description"
+      status: "Status"
+      position: "Position"
+      is_active: "Active"
+      
+      # Shops
+      vendor: "Vendor"
+      address: "Address"
+      primary_color: "Primary color"
+      secondary_color: "Secondary color"
+      code: "Code"
+      total_views: "Total Views"
+      
+      # Items
+      shop: "Shop"
+      product_sub_category: "Sub-category"
+      currency: "Currency"
+      variants_count: "Variants"
+      views_count: "Views"
+      validation_status: "Validation status"
+      price: "Price"
+      stock_quantity: "Stock"
+      
+      # Orders
+      user: "User"
+      delivery_zone: "Delivery zone"
+      delivery_slot: "Slot"
+      total_amount: "Total amount"
+      delivery_fee: "Delivery fee"
+      final_amount: "Final amount"
+      delivery_address: "Delivery address"
+      delivery_notes: "Delivery notes"
+      delivery_date: "Delivery date"
+      order_number: "Order number"
+      
+      # Employees
+      email: "Email"
+      role: "Role"
+      shops_access: "Shops access"
+      
+      # Payments
+      order: "Order"
+      payment_method: "Payment method"
+      amount: "Amount"
+      transaction_id: "Transaction ID"
+      payment_status: "Payment status"
+      
+      # Delivery
+      zone_name: "Zone name"
+      base_price: "Base price"
+      slot_time: "Time slot"
+      capacity: "Capacity"
+      category_name: "Category name"
+      size_category: "Size"
+      max_dimensions: "Max dimensions"
+      
+    # Actions
+    actions:
+      view: "View"
+      edit: "Edit"
+      delete: "Delete"
+      new: "New"
+      analytics: "Analytics"
+      
+    # Statuses
+    statuses:
+      pending: "Pending"
+      active: "Active"
+      approved: "Approved"
+      rejected: "Rejected"
+      suspended: "Suspended"
+      deactivate: "Deactivated"
+      confirmed: "Confirmed"
+      processing: "Processing"
+      shipped: "Shipped"
+      delivered: "Delivered"
+      cancelled: "Cancelled"
+      
+    # Messages
+    messages:
+      no_data: "No data available"
+      confirm_delete: "Are you sure you want to delete this item?"
+      successfully_created: "Successfully created"
+      successfully_updated: "Successfully updated"
+      successfully_deleted: "Successfully deleted"
+      
+    # Analytics page
+    analytics:
+      menu: "📊 Analytics"
+      title: "Analytics"
+      filter_button: "Filter"
+      
+      # KPIs
+      total_visits: "Total Visits"
+      unique_visitors: "Unique Visitors"
+      pages_viewed: "Pages Viewed"
+      shops_visited: "Shops Visited"
+      products_viewed: "Products Viewed"
+      cart_additions: "Cart Additions"
+      orders: "Orders"
+      conversion_rate: "Conversion Rate"
+      
+      # Charts
+      page_evolution: "📊 Page Views Evolution"
+      shops_evolution: "🛍️ Shop Views Evolution"
+      
+      # Top lists
+      top_pages: "📄 Most Visited Pages"
+      top_shops: "🏪 Top 15 Shops"
+      top_products: "🏷️ Top 15 Products"
+      
+      # Events
+      events_distribution: "📊 Events Distribution"
+      traffic_sources: "🔗 Top 10 Traffic Sources"
+      
+      # Technical
+      devices: "💻 Devices"
+      browsers: "🌐 Browsers"
+      top_countries: "🌍 Top 15 Countries"
+      
+      # Columns
+      page: "Page"
+      views: "Views"
+      percentage: "% of Total"
+      code: "Code"
+      visitors: "visitors"
+      no_utm_data: "No UTM source for this period"
+      no_geo_data: "No geolocation data for this period"
+      enable_geo: "💡 Enable geolocation in config/initializers/ahoy.rb"
+

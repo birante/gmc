@@ -1,0 +1,209 @@
+<% content_for :client_content do %>
+  <div>
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <nav class="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+        <%= link_to "Accueil", root_path, class: "hover:text-[#551694] transition-colors duration-150" %> 
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mon compte", client_account_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-900 font-medium">Mon tableau de bord</span>
+      </nav>
+    </div>
+
+    <!-- En-tête -->
+    <div class="mb-6">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2"><%= t('client.dashboards.show.title') %></h1>
+      <p class="text-sm sm:text-base text-gray-600"><%= t('client.dashboards.show.welcome', name: current_user.first_name) %></p>
+    </div>
+
+  <div class="space-y-6 sm:space-y-8">
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      <!-- Total commandes -->
+      <%= link_to client_orders_path, class: "bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md hover:border-[#551694]/20 transition-all duration-200 cursor-pointer group block" do %>
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2"><%= t('client.dashboards.show.total_orders', default: 'Total commandes') %></p>
+            <p class="text-2xl sm:text-3xl font-bold text-gray-900 group-hover:text-[#551694] transition-colors"><%= current_user.orders_count %></p>
+          </div>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-red-50 group-hover:bg-[#551694]/10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-red-600 group-hover:text-[#551694] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Commandes livrées -->
+      <%= link_to client_orders_path(status: 'delivered'), class: "bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md hover:border-[#551694]/20 transition-all duration-200 cursor-pointer group block" do %>
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2"><%= t('client.dashboards.show.delivered_orders', default: 'Commandes livrées') %></p>
+            <p class="text-2xl sm:text-3xl font-bold text-gray-900 group-hover:text-[#551694] transition-colors"><%= current_user.orders.where(status: 'delivered').size %></p>
+          </div>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 group-hover:bg-[#551694]/10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-green-600 group-hover:text-[#551694] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Commandes en cours -->
+      <%= link_to client_orders_path(status: 'in_progress'), class: "bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md hover:border-[#551694]/20 transition-all duration-200 cursor-pointer group block" do %>
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <p class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2"><%= t('client.dashboards.show.in_progress', default: 'En cours') %></p>
+            <p class="text-2xl sm:text-3xl font-bold text-gray-900 group-hover:text-[#551694] transition-colors"><%= current_user.orders.where(status: ['processing', 'shipped']).size %></p>
+          </div>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 group-hover:bg-[#551694]/10 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 group-hover:text-[#551694] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Dernières commandes -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="p-4 sm:p-6 border-b border-gray-100">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-900"><%= t('client.dashboards.show.recent_orders') %></h2>
+            <p class="text-xs sm:text-sm text-gray-500 mt-1"><%= t('client.dashboards.show.recent_orders_subtitle') %></p>
+          </div>
+          <%= link_to client_orders_path, class: "inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-[#551694] border border-[#551694] rounded-lg hover:bg-[#551694] hover:text-white transition-colors whitespace-nowrap" do %>
+            <%= t('client.dashboards.show.view_all_orders') %>
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="p-4 sm:p-6">
+        <% if @recent_orders.any? %>
+          <div class="space-y-3 sm:space-y-4">
+            <% @recent_orders.each do |order| %>
+              <%= link_to client_order_path(order), class: "block border border-gray-200 rounded-lg p-4 hover:border-[#551694] hover:shadow-md hover:bg-gray-50/50 transition-all duration-200 group" do %>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-3 mb-2">
+                      <p class="font-semibold text-sm sm:text-base text-gray-900 group-hover:text-[#551694] transition-colors">
+                        Commande #<%= order.id %>
+                      </p>
+                      <span class="px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap <%= case order.status
+                        when 'pending' then 'bg-yellow-100 text-yellow-800'
+                        when 'processing' then 'bg-blue-100 text-blue-800'
+                        when 'shipped' then 'bg-blue-100 text-blue-800'
+                        when 'delivered' then 'bg-green-100 text-green-800'
+                        when 'canceled' then 'bg-red-100 text-red-800'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                        <%= case order.status
+                        when 'pending' then 'En attente'
+                        when 'processing' then 'En traitement'
+                        when 'shipped' then 'Expédié'
+                        when 'delivered' then 'Livré'
+                        when 'canceled' then 'Annulé'
+                        else order.status.humanize
+                        end %>
+                      </span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-gray-600">
+                      <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <%= l(order.created_at, format: :short) %>
+                      </span>
+                      <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        <%= order.order_items.size %> <%= order.order_items.size > 1 ? t('client.dashboards.show.items_plural') : t('client.dashboards.show.items') %>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between sm:justify-end gap-4">
+                    <p class="text-sm sm:text-base font-semibold text-gray-900">
+                      <%= number_to_currency(order.final_amount, unit: order.currency.symbol, precision: 0) %>
+                    </p>
+                    <svg class="w-5 h-5 text-gray-400 group-hover:text-[#551694] transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+
+          <!-- Pagination -->
+          <% if @total_pages > 1 %>
+            <div class="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-gray-200">
+              <%= link_to client_dashboard_path(page: @page - 1), 
+                  class: "px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors #{'opacity-50 cursor-not-allowed' if @page <= 1}",
+                  disabled: @page <= 1 do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              <% end %>
+
+              <div class="flex items-center gap-1">
+                <% (1..@total_pages).each do |page_num| %>
+                  <% if page_num == @page %>
+                    <span class="px-4 py-2 text-sm font-semibold text-white bg-[#551694] rounded-lg">
+                      <%= page_num %>
+                    </span>
+                  <% elsif page_num == 1 || page_num == @total_pages || (page_num >= @page - 1 && page_num <= @page + 1) %>
+                    <%= link_to page_num, client_dashboard_path(page: page_num), 
+                        class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" %>
+                  <% elsif page_num == @page - 2 || page_num == @page + 2 %>
+                    <span class="px-2 text-gray-500">...</span>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <%= link_to client_dashboard_path(page: @page + 1), 
+                  class: "px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors #{'opacity-50 cursor-not-allowed' if @page >= @total_pages}",
+                  disabled: @page >= @total_pages do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="text-center py-12 sm:py-16">
+            <div class="relative inline-block mb-6">
+              <div class="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+              </div>
+              <div class="absolute -top-1 -right-1 w-6 h-6 bg-[#551694]/20 rounded-full flex items-center justify-center">
+                <span class="text-xs font-bold text-[#551694]">0</span>
+              </div>
+            </div>
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-2"><%= t('client.dashboards.show.no_orders', default: 'Aucune commande récente') %></h3>
+            <p class="text-sm text-gray-500 mb-8 max-w-md mx-auto"><%= t('client.dashboards.show.no_orders_message', default: 'Commencez à explorer notre catalogue et trouvez des produits qui vous intéressent.') %></p>
+            <%= link_to client_items_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-[#551694] text-white rounded-lg hover:bg-[#6a1fa8] hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-medium shadow-sm" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span><%= t('client.dashboards.show.discover_products', default: 'Découvrir les produits') %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  </div>
+<% end %>
+
+<%= render "shared/client_sidebar_wrapper" do %>
+  <%= content_for(:client_content) %>
+<% end %>

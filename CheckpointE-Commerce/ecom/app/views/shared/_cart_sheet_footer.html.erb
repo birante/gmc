@@ -1,0 +1,35 @@
+<% if cart && cart.cart_items.any? %>
+  <div class="border-t border-[#ebebee] px-4 sm:px-[22px] py-4 sm:py-6 pb-[max(1rem,env(safe-area-inset-bottom))] sm:pb-6">
+    <!-- Total -->
+    <div class="flex items-center justify-between mb-4">
+      <p class="text-[19px] font-bold text-[#18181b]"><%= t('navigation.total') %></p>
+      <p class="text-[18px] font-bold text-[#18181b]" id="cart-sheet-total">
+        <%= number_to_currency(cart.total_amount, unit: cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+      </p>
+    </div>
+    
+    <!-- Texte info -->
+    <p class="text-[14px] font-normal text-[#979797] leading-[1.336] mb-6">
+      Des taxes et frais de livraison peuvent s'appliquer au paiement.
+    </p>
+    
+    <!-- Bouton Finaliser l'achat -->
+    <div data-action="click->cart-sheet#stopPropagation">
+      <% if user_signed_in? %>
+        <%= link_to new_client_order_path,
+            class: "w-full h-[48px] bg-[#551694] text-white rounded-[60px] flex items-center justify-center text-[14px] font-medium hover:opacity-90 transition-opacity",
+            data: { action: "click->cart-sheet#close" } do %>
+          <%= t('navigation.checkout') %>
+        <% end %>
+      <% else %>
+        <% return_to_url = url_for(controller: 'client/orders', action: 'new', only_path: true) %>
+        <%= link_to url_for(controller: 'client/registrations', action: 'new', return_to: return_to_url),
+            class: "w-full h-[48px] bg-[#551694] text-white rounded-[60px] flex items-center justify-center text-[14px] font-medium hover:opacity-90 transition-opacity",
+            data: { action: "click->cart-sheet#close" } do %>
+          <%= t('navigation.checkout') %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+

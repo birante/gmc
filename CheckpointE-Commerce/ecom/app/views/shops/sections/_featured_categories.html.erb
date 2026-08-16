@@ -1,0 +1,6 @@
+<%# Catégories rapides (secteurs) %>
+<% if shop.sectors.any? %>
+  <section class="pt-6">
+    <%= render "shops/featured_categories", shop: shop, primary_color: (local_assigns[:primary_color] || shop_primary_color(shop)), secondary_color: (local_assigns[:secondary_color] || shop_secondary_color(shop)) %>
+  </section>
+<% end %>

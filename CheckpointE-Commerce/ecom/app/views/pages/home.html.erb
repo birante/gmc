@@ -1,0 +1,60 @@
+<%# Page d'accueil - Storefront aa (SEO + accessibilité) %>
+<%# ====== SEO META TAGS ====== %>
+<% content_for :title, site_seo('seo.home.title') %>
+<% content_for :meta_description, site_seo('seo.home.description') %>
+<% content_for :meta_keywords, site_seo('seo.home.keywords') %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<% content_for :og_type, "website" %>
+<%# ====== PRELOAD LCP IMAGES ====== %>
+<% content_for :preload do %>
+  <% unless Rails.env.test? %>
+    <% begin %>
+      <% asset_url = asset_path('storefront/banners/hero-bg-samsung.jpg') %>
+      <link rel="preload" as="image" href="<%= asset_url %>" fetchpriority="high">
+      <% rescue StandardError => e %>
+      <%# Asset not found or error loading asset, skip preload %>
+      <% Rails.logger.debug "Skipping preload for hero-bg-samsung.jpg: #{e.message}" if defined?(Rails.logger) %>
+    <% end %>
+  <% end %>
+<% end %>
+<%# ====== STRUCTURED DATA (Schema.org e-commerce) ====== %>
+<% content_for :structured_data do %>
+  <%= combined_json_ld_tag(organization_schema, website_schema, homepage_webpage_schema, homepage_breadcrumb_schema) %>
+  <% if defined?(@promo_items) && @promo_items.present? %>
+    <%= json_ld_tag(item_list_schema(@promo_items.first(10), t('storefront.promo_products', default: 'Produits en promotion'))) %>
+  <% end %>
+<% end %>
+<%# ====== ACCESSIBILITÉ : titre principal (h1) et repère ====== %>
+<div role="region" aria-label="<%= t('accessibility.home_content', default: 'Contenu de la page d\'accueil aa') %>">
+  <h1 class="sr-only"><%= t('seo.home.title') %></h1>
+  <%# 1. Marquee - Bandeau animé avec promos %>
+  <%= render "shared/storefront/marquee", marquee_section: @marquee_section %>
+  <%# 2. Hero Slider - Carousel principal %>
+  <%= render "shared/storefront/hero_slider" %>
+  <%# 3. Bannières promotionnelles (4 bannières) %>
+  <%= render "shared/storefront/promo_banners" %>
+  <%# 4. Catégories populaires (grille scrollable) %>
+  <%= render "shared/storefront/categories_grid", categories: @categories %>
+  <%# 5. Bannières secondaires %>
+  <%= render "shared/storefront/secondary_banners" %>
+  <%# 6. Tendances du moment (grid 4x4 de sous-catégories) %>
+  <%= render "shared/storefront/trending_categories", sub_categories: @sub_categories %>
+  <%# 7. Bannière promo avec carousel produits et countdown (EnPromo) %>
+  <%= render "shared/storefront/promo_banner_carousel", promo_items: @promo_items, promo_settings: @promo_carousel_settings %>
+  <%# 8. Boutiques locales partenaires %>
+  <%= render "shared/storefront/local_shops", local_shops: @local_shops, side_banner: @local_shops_banner, local_products: @made_in_senegal_items %>
+  <%# 9. Boutiques officielles (logos marques) %>
+  <%= render "shared/storefront/official_brands", official_shops: @official_shops %>
+  <%# 10. Boutiques mises en avant (Sharp | Black Friday) %>
+  <% if @shop_spotlights.present? %>
+    <% @shop_spotlights.each do |spotlight| %>
+      <%= render "shared/storefront/shop_spotlight", spotlight: spotlight %>
+    <% end %>
+  <% end %>
+  <%# 11. Recommandations %>
+  <%= render "shared/storefront/recommendation" %>
+  <%# 12. Ventes flash avec countdown %>
+  <%# <%= render "shared/storefront/flash_sales", flash_items: @flash_items %>
+  <%# 13. Newsletter (inscription email) %>
+  <%= render "shared/storefront/newsletter" %>
+</div>

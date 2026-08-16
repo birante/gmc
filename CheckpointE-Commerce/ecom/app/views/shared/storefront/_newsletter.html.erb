@@ -1,0 +1,75 @@
+<%# Newsletter - Inscription avec accessibilité %>
+<section class="bg-[#F9F8F5] py-10 md:py-14" aria-labelledby="newsletter-heading" data-controller="newsletter">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 md:gap-8">
+      <!-- Left Content + Plane Icon -->
+      <div class="flex items-center gap-4 md:gap-8">
+        <div>
+          <h2 id="newsletter-heading" class="text-xl md:text-[30px] font-semibold text-[#3F4254] tracking-tight mb-2">
+            <%= t('storefront.newsletter.title_new', default: 'Nouveau sur') %> <span class="text-[#551694]">aa</span> ?
+          </h2>
+          <p class="text-[#464E5F] text-sm md:text-lg">
+            <%= t('storefront.newsletter.subtitle', default: 'Inscrivez-vous à notre newsletter pour recevoir nos meilleures offres!') %>
+          </p>
+        </div>
+        <!-- Plane Icon (hidden on small mobile) - Decorative -->
+        <div class="hidden sm:block flex-shrink-0" aria-hidden="true">
+          <%= image_tag "storefront/plane.png", 
+              alt: "", 
+              class: "w-[75px] h-auto",
+              loading: "lazy",
+              width: 75,
+              height: 75 %>
+        </div>
+      </div>
+      <!-- Right Form -->
+      <div class="flex-shrink-0 w-full md:w-auto md:max-w-[522px]">
+        <%= form_with url: newsletter_subscribers_path, 
+            method: :post, 
+            local: true, 
+            data: { 
+              turbo: false,
+              action: "newsletter#submit"
+            },
+            html: { 
+              role: "form", 
+              "aria-label": t('storefront.newsletter.form_label', default: 'Inscription à la newsletter'),
+              "aria-describedby": "newsletter-privacy"
+            } do |f| %>
+          <!-- Email Input with Button Inside -->
+          <div class="relative bg-gray-100 border border-[rgba(181,181,195,0.36)] rounded-[15px] h-[52px] flex items-center px-4 focus-within:ring-2 focus-within:ring-[#551694] focus-within:border-[#551694]">
+            <label for="newsletter-email" class="sr-only"><%= t('storefront.newsletter.email_label', default: 'Adresse email') %></label>
+            <input type="email" 
+                   id="newsletter-email"
+                   name="email" 
+                   placeholder="<%= t('storefront.newsletter.email_placeholder', default: 'Entrez votre adresse mail') %>"
+                   required
+                   autocomplete="email"
+                   aria-required="true"
+                   data-newsletter-target="email"
+                   class="flex-1 bg-transparent text-[#3F4254] placeholder-[#99A1B7] text-base focus:outline-none pr-4">
+            <button type="submit" 
+                    data-newsletter-target="submitBtn"
+                    class="absolute right-[5px] top-1/2 -translate-y-1/2 h-[42px] px-5 bg-[#551694] hover:bg-[#4a1468] text-white text-[13px] font-normal uppercase rounded-[11px] transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#551694]">
+              <span data-newsletter-target="btnText"><%= t('storefront.newsletter.subscribe', default: "S'abonner") %></span>
+            </button>
+          </div>
+          <!-- Messages (hidden by default) -->
+          <div data-newsletter-target="successMsg" class="hidden text-green-600 text-sm mt-3 pl-1 font-medium">
+            ✓ <span data-newsletter-target="successText"></span>
+          </div>
+          <div data-newsletter-target="errorMsg" class="hidden text-red-600 text-sm mt-3 pl-1 font-medium">
+            ✕ <span data-newsletter-target="errorText"></span>
+          </div>
+          <!-- Privacy Notice -->
+          <p id="newsletter-privacy" class="text-gray-500 text-sm mt-3.5 pl-1">
+            <%= t('storefront.newsletter.privacy_notice', default: "En s'inscrivant vous acceptez nos") %>
+            <%= link_to t('storefront.newsletter.terms_link', default: 'Termes & Conditions'), 
+                terms_path, 
+                class: "text-[#551694] underline hover:text-[#4a1468] focus:outline-none focus:ring-2 focus:ring-[#551694] rounded" %>
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

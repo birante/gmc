@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Erreur serveur (500) | aa</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+
+      :root {
+        --bg: #f8f3ff;
+        --card: #ffffff;
+        --text: #220f3f;
+        --muted: #6b5b85;
+        --brand: #551694;
+        --brand-2: #7b2ec1;
+        --line: #e8ddf7;
+      }
+
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 15% 12%, #efe3ff 0%, transparent 34%),
+          radial-gradient(circle at 85% 88%, #ede2fc 0%, transparent 35%),
+          var(--bg);
+      }
+
+      .card {
+        width: min(760px, 100%);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        box-shadow: 0 18px 42px rgba(52, 24, 95, 0.1);
+        padding: 28px;
+      }
+
+      .brand {
+        display: inline-block;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: var(--brand);
+        margin-bottom: 12px;
+      }
+
+      .code {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #d8c4f2;
+        background: #f3eafd;
+        color: var(--brand);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+      }
+
+      h1 {
+        font-size: clamp(26px, 3.2vw, 38px);
+        line-height: 1.15;
+        margin-bottom: 10px;
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 24px;
+      }
+
+      .btn {
+        appearance: none;
+        border: 0;
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        color: #fff;
+        background: linear-gradient(120deg, var(--brand), var(--brand-2));
+      }
+
+      .btn-secondary {
+        color: var(--text);
+        background: #f7f2ff;
+        border: 1px solid #ded0f3;
+      }
+
+      .hint {
+        margin-top: 16px;
+        font-size: 13px;
+        color: #7a6a93;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card" role="main" aria-labelledby="title">
+      <div class="brand">aa</div>
+      <div class="code">Erreur 500</div>
+      <h1 id="title">Un incident serveur est survenu.</h1>
+      <p>
+        Nos equipes ont probablement deja ete alertees. Merci de reessayer dans
+        quelques instants.
+      </p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="/">Retour a l'accueil</a>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          onclick="window.location.reload()"
+        >
+          Reessayer
+        </button>
+      </div>
+
+      <p class="hint">Code technique: HTTP 500 (Internal Server Error)</p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<nav class="bg-white shadow-md mb-8" id="client-nav">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo / Brand -->
+      <div class="flex items-center">
+        <%= link_to client_items_path, class: "text-xl font-bold text-[#551694]" do %>
+          aa
+        <% end %>
+      </div>
+      <!-- Navigation Links (desktop) -->
+      <div class="hidden md:flex items-center space-x-6">
+        <%= link_to t('shared.client_nav.catalog'), client_items_path, class: "text-gray-700 hover:text-[#551694] #{'font-semibold text-[#551694]' if current_page?(client_items_path)}" %>
+        <% if current_user %>
+          <button type="button" onclick="document.dispatchEvent(new CustomEvent('cart-sheet:open'))" class="relative text-gray-700 hover:text-[#551694]">
+            <span class="flex items-center gap-1">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              <%= t('shared.client_nav.cart') %>
+              <% if cart_items_count(current_cart_readonly) > 0 %>
+                <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <%= cart_items_count(current_cart_readonly) %>
+                </span>
+              <% end %>
+            </span>
+          </button>
+          <%= link_to t('shared.client_nav.my_orders'), client_orders_path, class: "text-gray-700 hover:text-[#551694] #{'font-semibold text-[#551694]' if current_page?(client_orders_path)}" %>
+          <%= link_to t('shared.client_nav.addresses'), client_addresses_path, class: "text-gray-700 hover:text-[#551694] #{'font-semibold text-[#551694]' if current_page?(client_addresses_path)}" %>
+          <div class="relative group">
+            <button class="flex items-center gap-1 text-gray-700 hover:text-[#551694]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <%= current_user.first_name %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <div class="hidden group-hover:block absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+              <%= button_to t('shared.client_nav.logout'), client_session_path, method: :delete, class: "block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" %>
+            </div>
+          </div>
+        <% else %>
+          <%= link_to t('shared.client_nav.login'), new_client_session_path, class: "text-gray-700 hover:text-[#551694]" %>
+          <%= link_to t('shared.client_nav.signup'), new_client_registration_path, class: "px-4 py-2 bg-[#551694] text-white rounded-md hover:bg-[#451384]" %>
+        <% end %>
+      </div>
+      <!-- Mobile menu button -->
+      <div class="md:hidden">
+        <button type="button"
+                onclick="document.getElementById('client-nav-mobile').classList.toggle('hidden')"
+                class="p-2 text-gray-700 hover:text-[#551694] focus:outline-none focus:ring-2 focus:ring-[#551694] rounded">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Mobile menu panel -->
+    <div id="client-nav-mobile" class="hidden md:hidden border-t border-gray-200 pb-4 pt-2">
+      <div class="flex flex-col space-y-1">
+        <%= link_to t('shared.client_nav.catalog'), client_items_path, class: "px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#551694] font-medium #{'bg-purple-50 text-[#551694]' if current_page?(client_items_path)}" %>
+        <% if current_user %>
+          <button type="button" onclick="document.dispatchEvent(new CustomEvent('cart-sheet:open'))" class="text-left px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#551694] font-medium flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <%= t('shared.client_nav.cart') %>
+          </button>
+          <%= link_to t('shared.client_nav.my_orders'), client_orders_path, class: "px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#551694] font-medium #{'bg-purple-50 text-[#551694]' if current_page?(client_orders_path)}" %>
+          <%= link_to t('shared.client_nav.addresses'), client_addresses_path, class: "px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#551694] font-medium #{'bg-purple-50 text-[#551694]' if current_page?(client_addresses_path)}" %>
+          <div class="border-t border-gray-200 pt-2 mt-1">
+            <%= button_to t('shared.client_nav.logout'), client_session_path, method: :delete, class: "w-full text-left px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium" %>
+          </div>
+        <% else %>
+          <%= link_to t('shared.client_nav.login'), new_client_session_path, class: "px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#551694] font-medium" %>
+          <%= link_to t('shared.client_nav.signup'), new_client_registration_path, class: "mx-3 mt-1 py-2.5 bg-[#551694] text-white rounded-lg hover:bg-[#451384] font-semibold text-center" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,264 @@
+fr:
+  hello: "Bonjour"
+  
+  common:
+    confirm: "Êtes-vous sûr ?"
+    save: "Enregistrer"
+    cancel: "Annuler"
+    delete: "Supprimer"
+    edit: "Modifier"
+    back: "Retour"
+    loading: "Chargement..."
+    errors:
+      one: "%{count} erreur"
+      other: "%{count} erreurs"
+
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%e %b"
+      long: "%e %B %Y"
+    day_names:
+      - dimanche
+      - lundi
+      - mardi
+      - mercredi
+      - jeudi
+      - vendredi
+      - samedi
+    abbr_day_names:
+      - dim
+      - lun
+      - mar
+      - mer
+      - jeu
+      - ven
+      - sam
+    month_names:
+      - ~
+      - janvier
+      - février
+      - mars
+      - avril
+      - mai
+      - juin
+      - juillet
+      - août
+      - septembre
+      - octobre
+      - novembre
+      - décembre
+    abbr_month_names:
+      - ~
+      - jan.
+      - fév.
+      - mar.
+      - avr.
+      - mai
+      - juin
+      - juil.
+      - août
+      - sept.
+      - oct.
+      - nov.
+      - déc.
+    order:
+      - :day
+      - :month
+      - :year
+
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d/%m %H:%M"
+      long: "%A %d %B %Y %H:%M"
+    am: "am"
+    pm: "pm"
+
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: "environ une heure"
+        other: "environ %{count} heures"
+      about_x_months:
+        one: "environ un mois"
+        other: "environ %{count} mois"
+      about_x_years:
+        one: "environ un an"
+        other: "environ %{count} ans"
+      almost_x_years:
+        one: "presqu'un an"
+        other: "presque %{count} ans"
+      half_a_minute: "une demi-minute"
+      less_than_x_minutes:
+        zero: "moins d'une minute"
+        one: "moins d'une minute"
+        other: "moins de %{count} minutes"
+      less_than_x_seconds:
+        zero: "moins d'une seconde"
+        one: "moins d'une seconde"
+        other: "moins de %{count} secondes"
+      over_x_years:
+        one: "plus d'un an"
+        other: "plus de %{count} ans"
+      x_days:
+        one: "1 jour"
+        other: "%{count} jours"
+      x_minutes:
+        one: "1 minute"
+        other: "%{count} minutes"
+      x_months:
+        one: "1 mois"
+        other: "%{count} mois"
+      x_seconds:
+        one: "1 seconde"
+        other: "%{count} secondes"
+    prompts:
+      day: "Jour"
+      hour: "Heure"
+      minute: "Minute"
+      month: "Mois"
+      second: "Seconde"
+      year: "Année"
+
+  number:
+    currency:
+      format:
+        delimiter: " "
+        format: "%n %u"
+        precision: 2
+        separator: ","
+        significant: false
+        strip_insignificant_zeros: false
+        unit: "€"
+    format:
+      delimiter: " "
+      precision: 3
+      separator: ","
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: "%n %u"
+        units:
+          billion: "milliard"
+          million: "million"
+          quadrillion: "million de milliards"
+          thousand: "millier"
+          trillion: "billion"
+          unit: ""
+      format:
+        delimiter: ""
+        precision: 3
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: "%n %u"
+        units:
+          byte:
+            one: "octet"
+            other: "octets"
+          gb: "Go"
+          kb: "ko"
+          mb: "Mo"
+          tb: "To"
+    percentage:
+      format:
+        delimiter: ""
+    precision:
+      format:
+        delimiter: ""
+
+  views:
+    pagination:
+      first: "&laquo; Premier"
+      last: "Dernier &raquo;"
+      previous: "&lsaquo; Précédent"
+      next: "Suivant &rsaquo;"
+      truncate: "&hellip;"
+
+  helpers:
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: "Aucun %{entry_name} trouvé"
+          one: "Affichage de <b>1</b> %{entry_name}"
+          other: "Affichage de <b>tous les %{count}</b> %{entry_name}"
+      more_pages:
+        display_entries: "Affichage de %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> sur <b>%{total}</b> au total"
+
+  activerecord:
+    errors:
+      messages:
+        required: "doit être renseigné"
+        blank: "ne peut pas être vide"
+        taken: "est déjà utilisé"
+        too_long: "est trop long (maximum %{count} caractères)"
+        too_short: "est trop court (minimum %{count} caractères)"
+        wrong_length: "n'a pas la bonne longueur (doit être %{count} caractères)"
+        invalid: "n'est pas valide"
+        confirmation: "ne correspond pas à la confirmation"
+        accepted: "doit être accepté"
+        empty: "ne peut pas être vide"
+        equal_to: "doit être égal à %{count}"
+        even: "doit être pair"
+        exclusion: "est réservé"
+        greater_than: "doit être supérieur à %{count}"
+        greater_than_or_equal_to: "doit être supérieur ou égal à %{count}"
+        inclusion: "n'est pas inclus dans la liste"
+        less_than: "doit être inférieur à %{count}"
+        less_than_or_equal_to: "doit être inférieur ou égal à %{count}"
+        model_invalid: "La validation a échoué: %{errors}"
+        not_a_number: "n'est pas un nombre"
+        not_an_integer: "doit être un entier"
+        odd: "doit être impair"
+        other_than: "doit être différent de %{count}"
+        present: "doit être vide"
+        record_invalid: "La validation a échoué: %{errors}"
+        restrict_dependent_destroy:
+          one: "Impossible de supprimer l'enregistrement car un %{record} dépendant existe"
+          many: "Impossible de supprimer l'enregistrement car des %{record} dépendants existent"
+        too_many: "trop nombreux (maximum %{count})"
+        uniqueness: "doit être unique"
+      template:
+        header:
+          one: "1 erreur a empêché ce %{model} d'être enregistré"
+          other: "%{count} erreurs ont empêché ce %{model} d'être enregistré"
+        body: "Il y a des problèmes avec les champs suivants:"
+      models:
+        item:
+          attributes:
+            product_sub_category:
+              required: "doit être sélectionnée"
+              blank: "doit être sélectionnée"
+            name:
+              blank: "ne peut pas être vide"
+            price:
+              blank: "ne peut pas être vide"
+            stock_quantity:
+              blank: "ne peut pas être vide"
+        item_attribute:
+          attributes:
+            name:
+              taken: "est déjà utilisé pour ce produit"
+
+  vendors:
+    authentication:
+      must_be_logged_in: "Vous devez vous connecter pour accéder à cette page"
+      must_be_logged_in_with_period: "Vous devez vous connecter pour accéder à cette page."
+
+  categories:
+    not_found: "Catégorie non trouvée"
+
+  items:
+    not_found: "Article non trouvé"
+
+  shops:
+    not_found: "Boutique non trouvée"
+
+  breadcrumbs:
+    home: "Accueil"
+    categories: "Catégories"
+    products: "Produits"
+    shops: "Boutiques"
+

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Votre commande a été expédiée</h1>
+    <p>Bonjour <%= @user.first_name %>,</p>
+    <p>Votre commande <strong>#{@order.order_number}</strong> a été expédiée<% if @order.departure_date %> le <%= @order.departure_date.strftime('%d/%m/%Y à %H:%M') %><% end %>.</p>
+    <p>Elle arrivera bientôt à destination.</p>
+    <p>Merci pour votre confiance !</p>
+  </body>
+</html>
+

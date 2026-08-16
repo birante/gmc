@@ -1,0 +1,92 @@
+<%# SEO Meta Tags %>
+<% content_for :title, @page_title %>
+<% content_for :meta_description, @page_description %>
+<% content_for :canonical_url, shop_url(@shop) %>
+
+<% if @shop.local? %>
+  <%= render "local_shop_show" %>
+<% else %>
+  <%# Vue boutique officielle - Refonte UX/UI %>
+  <% 
+    primary_color = @shop.official? ? shop_primary_color(@shop) : "#551694"
+    secondary_color = @shop.official? ? shop_secondary_color(@shop) : "#7C3AED"
+  %>
+
+  <% if @shop.official? %>
+    <% content_for :hide_public_navbar, true %>
+    <% content_for :hide_categories_bar, true %>
+    <% content_for :hide_nav_search, true %>
+    <% content_for :hide_vendor_cta, true %>
+  <% end %>
+
+  <% content_for :structured_data do %>
+    <%= json_ld_tag(breadcrumb_schema([
+      [t('breadcrumbs.home', default: 'Accueil'), root_url],
+      [t('breadcrumbs.shops', default: 'Boutiques'), shops_url],
+      [@shop.name, shop_url(@shop)]
+    ])) %>
+    <%= json_ld_tag(shop_schema(@shop)) %>
+    <% if @items.any? %>
+      <%= json_ld_tag(item_list_schema(@items, "#{@shop.name} - #{t('shops.products_title', default: 'Produits')}")) %>
+    <% end %>
+  <% end %>
+  <% if @shop.logo.attached? %>
+    <% content_for :og_image, url_for(@shop.logo) %>
+  <% end %>
+
+  <div class="min-h-screen bg-gray-50/50" style="--primary-color: <%= primary_color %>; --secondary-color: <%= secondary_color %>;">
+    <%# 1. Hero/Header + 2. Header boutique %>
+    <div class="container mx-auto px-3 sm:px-4 lg:px-[50px] pt-4">
+      <% if @shop_page_header_slides&.any? { |s| s.image.attached? } %>
+        <%= render "shop_page_header_slides", shop: @shop, slides: @shop_page_header_slides, primary_color: primary_color %>
+      <% else %>
+        <% if @shop_page_sections.any? %>
+          <% hero_section = @shop_page_sections.find { |s| s.section_type == "hero_carousel" } %>
+          <% if hero_section %>
+            <%= render "shops/sections/hero_carousel", section: hero_section, shop: @shop, primary_color: primary_color, secondary_color: secondary_color %>
+          <% else %>
+            <%= render "hero_carousel", shop: @shop, primary_color: primary_color, secondary_color: secondary_color %>
+          <% end %>
+        <% else %>
+          <%= render "hero_carousel", shop: @shop, primary_color: primary_color, secondary_color: secondary_color %>
+        <% end %>
+      <% end %>
+      <%= render "shop_info_header", shop: @shop, primary_color: primary_color, available_items_count: @available_items_count, show_promos_tab: @shop.official? && (@shop_categories_with_products&.any? || @meilleures_offres.present? || @nouveautes.present? || @destockage.present?) %>
+    </div>
+
+    <%# 3. Contenu principal - Sections digitalisées ou layout par défaut %>
+    <div class="pb-12" role="region" aria-label="<%= t('shops.main_content', default: 'Contenu de la boutique') %>">
+      <div class="container mx-auto px-3 sm:px-4 lg:px-[50px]">
+        <% if @shop_page_sections.any? %>
+          <%# Rendu des sections dans l'ordre (position) - hero_carousel déjà affiché en haut %>
+          <div class="pt-8 space-y-10">
+            <% @shop_page_sections.reject { |s| s.section_type == "hero_carousel" }.each do |section| %>
+              <%= render "shop_section", section: section, shop: @shop, primary_color: primary_color, secondary_color: secondary_color %>
+            <% end %>
+          </div>
+        <% else %>
+          <%# Layout par défaut (rétrocompatibilité) %>
+          <% if @shop.official? %>
+            <section id="promos" class="scroll-mt-20 pt-6 space-y-6" role="region" aria-labelledby="promos-heading">
+              <h2 id="promos-heading" class="sr-only"><%= t('shops.promos_heading', default: 'Promotions et offres') %></h2>
+              <%= render "global_carousels", shop: @shop, meilleures_offres: @meilleures_offres || [], nouveautes: @nouveautes || [], destockage: @destockage || [] %>
+              <% if @shop_categories_with_products&.any? %>
+                <%= render "categories_carousels", shop: @shop, shop_categories_with_products: @shop_categories_with_products %>
+              <% end %>
+            </section>
+          <% end %>
+
+          <% if @shop.sectors.any? && (!@shop.official? || !@shop_categories_with_products&.any?) %>
+            <section class="pt-6">
+              <%= render "featured_categories", shop: @shop, primary_color: primary_color, secondary_color: secondary_color %>
+            </section>
+          <% end %>
+
+          <section id="products-section" class="scroll-mt-20 pt-8">
+            <%= render "products_section", items: @items, primary_color: primary_color %>
+          </section>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

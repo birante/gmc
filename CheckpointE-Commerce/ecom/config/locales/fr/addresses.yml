@@ -1,0 +1,29 @@
+fr:
+  client:
+    addresses:
+      index:
+        title: "Mes adresses"
+        back_to_checkout: "← Retour au checkout"
+        add_address: "Ajouter une adresse"
+        default: "Par défaut"
+        address_label: "Adresse"
+        edit: "Modifier"
+        set_default: "Définir par défaut"
+        delete: "Supprimer"
+        delete_confirm: "Êtes-vous sûr?"
+        no_addresses_title: "Aucune adresse enregistrée"
+        no_addresses_message: "Ajoutez une adresse de livraison pour passer commande"
+      form:
+        street_address: "Adresse complète"
+        street_address_placeholder: "Ex: Cité Keur Gorgui, Villa 123"
+        city: "Ville"
+        postal_code: "Code postal"
+        country: "Pays"
+        latitude: "Latitude (optionnel)"
+        latitude_placeholder: "14.6937"
+        longitude: "Longitude (optionnel)"
+        longitude_placeholder: "-17.4441"
+        is_default: "Définir comme adresse par défaut"
+        cancel: "Annuler"
+        save: "Enregistrer"
+

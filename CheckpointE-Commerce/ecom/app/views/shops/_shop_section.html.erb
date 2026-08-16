@@ -1,0 +1,17 @@
+<%# Rendu d'une section de la page boutique selon son type %>
+<% primary_color = local_assigns[:primary_color] || shop_primary_color(shop) %>
+<% secondary_color = local_assigns[:secondary_color] || shop_secondary_color(shop) %>
+<% case section.section_type %>
+<% when "hero_carousel" %>
+  <%= render "shops/sections/hero_carousel", section: section, shop: shop, primary_color: primary_color, secondary_color: secondary_color %>
+<% when "promo_banners" %>
+  <%= render "shops/sections/promo_banners", section: section, shop: shop %>
+<% when "global_carousels" %>
+  <%= render "shops/sections/global_carousels", section: section, shop: shop, primary_color: primary_color, secondary_color: secondary_color %>
+<% when "categories_carousels" %>
+  <%= render "shops/sections/categories_carousels", section: section, shop: shop, primary_color: primary_color, secondary_color: secondary_color %>
+<% when "featured_categories" %>
+  <%= render "shops/sections/featured_categories", section: section, shop: shop, primary_color: primary_color, secondary_color: secondary_color %>
+<% when "products" %>
+  <%= render "shops/sections/products", section: section, shop: shop, primary_color: primary_color %>
+<% end %>

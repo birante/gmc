@@ -1,0 +1,75 @@
+<%# Categories Grid - Design avec images produits et accessibilité %>
+<%
+  # Utiliser uniquement les items passés (pas de fallback)
+  items = local_assigns[:items] || local_assigns[:categories]
+  items = items.to_a if items.respond_to?(:to_a)
+%>
+
+<% return unless items.any? %>
+
+<section class="container mx-auto px-4 lg:px-[50px] py-6 md:py-8" aria-labelledby="categories-heading">
+  <!-- Section Header -->
+  <header class="mb-5 md:mb-8">
+    <h2 id="categories-heading" class="text-xl md:text-2xl font-semibold text-[#362526]">
+      <%= t('storefront.categories.explore_title', default: 'Explorer par catégories') %>
+    </h2>
+  </header>
+
+  <!-- Categories Horizontal Scroll -->
+  <div class="relative" data-controller="horizontal-scroll">
+        <nav data-horizontal-scroll-target="scrollable" 
+          class="flex gap-4 md:gap-6 overflow-x-auto pb-4 px-2 md:px-8 scrollbar-hide" 
+         style="scrollbar-width: none; -ms-overflow-style: none;"
+         role="list"
+         aria-label="<%= t('storefront.categories.nav_label', default: 'Catégories de produits') %>">
+      <% if items.present? %>
+        <% items.each do |item| %>
+        <%= link_to(item.link, 
+            class: "flex-shrink-0 group focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 rounded-lg",
+            role: "listitem",
+            "aria-label": t('storefront.categories.explore_category', category: item.title, default: "Explorer la catégorie #{item.title}")) do %>
+          <div class="flex flex-col items-center gap-4 md:gap-5 w-[104px] md:w-[124px]">
+            <!-- Circle with Product Image -->
+            <div class="w-[104px] h-[104px] md:w-[124px] md:h-[124px] rounded-full overflow-hidden flex items-center justify-center group-hover:bg-[#551694]/15 group-focus:bg-[#551694]/15 transition-colors <%= item.image.attached? ? 'bg-[rgba(227,227,236,0.66)]' : 'bg-[#f9f9f9]' %>">
+              <% if item.image.attached? %>
+                <%= image_tag(item.image,
+                    alt: item.title,
+                    aria: { hidden: "true" },
+                    class: "w-full h-full object-cover",
+                    width: 124,
+                    height: 124) %>
+              <% else %>
+                <span class="text-gray-400 font-semibold text-xs text-center px-2"><%= item.title %></span>
+              <% end %>
+            </div>
+            <!-- Category Name -->
+            <span class="text-sm md:text-[14px] font-semibold text-black text-center leading-snug line-clamp-2 group-hover:text-[#551694] transition-colors">
+              <%= item.title %>
+            </span>
+          </div>
+        <% end %>
+        <% end %>
+      <% end %>
+    </nav>
+
+    <!-- Scroll Buttons (sur les côtés) -->
+    <button type="button"
+            data-horizontal-scroll-target="leftButton"
+            data-action="click->horizontal-scroll#scrollLeft"
+            aria-label="<%= t('storefront.categories.scroll_left', default: 'Faire défiler les catégories vers la gauche') %>"
+            class="hidden md:flex absolute left-0 top-[45px] md:top-[55px] -translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    </button>
+    <button type="button"
+            data-horizontal-scroll-target="rightButton"
+            data-action="click->horizontal-scroll#scrollRight"
+            aria-label="<%= t('storefront.categories.scroll_right', default: 'Faire défiler les catégories vers la droite') %>"
+            class="hidden md:flex absolute right-0 top-[45px] md:top-[55px] translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </button>
+  </div>
+</section>

@@ -1,0 +1,345 @@
+<%
+  # Paramètres
+  vendor ||= current_vendor || @vendor
+  shops ||= @shops || vendor&.shops&.order(created_at: :desc) || []
+  # Utiliser @current_shop défini par VendorShopContext, ou @shop, ou la première boutique
+  current_shop ||= @current_shop || @shop || shops.first
+  active_tab ||= 'dashboard'
+%>
+<div data-controller="sidebar">
+  <!-- ===== TOPBAR MOBILE (visible uniquement sur mobile) ===== -->
+  <div class="md:hidden bg-white border-b border-gray-200 sticky top-0 z-30">
+    <div class="flex justify-between items-center px-4 py-3">
+      <!-- Hamburger avec label -->
+      <%= button_tag type: 'button', 
+          data: { action: 'click->sidebar#toggle' },
+          class: 'flex flex-col items-center justify-center gap-0.5 p-1 focus:outline-none' do %>
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+        <span class="text-[10px] text-gray-600 font-medium"><%= t('navigation.menu') %></span>
+      <% end %>
+      <!-- Logo centré -->
+      <%= link_to root_path do %>
+        <%= image_tag "logo-mini.png", alt: "aa", class: "h-7 w-auto" %>
+      <% end %>
+      <!-- Icônes droite -->
+      <div class="flex items-center gap-1">
+        <!-- Sélecteur de langue -->
+        <%= render 'shared/language_selector' %>
+        <!-- Notifications avec badge numérique -->
+        <%= button_tag type: 'button', class: 'relative p-1.5' do %>
+          <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <span class="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full text-white text-[9px] font-semibold flex items-center justify-center">3</span>
+        <% end %>
+        <!-- Avatar -->
+        <div class="h-8 w-8 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold text-xs border border-gray-200">
+          <%= vendor&.first_name&.first&.upcase || 'V' %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ===== OVERLAY (fond semi-transparent) ===== -->
+  <div data-sidebar-target="overlay" 
+       data-action="click->sidebar#close"
+    class="hidden fixed inset-0 bg-black/50 opacity-0 z-40 md:hidden transition-opacity duration-300">
+  </div>
+  <!-- ===== SIDEBAR MOBILE ===== -->
+  <div data-sidebar-target="sidebar" 
+       class="hidden fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white z-50 transform -translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+    <div class="h-full flex flex-col overflow-y-auto">
+      <!-- 1. En-tête profil -->
+      <div class="relative px-6 py-4 border-b bg-gray-50">
+        <!-- Bouton fermer X -->
+        <%= button_tag type: 'button',
+          data: { action: 'click->sidebar#close' },
+          class: 'absolute top-4 right-4 p-1 text-gray-400 hover:text-gray-600 focus:outline-none' do %>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        <% end %>
+        <!-- Profil vendeur -->
+        <div class="flex items-center gap-3">
+          <div class="h-12 w-12 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold text-lg border-2 border-white shadow">
+            <%= vendor&.first_name&.first&.upcase || 'V' %>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-semibold text-gray-900 truncate"><%= vendor&.first_name %> <%= vendor&.last_name %></p>
+            <p class="text-xs text-gray-500 truncate"><%= vendor&.email %></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2. Sélecteur boutique -->
+      <% if shops.any? %>
+        <div class="px-6 py-3 border-b bg-white">
+          <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
+            <%= t('vendors.navigation.active_shop') %>
+          </label>
+          <%= select_tag 'shop_slug_mobile',
+            options_for_select(
+              shops.map { |s| [s.name, url_with_shop(vendors_dashboard_path, s)] },
+              url_with_shop(vendors_dashboard_path, current_shop)
+            ),
+            {
+              onchange: 'if(this.value) window.location.href = this.value',
+              class: 'w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]'
+            } %>
+        </div>
+      <% end %>
+      <!-- 3. Navigation principale -->
+      <nav class="px-4 py-3 flex-1">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 mb-3">
+          <%= t('vendors.navigation.navigation_section') %>
+        </div>
+        <%= link_to url_with_shop(vendors_dashboard_path, current_shop), 
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'dashboard' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.dashboard') %></span>
+          <% if active_tab == 'dashboard' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to (current_shop ? analytics_vendors_shop_path(current_shop) : "#"), 
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'analytics' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1">Analytics</span>
+          <% if active_tab == 'analytics' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to url_with_shop(vendors_items_path, current_shop),
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'catalogue' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.catalogue') %></span>
+          <% if active_tab == 'catalogue' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to url_with_shop(vendors_colors_path, current_shop),
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'couleurs' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1">Mes couleurs</span>
+          <% if active_tab == 'couleurs' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to url_with_shop(vendors_orders_path, current_shop),
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'commandes' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.orders') %></span>
+          <% if active_tab == 'commandes' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to url_with_shop(vendors_clients_path, current_shop), 
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'clients' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.clients') %></span>
+          <% if active_tab == 'clients' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to url_with_shop(vendors_finances_path, current_shop), 
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'finances' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1">Finances</span>
+          <% if active_tab == 'finances' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to (current_shop ? edit_vendors_shop_path(current_shop) : "#"), 
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'parametres' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.settings') %></span>
+          <% if active_tab == 'parametres' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+      </nav>
+      <!-- 4. Section compte (en bas) -->
+      <div class="px-4 py-3 border-t bg-gray-50 mt-auto">
+        <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 mb-3">
+          <%= t('vendors.navigation.account_section') %>
+        </div>
+        <!-- Lien Collaborateurs : uniquement pour les vendors (pas pour les employés) -->
+        <%= link_to vendors_employees_path, 
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'vendeurs' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.my_vendors') %></span>
+          <% if active_tab == 'vendeurs' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= link_to vendors_account_path,
+          data: { action: 'click->sidebar#close' },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors mb-1 #{active_tab == 'compte' ? 'bg-purple-50 text-[#551694]' : ''}" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-sm font-medium flex-1"><%= t('vendors.navigation.my_account') %></span>
+          <% if active_tab == 'compte' %>
+            <div class="h-2 w-2 rounded-full bg-[#551694]"></div>
+          <% end %>
+        <% end %>
+        <%= button_to (acting_as_vendor? ? vendors_session_path : employees_session_path), 
+          method: :delete,
+          data: { turbo: false },
+          class: "flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors w-full mt-2" do %>
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span class="text-sm font-medium"><%= t('vendors.navigation.logout') %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <!-- ===== TOPBAR DESKTOP (masquée sur mobile) ===== -->
+  <div class="hidden md:block bg-white sticky top-0 z-50">
+    <!-- Niveau 1 : Logo + Sélecteur de boutiques | Icônes + Profil -->
+    <div class="flex justify-between items-center px-12 sm:px-16 lg:px-28 py-3">
+      <!-- Partie gauche : Logo + Sélecteur de boutiques -->
+      <div class="flex items-center space-x-4">
+        <!-- Logo -->
+        <%= link_to root_path do %>
+          <%= image_tag "logo-mini.png", alt: "aa", class: "h-8 w-auto" %>
+        <% end %>
+        <!-- Sélecteur de boutiques -->
+        <% if shops.any? %>
+          <div class="relative">
+            <%= select_tag 'shop_slug',
+                options_for_select(
+                  shops.map { |s| [s.name, url_with_shop(vendors_dashboard_path, s)] },
+                  url_with_shop(vendors_dashboard_path, current_shop)
+                ),
+                {
+                  id: 'shop-selector',
+                  onchange: 'if(this.value) window.location.href = this.value',
+                  class: 'appearance-none bg-white border border-gray-300 rounded-md pl-3 pr-8 py-2 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694] cursor-pointer'
+                } %>
+            <!-- Icône dropdown -->
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+              <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        <% else %>
+          <span class="text-sm font-medium text-gray-500"><%= t('vendors.navigation.no_shop') %></span>
+        <% end %>
+      </div>
+      <!-- Partie droite : Icônes + Photo profil -->
+      <div class="flex items-center space-x-3">
+        <!-- Icône notifications -->
+        <%= button_tag type: 'button', class: 'relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#551694] rounded-full' do %>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+          </svg>
+          <!-- Badge notification -->
+          <span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+        <% end %>
+        <!-- Icône messages -->
+        <%= button_tag type: 'button', class: 'relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#551694] rounded-full' do %>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+          </svg>
+        <% end %>
+        <!-- Avatar avec initiales -->
+        <div class="h-10 w-10 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold text-sm border-2 border-gray-200">
+          <%= vendor&.first_name&.first&.upcase || 'V' %>
+        </div>
+        <!-- Sélecteur de langue -->
+        <%= render 'shared/language_selector' %>
+        <!-- Icône de déconnexion -->
+        <%= button_to vendors_session_path, method: :delete, 
+            class: "p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500",
+            title: t('vendors.navigation.logout'),
+            data: { turbo: false, turbo_confirm: t('common.logout_confirm') } do %>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+        <% end %>
+      </div>
+    </div>
+    <!-- Niveau 2 : Menu de navigation -->
+    <div class="flex justify-between items-center px-12 sm:px-16 lg:px-28 border-b border-gray-200">
+      <!-- Partie gauche : Navigation principale -->
+      <nav class="flex space-x-8">
+        <%= link_to t('vendors.navigation.dashboard'), 
+            url_with_shop(vendors_dashboard_path, current_shop), 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'dashboard' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to "Analytics", 
+            (current_shop ? analytics_vendors_shop_path(current_shop) : "#"), 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'analytics' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to t('vendors.navigation.catalogue'),
+          url_with_shop(vendors_items_path, current_shop),
+          class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'catalogue' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to "Couleurs",
+            url_with_shop(vendors_colors_path, current_shop),
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'couleurs' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to t('vendors.navigation.orders'),
+            url_with_shop(vendors_orders_path, current_shop), 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'commandes' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to t('vendors.navigation.clients'), 
+            url_with_shop(vendors_clients_path, current_shop), 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'clients' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to "Finances", 
+            url_with_shop(vendors_finances_path, current_shop), 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'finances' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to t('vendors.navigation.settings'), 
+            (current_shop ? edit_vendors_shop_path(current_shop) : "#"), 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'parametres' ? 'text-[#551694] nav-link-active' : ''}" %>
+      </nav>
+      <!-- Partie droite : Liens secondaires -->
+      <div class="flex space-x-6">
+        <%= link_to t('vendors.navigation.my_vendors'), 
+            vendors_employees_path, 
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'vendeurs' ? 'text-[#551694] nav-link-active' : ''}" %>
+        <%= link_to t('vendors.navigation.my_account'),
+            vendors_account_path,
+            class: "relative px-1 py-4 text-sm font-medium text-gray-700 hover:text-[#551694] transition-colors #{active_tab == 'compte' ? 'text-[#551694] nav-link-active' : ''}" %>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  /* Indicateur actif avec pseudo-élément ::after (desktop uniquement) */
+  .nav-link-active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: #551694;
+  }
+</style>

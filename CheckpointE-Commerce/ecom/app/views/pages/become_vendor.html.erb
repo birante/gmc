@@ -1,0 +1,367 @@
+<% content_for :title, "Devenir vendeur sur aa - Vendez en ligne simplement" %>
+<% content_for :meta_description, "Lancez votre boutique sur aa, gérez votre catalogue, vos commandes et vos paiements depuis une interface pensée pour les vendeurs." %>
+<% content_for :meta_keywords, "devenir vendeur, aa, boutique en ligne, vendre sur aa, marketplace sénégal" %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<% content_for :structured_data do %>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "<%= request.original_url.split('?').first %>#webpage",
+          "url": "<%= request.original_url.split('?').first %>",
+          "name": "<%= j content_for(:title) %>",
+          "description": "<%= j content_for(:meta_description) %>",
+          "inLanguage": "<%= I18n.locale == :fr ? 'fr' : 'en' %>",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "aa",
+            "url": "<%= root_url %>"
+          },
+          "breadcrumb": { "@id": "<%= request.original_url.split('?').first %>#breadcrumb" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "@id": "<%= request.original_url.split('?').first %>#breadcrumb",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "<%= root_url %>" },
+            { "@type": "ListItem", "position": 2, "name": "Devenir vendeur", "item": "<%= request.original_url.split('?').first %>" }
+          ]
+        }
+      ]
+    }
+  </script>
+<% end %>
+<section class="bg-[#EEEAF8] overflow-hidden" aria-labelledby="hero-heading">
+  <div class="container mx-auto px-4 lg:px-[50px] py-14 md:py-20 lg:py-24">
+    <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(520px,1.05fr)] lg:gap-16">
+      <div class="max-w-xl text-center lg:text-left">
+        <h1 id="hero-heading" class="text-[2.45rem] md:text-5xl lg:text-[3.55rem] font-bold tracking-tight text-[#5E24A8] leading-[1.02]">
+          Vos clients sont déjà en ligne.<br>
+          Soyez là où ils achètent.
+        </h1>
+        <p class="mt-5 text-[15px] md:text-lg leading-7 text-[#5A5870] max-w-lg mx-auto lg:mx-0">
+          aa connecte vos produits à des milliers d'acheteurs, et vous donne tous les outils pour vendre simplement, en ligne.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <%= link_to new_vendors_registration_path, class: "inline-flex items-center justify-center gap-2 rounded-full bg-[#5E24A8] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(94,36,168,0.22)] transition hover:bg-[#4D1D8A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5E24A8] focus-visible:ring-offset-2 sm:w-auto" do %>
+            Vendre sur aa
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          <% end %>
+          <%= link_to new_vendors_session_path, class: "inline-flex items-center justify-center rounded-full border border-[#5E24A8] px-6 py-3.5 text-sm font-semibold text-[#5E24A8] transition hover:bg-[#5E24A8]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5E24A8] focus-visible:ring-offset-2 sm:w-auto" do %>
+            Connexion
+          <% end %>
+        </div>
+      </div>
+      <div class="relative mx-auto w-full max-w-[520px] lg:hidden" aria-hidden="true">
+        <div class="relative">
+          <div class="rounded-[18px] bg-white p-3 shadow-[0_18px_55px_rgba(91,53,157,0.14)]">
+            <div class="bg-[#F2F1F8] rounded-t-[14px] h-7 flex items-center gap-2 px-3">
+              <div class="w-2.5 h-2.5 rounded-full bg-[#FF6A66]"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#FFCA3A]"></div>
+              <div class="w-2.5 h-2.5 rounded-full bg-[#61D095]"></div>
+            </div>
+            <div class="bg-white rounded-b-[14px] p-4">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-2xl bg-[#F5EEFF] p-3">
+                  <p class="text-[10px] text-[#77728C] mb-1.5">Chiffre d'affaires</p>
+                  <p class="text-sm font-bold text-[#5E24A8]">1.200.876,300 FCFA</p>
+                </div>
+                <div class="rounded-2xl bg-[#EEF5FF] p-3">
+                  <p class="text-[10px] text-[#77728C] mb-1.5">Commandes</p>
+                  <p class="text-sm font-bold text-[#2864FF]">885.000 FCFA</p>
+                </div>
+                <div class="rounded-2xl bg-[#EAF9EE] p-3">
+                  <p class="text-[10px] text-[#77728C] mb-1.5">Ventes</p>
+                  <p class="text-sm font-bold text-[#00A651]">7.567.000 FCFA</p>
+                </div>
+                <div class="rounded-2xl bg-[#FFF3EA] p-3">
+                  <p class="text-[10px] text-[#77728C] mb-1.5">Bénéfices</p>
+                  <p class="text-sm font-bold text-[#FF6A00]">4.005.788 FCFA</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="absolute -right-3 bottom-4 w-[82px] rounded-[18px] bg-white p-2 shadow-[0_16px_40px_rgba(39,27,78,0.18)] rotate-[5deg]">
+            <div class="rounded-[14px] bg-[#1E1934] px-4 py-2">
+              <div class="mx-auto h-1 w-8 rounded-full bg-white/30"></div>
+            </div>
+            <div class="space-y-2 rounded-b-[14px] bg-white p-2.5">
+              <div class="h-10 rounded-xl bg-[#EEE6FF]"></div>
+              <div class="h-7 rounded-lg bg-[#F1F0F8]"></div>
+              <div class="h-7 rounded-lg bg-[#F1F0F8]"></div>
+              <div class="h-9 rounded-xl bg-[#E7D7FF]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative hidden lg:block min-h-[380px]" aria-hidden="true">
+        <div class="absolute inset-y-6 right-2 left-10 rounded-[28px] bg-white/40 blur-2xl"></div>
+        <div class="relative ml-auto max-w-[680px]">
+          <div class="bg-white rounded-lg shadow-2xl p-4 mb-4 transform rotate-[-2deg]">
+            <div class="bg-[#F2F1F8] rounded-t-lg h-8 flex items-center gap-2 px-4">
+              <div class="w-3 h-3 rounded-full bg-[#FF6A66]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#FFCA3A]"></div>
+              <div class="w-3 h-3 rounded-full bg-[#61D095]"></div>
+            </div>
+            <div class="bg-white rounded-b-lg p-6 h-64">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-[#F5EEFF] rounded-lg p-4">
+                  <p class="text-xs text-[#77728C] mb-2">Chiffre d'affaires</p>
+                  <p class="text-2xl font-bold text-[#5E24A8]">1.200.876,300 FCFA</p>
+                </div>
+                <div class="bg-[#EEF5FF] rounded-lg p-4">
+                  <p class="text-xs text-[#77728C] mb-2">Commandes</p>
+                  <p class="text-2xl font-bold text-[#2864FF]">885.000 FCFA</p>
+                </div>
+                <div class="bg-[#EAF9EE] rounded-lg p-4">
+                  <p class="text-xs text-[#77728C] mb-2">Ventes</p>
+                  <p class="text-2xl font-bold text-[#00A651]">7.567.000 FCFA</p>
+                </div>
+                <div class="bg-[#FFF3EA] rounded-lg p-4">
+                  <p class="text-xs text-[#77728C] mb-2">Bénéfices</p>
+                  <p class="text-2xl font-bold text-[#FF6A00]">4.005.788 FCFA</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="absolute -right-7 bottom-2 w-[92px] rounded-[18px] bg-white p-2 shadow-[0_16px_40px_rgba(39,27,78,0.18)] rotate-[5deg]">
+            <div class="rounded-[14px] bg-[#1E1934] px-4 py-2">
+              <div class="mx-auto h-1 w-8 rounded-full bg-white/30"></div>
+            </div>
+            <div class="space-y-2 rounded-b-[14px] bg-white p-2.5">
+              <div class="h-10 rounded-xl bg-[#EEE6FF]"></div>
+              <div class="h-7 rounded-lg bg-[#F1F0F8]"></div>
+              <div class="h-7 rounded-lg bg-[#F1F0F8]"></div>
+              <div class="h-9 rounded-xl bg-[#E7D7FF]"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-[#5E24A8] py-16 md:py-20" aria-labelledby="benefits-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="mx-auto max-w-3xl text-center text-white">
+      <h2 id="benefits-heading" class="text-3xl md:text-[2.5rem] font-bold leading-tight">
+        Tout ce dont vous avez besoin pour vendre en ligne. <span class="text-[#FFC700]">Sans stress.</span>
+      </h2>
+      <p class="mt-4 text-sm md:text-base text-[#E6D7FF] leading-7">
+        aa vous accompagne à chaque étape: visibilité, gestion, livraison, paiement.
+      </p>
+      <div class="mt-8 flex justify-center">
+        <%= link_to new_vendors_registration_path, class: "inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC700] px-7 py-3.5 text-sm font-bold text-[#2E0A66] shadow-[0_8px_20px_rgba(255,199,0,0.3)] transition hover:bg-[#f5c000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FFC700] focus-visible:ring-offset-2" do %>
+          Créer ma boutique
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+          </svg>
+        <% end %>
+      </div>
+    </div>
+    <div class="mt-12 grid gap-5 lg:grid-cols-3 lg:grid-rows-2 items-stretch">
+      <article class="rounded-2xl bg-white p-6 shadow-[0_12px_28px_rgba(20,9,48,0.12)] min-h-[214px]">
+        <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#5E24A8] text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v8m4-4H8m12 0a8 8 0 11-16 0 8 8 0 0116 0z" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-[#5E24A8] leading-7">Vendez en ligne. Touchez plus de clients dès aujourd'hui.</h3>
+        <p class="mt-3 text-sm leading-6 text-[#646276]">
+          Mettez vos produits en ligne rapidement et profitez de la visibilité de aa pour toucher plus d'acheteurs et développer vos ventes.
+        </p>
+      </article>
+      <figure class="row-span-2 overflow-hidden rounded-2xl shadow-[0_16px_44px_rgba(36,12,87,0.18)] bg-[#7345B5] min-h-[452px]">
+        <%= image_tag "becomevendors/1.png", alt: "Commerçante aa dans sa boutique", class: "h-full w-full object-cover" %>
+        <figcaption class="-mt-16 px-6 pb-6 relative z-10">
+          <span class="inline-flex rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#5E24A8] shadow-lg">Créer ma boutique</span>
+        </figcaption>
+      </figure>
+      <article class="rounded-2xl bg-white p-6 shadow-[0_12px_28px_rgba(20,9,48,0.12)] min-h-[214px]">
+        <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#5E24A8] text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h10" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-[#5E24A8] leading-7">Des outils qui travaillent pour vous</h3>
+        <p class="mt-3 text-sm leading-6 text-[#646276]">
+          Simplifiez la gestion de votre boutique avec des outils intelligents pour gagner du temps et optimiser votre catalogue.
+        </p>
+      </article>
+      <article class="rounded-2xl bg-white p-6 shadow-[0_12px_28px_rgba(20,9,48,0.12)] min-h-[214px]">
+        <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#5E24A8] text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h5M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-[#5E24A8] leading-7">Gérez tout depuis un seul endroit</h3>
+        <p class="mt-3 text-sm leading-6 text-[#646276]">
+          Gérez commandes, paiements et clients en temps réel depuis un tableau de bord simple et centralisé.
+        </p>
+      </article>
+      <article class="rounded-2xl bg-white p-6 shadow-[0_12px_28px_rgba(20,9,48,0.12)] min-h-[214px]">
+        <div class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#5E24A8] text-white">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10c0 3.314-2.686 6-6 6s-6-2.686-6-6 2.686-6 6-6 6 2.686 6 6zm-6 8v2m-4 0h8" />
+          </svg>
+        </div>
+        <h3 class="mt-5 text-xl font-semibold text-[#5E24A8] leading-7">On vous accompagne à chaque étape</h3>
+        <p class="mt-3 text-sm leading-6 text-[#646276]">
+          Profitez d'un accompagnement personnalisé à chaque étape de votre développement pour vendre et développer votre activité en toute confiance.
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+<section class="bg-[#F6F2FD] py-8 md:py-10">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="grid gap-5 lg:grid-cols-2">
+      <article class="rounded-[28px] bg-[#F3ECFF] p-6 md:p-8 shadow-[0_14px_36px_rgba(66,37,124,0.08)]">
+        <p class="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7C68A6]">Boutique & visibilité</p>
+        <h2 class="mt-5 text-3xl font-semibold leading-tight text-[#5E24A8]">Une boutique professionnelle qui inspire confiance</h2>
+        <p class="mt-4 max-w-xl text-sm leading-7 text-[#66637A]">
+          Votre boutique aa est visible par tous les acheteurs sur la marketplace. Créez votre identité de marque, gérez vos produits, vos promotions et touchez des clients partout au Sénégal.
+        </p>
+        <figure class="mt-8 overflow-hidden rounded-[24px] bg-white shadow-[0_12px_34px_rgba(68,40,120,0.08)]">
+          <%= image_tag "becomevendors/2.png", alt: "Aperçu boutique publique aa", class: "w-full" %>
+        </figure>
+      </article>
+      <article class="rounded-[28px] bg-[#F3ECFF] p-6 md:p-8 shadow-[0_14px_36px_rgba(66,37,124,0.08)]">
+        <p class="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7C68A6]">Catalogue & gestion produit</p>
+        <h2 class="mt-5 text-3xl font-semibold leading-tight text-[#5E24A8]">Un catalogue optimisé pour vendre</h2>
+        <p class="mt-4 max-w-xl text-sm leading-7 text-[#66637A]">
+          Ajoutez vos produits en quelques clics, organisez-les par catégorie, gérez vos variantes de couleur et de taille, tout depuis une interface simple et intuitive.
+        </p>
+        <figure class="mt-8 overflow-hidden rounded-[24px] bg-white shadow-[0_12px_34px_rgba(68,40,120,0.08)]">
+          <%= image_tag "becomevendors/3.png", alt: "Gestion du catalogue vendeur aa", class: "w-full" %>
+        </figure>
+      </article>
+      <article class="rounded-[28px] bg-[#F3ECFF] p-6 md:p-8 shadow-[0_14px_36px_rgba(66,37,124,0.08)]">
+        <p class="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7C68A6]">Analytics & activité</p>
+        <h2 class="mt-5 text-3xl font-semibold leading-tight text-[#5E24A8]">Pilotez votre business en temps réel.</h2>
+        <p class="mt-4 max-w-xl text-sm leading-7 text-[#66637A]">
+          Votre tableau de bord Analytics vous donne une vision complète de votre boutique, vos commandes, conversions, top produits, pour décider vite et vendre plus.
+        </p>
+        <figure class="mt-8 overflow-hidden rounded-[24px] bg-white shadow-[0_12px_34px_rgba(68,40,120,0.08)]">
+          <%= image_tag "becomevendors/4.png", alt: "Analytics vendeur aa", class: "w-full" %>
+        </figure>
+      </article>
+      <article class="rounded-[28px] bg-[#F3ECFF] p-6 md:p-8 shadow-[0_14px_36px_rgba(66,37,124,0.08)]">
+        <p class="inline-flex rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7C68A6]">Finance & retraits</p>
+        <h2 class="mt-5 text-3xl font-semibold leading-tight text-[#5E24A8]">Votre argent. Disponible et sécurisé.</h2>
+        <p class="mt-4 max-w-xl text-sm leading-7 text-[#66637A]">
+          Suivez votre solde disponible, vos revenus nets et l'historique complet de vos transactions. Retirez vos fonds quand vous voulez via Wave, Orange Money ou virement bancaire.
+        </p>
+        <figure class="mt-8 overflow-hidden rounded-[24px] bg-white shadow-[0_12px_34px_rgba(68,40,120,0.08)]">
+          <%= image_tag "becomevendors/5.png", alt: "Solde et revenus vendeur aa", class: "w-full" %>
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+<section class="bg-[#5E24A8] py-12 md:py-16" aria-labelledby="steps-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.85fr)] items-center">
+      <figure class="overflow-hidden rounded-[6px] border border-white/10 bg-[#4C1D8B] shadow-[0_18px_46px_rgba(16,8,45,0.28)]">
+        <%= image_tag "becomevendors/6.png", alt: "Dashboard vendeur aa", class: "w-full" %>
+      </figure>
+      <div class="text-white">
+        <p class="text-[11px] uppercase tracking-[0.24em] text-[#EBCBFF] font-semibold">Inscription</p>
+        <h2 id="steps-heading" class="mt-3 text-3xl md:text-4xl font-bold leading-tight">Lancez votre boutique en 3 étapes simples</h2>
+        <ol class="mt-8 space-y-5 text-sm md:text-base leading-7 text-[#EADFFF]">
+          <li>
+            <strong class="block text-white">1. Créez votre compte:</strong>
+            Inscrivez-vous en quelques clics.
+          </li>
+          <li>
+            <strong class="block text-white">2. Configurez votre boutique:</strong>
+            Créez votre catalogue et configurez vos moyens de paiement.
+          </li>
+          <li>
+            <strong class="block text-white">3. Commencez à vendre:</strong>
+            Recevez vos commandes et développez votre activité.
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-[#EEEAF8] py-12 md:py-16" aria-labelledby="cta-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="rounded-[2px] bg-white px-6 py-8 md:px-12 md:py-12 shadow-[0_14px_34px_rgba(54,31,99,0.08)]">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center">
+        <div>
+          <h2 id="cta-heading" class="text-3xl md:text-4xl font-bold leading-tight text-[#5E24A8]">Prêt à booster vos ventes avec aa ?</h2>
+        </div>
+        <div>
+          <p class="text-sm md:text-base leading-7 text-[#66637A]">
+            Rejoignez les vendeurs qui utilisent déjà aa pour vendre plus simplement et plus efficacement.
+          </p>
+          <div class="mt-6">
+            <%= link_to "Créer ma boutique maintenant", new_vendors_registration_path, class: "inline-flex items-center justify-center rounded-full bg-[#5E24A8] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#4D1D8A] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5E24A8] focus-visible:ring-offset-2" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-white py-14 md:py-20" aria-labelledby="faq-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="mx-auto max-w-5xl">
+      <h2 id="faq-heading" class="text-3xl md:text-4xl font-bold text-[#5E24A8] leading-tight">Vous avez des questions ? On vous répond.</h2>
+      <div class="mt-10 divide-y divide-[#E7E3F0] border-t border-[#E7E3F0]">
+        <details class="group py-6" open>
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold text-[#5E24A8] marker:hidden">
+            Est-ce que je dois avoir des compétences techniques pour vendre sur aa ?
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5E24A8] text-white">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <p class="mt-4 max-w-4xl text-sm md:text-base leading-7 text-[#66637A]">
+            Non. aa est conçu pour être simple à utiliser. Vous pouvez créer votre boutique, ajouter vos produits et gérer vos ventes facilement, même sans expérience technique.
+          </p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold text-[#5E24A8] marker:hidden">
+            Comment fonctionne la livraison des commandes ?
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5E24A8] text-white">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <p class="mt-4 max-w-4xl text-sm md:text-base leading-7 text-[#66637A]">
+            aa s'occupe de la livraison pour vous. Les commandes sont collectées chez vous puis livrées aux clients, pour vous permettre de vous concentrer sur votre activité.
+          </p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold text-[#5E24A8] marker:hidden">
+            Quand est-ce que je reçois l'argent de mes ventes ?
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5E24A8] text-white">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <p class="mt-4 max-w-4xl text-sm md:text-base leading-7 text-[#66637A]">
+            Les paiements sont traités rapidement selon votre abonnement. aa vous permet de suivre vos revenus et de recevoir vos paiements en toute transparence.
+          </p>
+        </details>
+        <details class="group py-6">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-semibold text-[#5E24A8] marker:hidden">
+            Est-ce que aa peut m'aider à trouver des clients ?
+            <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#5E24A8] text-white">
+              <span class="group-open:hidden">+</span>
+              <span class="hidden group-open:inline">−</span>
+            </span>
+          </summary>
+          <p class="mt-4 max-w-4xl text-sm md:text-base leading-7 text-[#66637A]">
+            Oui. aa met en avant vos produits sur la plateforme et propose des campagnes marketing pour vous aider à gagner en visibilité et attirer plus d'acheteurs.
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>

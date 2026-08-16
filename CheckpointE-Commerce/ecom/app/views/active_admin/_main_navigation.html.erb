@@ -1,0 +1,63 @@
+<div id="main-menu" class="fixed top-0 xl:top-16 bottom-0 start-0 z-40 w-72 xl:w-60 overflow-y-auto custom-scrollbar transition-transform duration-300 ease-in-out -translate-x-full xl:translate-x-0 bg-white dark:bg-gray-950 xl:border-r xl:border-gray-200 dark:xl:border-gray-800 shadow-xl xl:shadow-none" tabindex="-1">
+  <div class="xl:flex hidden items-center gap-2 px-4 py-4 text-white" style="background: #6C3FD6;">
+    <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-white/20">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6v2h2l2 12H4L6 8h2V6a4 4 0 118 0zm-2 2V6a2 2 0 10-4 0v2h4zM6 10v10h12V10H6z"/></svg>
+    </div>
+    <span class="font-bold text-lg">aa</span>
+  </div>
+  <div class="p-4 pt-2">
+    <ul role="list" class="flex flex-1 flex-col space-y-1">
+      <% current_menu.items(self).each do |item| %>
+        <% children = item.items(self).presence %>
+        <li <%= current_menu_item?(item) && "data-open" %> class="group" data-item-id="<%= item.id %>">
+          <% if children %>
+            <% label_text = item.label(self).to_s %>
+            <% emoji_match = label_text.match(/^(\p{Emoji}+)\s+(.+)$/) %>
+            <% emoji = emoji_match ? emoji_match[1] : '' %>
+            <% text = emoji_match ? emoji_match[2] : label_text %>
+            <button data-menu-button class="w-full flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 <%= current_menu_item?(item) ? "bg-[#6C3FD6]/10 text-[#6C3FD6]" : "" %>" aria-label="<%= t('active_admin.toggle_section') %>">
+              <span class="flex items-center gap-2 min-w-0 flex-1">
+                <% if emoji.present? %>
+                  <span class="flex-shrink-0 text-base leading-none inline-flex items-center justify-center" style="width: 1.25rem;"><%= emoji %></span>
+                <% end %>
+                <span class="truncate"><%= text %></span>
+              </span>
+              <svg class="group-data-open:rotate-90 ml-2 h-5 w-5 shrink-0 transition-transform duration-200 text-gray-400 dark:text-gray-500 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <ul role="list" class="mt-1 ml-4 space-y-0.5 hidden group-data-open:block border-l-2 border-gray-200 dark:border-gray-700 pl-3 py-1">
+              <% children.each do |j| %>
+                <li data-item-id="<%= j.id %>">
+                  <%= link_to j.label(self), j.url(self), j.html_options.merge(class: "block rounded-lg px-3 py-2 text-sm font-normal text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white no-underline #{current_menu_item?(j) ? "bg-[#6C3FD6]/10 text-[#6C3FD6] font-semibold" : ""}") %>
+                </li>
+              <% end %>
+            </ul>
+          <% elsif url = item.url(self) %>
+            <% label_text = item.label(self).to_s %>
+            <% emoji_match = label_text.match(/^(\p{Emoji}+)\s+(.+)$/) %>
+            <% emoji = emoji_match ? emoji_match[1] : '' %>
+            <% text = emoji_match ? emoji_match[2] : label_text %>
+            <%= link_to url, item.html_options.merge(class: "flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-all duration-200 no-underline min-w-0 #{current_menu_item?(item) ? "bg-[#6C3FD6]/10 text-[#6C3FD6] dark:bg-[#6C3FD6]/20 dark:text-[#a78bfa]" : ""}") do %>
+              <% if emoji.present? %>
+                <span class="flex-shrink-0 text-base leading-none inline-flex items-center justify-center" style="width: 1.25rem;"><%= emoji %></span>
+              <% end %>
+              <span class="truncate flex-1"><%= text %></span>
+            <% end %>
+          <% else %>
+            <% label_text = item.label(self).to_s %>
+            <% emoji_match = label_text.match(/^(\p{Emoji}+)\s+(.+)$/) %>
+            <% emoji = emoji_match ? emoji_match[1] : '' %>
+            <% text = emoji_match ? emoji_match[2] : label_text %>
+            <div class="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <% if emoji.present? %>
+                <span class="flex-shrink-0 text-base leading-none inline-flex items-center justify-center" style="width: 1.25rem;"><%= emoji %></span>
+              <% end %>
+              <span class="truncate"><%= text %></span>
+            </div>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

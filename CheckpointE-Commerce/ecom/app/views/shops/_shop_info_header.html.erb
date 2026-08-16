@@ -1,0 +1,93 @@
+<%# Header boutique - Compact, moderne, sticky (contenu centré via parent) %>
+<% primary_color = local_assigns[:primary_color] || "#551694" %>
+<% items_count = local_assigns[:available_items_count] || shop.items.available_for_sale.count %>
+<header class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border shadow-sm rounded-xl mt-4" style="border-color: <%= primary_color %>15;" role="banner">
+  <div class="px-4 lg:px-8">
+    <%# Ligne principale: Logo + Infos + Actions %>
+    <div class="flex items-center justify-between gap-4 py-3">
+      <%# Logo + Nom %>
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-50" style="border: 1px solid <%= primary_color %>20;">
+          <% if shop.logo.attached? %>
+            <%= storage_image_tag(shop.logo, variant_name: :logo_small, alt: shop.name, class: "w-full h-full object-contain p-1", width: 56, height: 56) %>
+          <% else %>
+            <span class="text-xl font-bold" style="color: <%= primary_color %>;"><%= shop.name.first.upcase %></span>
+          <% end %>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-base md:text-lg font-bold text-gray-900 truncate"><%= shop.name %></h1>
+            <% if shop.verified? %>
+              <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs px-2 py-0.5 rounded-md flex-shrink-0" title="Boutique vérifiée">
+                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                Vérifiée
+              </span>
+            <% end %>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+            <% if shop.average_rating.present? %>
+              <% shop_rating = shop.average_rating %>
+              <% rounded_shop_rating = shop_rating.round %>
+              <span class="flex items-center gap-1" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_shop_rating) %>">
+                <% 5.times do |i| %>
+                  <svg class="w-3.5 h-3.5 <%= i < rounded_shop_rating ? 'text-amber-400 fill-current' : 'text-gray-200' %>" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <% end %>
+                <span class="font-medium text-gray-700"><%= shop_rating.round(1) %></span>
+                <span class="text-gray-500">(<%= shop.reviews_count >= 1000 ? "#{(shop.reviews_count / 1000.0).round(1)}K" : shop.reviews_count %> avis)</span>
+              </span>
+              <% unless shop.official? %>
+                <span>•</span>
+              <% end %>
+            <% end %>
+            <% unless shop.official? %>
+              <span><%= items_count >= 1000 ? "#{(items_count / 1000.0).round(1)}K" : items_count %> produits</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <%# Réseaux sociaux (officielles) %>
+      <% if shop.official? %>
+        <% fb = shop.social_links.joins(:social_platform).find_by(social_platforms: { code: 'facebook' }) %>
+        <% ig = shop.social_links.joins(:social_platform).find_by(social_platforms: { code: 'instagram' }) %>
+        <% tw = shop.social_links.joins(:social_platform).find_by(social_platforms: { code: 'twitter' }) %>
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <span class="text-xs text-gray-500 hidden sm:inline">Suivez-nous</span>
+          <%= link_to (fb&.url.presence || "#"), target: fb&.url.present? ? "_blank" : "_self", rel: "noopener noreferrer", onclick: fb&.url.blank? ? "return false;" : "", class: "w-9 h-9 rounded-lg bg-gray-100 hover:bg-[#1877F2] hover:text-white flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1877F2] #{fb&.url.blank? ? 'opacity-50 cursor-not-allowed' : ''}", aria: { label: "Facebook" } do %><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg><% end %>
+          <%= link_to (ig&.url.presence || "#"), target: ig&.url.present? ? "_blank" : "_self", rel: "noopener noreferrer", onclick: ig&.url.blank? ? "return false;" : "", class: "w-9 h-9 rounded-lg bg-gray-100 hover:bg-[#E4405F] hover:text-white flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#E4405F] #{ig&.url.blank? ? 'opacity-50 cursor-not-allowed' : ''}", aria: { label: "Instagram" } do %><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/></svg><% end %>
+          <%= link_to (tw&.url.presence || "#"), target: tw&.url.present? ? "_blank" : "_self", rel: "noopener noreferrer", onclick: tw&.url.blank? ? "return false;" : "", class: "w-9 h-9 rounded-lg bg-gray-100 hover:bg-[#1DA1F2] hover:text-white flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1DA1F2] #{tw&.url.blank? ? 'opacity-50 cursor-not-allowed' : ''}", aria: { label: "Twitter" } do %><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg><% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Navigation %>
+    <div class="py-2 border-t" style="border-color: <%= primary_color %>10;">
+      <nav class="flex gap-6 overflow-x-auto scrollbar-hide -mb-px" aria-label="<%= t('shops.nav_label', default: 'Navigation de la boutique') %>" style="scrollbar-width: none;">
+        <a href="#products-section" class="nav-tab text-sm font-medium py-2 border-b-2 whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-sm" style="border-color: <%= primary_color %>; color: <%= primary_color %>; --tw-ring-color: <%= primary_color %>;" data-scroll="products-section">Produits</a>
+        <% if local_assigns[:show_promos_tab] %>
+          <a href="#promos" class="nav-tab text-sm font-medium text-gray-500 hover:text-gray-900 py-2 border-b-2 border-transparent hover:border-gray-300 whitespace-nowrap transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 rounded-sm focus-visible:ring-gray-400" data-scroll="promos">Promotions</a>
+        <% end %>
+      </nav>
+    </div>
+
+    <%# Recherche (boutiques locales uniquement) %>
+    <% unless shop.official? %>
+      <div class="pb-3 pt-1">
+        <form class="relative max-w-xl">
+          <input type="search" placeholder="Rechercher dans cette boutique..." class="w-full pl-10 pr-4 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 transition-all" style="border-color: <%= primary_color %>20; --tw-ring-color: <%= primary_color %>40;">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </form>
+      </div>
+    <% end %>
+  </div>
+</header>
+
+<script>
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = tab.getAttribute('data-scroll');
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Problème avec un article de votre commande</h1>
+    <p>Bonjour <%= @user.first_name %>,</p>
+    <p>Nous vous informons qu'il y a eu un problème avec un article de votre commande <strong>#{@order.order_number}</strong> :</p>
+    <ul>
+      <li><strong><%= @order_item.item.name %></strong></li>
+      <% if @order_item.item_variant %>
+        <li>Variante : <%= @order_item.item_variant.display_name %></li>
+      <% end %>
+      <li>Quantité : <%= @order_item.quantity %></li>
+    </ul>
+    <p>Nous travaillons à résoudre ce problème dans les plus brefs délais. Notre service client vous contactera bientôt pour vous tenir informé.</p>
+    <p>Nous nous excusons pour la gêne occasionnée.</p>
+  </body>
+</html>

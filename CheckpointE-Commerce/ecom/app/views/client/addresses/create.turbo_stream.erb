@@ -1,0 +1,243 @@
+<%# Turbo Stream pour créer une adresse depuis la page de commande %>
+
+<% if @address.persisted? %>
+  <%# Masquer le formulaire d'ajout %>
+  <%= turbo_stream.update "new-address-form" do %>
+    <div id="new-address-form" class="hidden"></div>
+  <% end %>
+
+  <%# Afficher le message de succès %>
+  <%= turbo_stream.append "address-section" do %>
+    <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm" role="alert" id="address-success-message">
+      <p class="font-semibold">✓ Adresse créée avec succès !</p>
+    </div>
+  <% end %>
+
+  <%# Mettre à jour la section d'adresses existantes %>
+  <% @addresses = current_user.addresses.order(is_default: :desc, created_at: :desc) %>
+  <% selected_address = @address %>
+  
+  <%= turbo_stream.replace "existing-addresses" do %>
+    <div id="existing-addresses">
+      <div class="relative">
+        <input 
+          type="text" 
+          value="<%= selected_address.street_address %>" 
+          readonly
+          id="selected-address-display"
+          class="w-full px-4 py-3 pr-12 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:outline-none focus:border-[#551694] bg-gray-50 text-gray-900 font-medium"
+        />
+        <button 
+          type="button"
+          class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-[#551694] transition-colors"
+          onclick="document.getElementById('address-modal').classList.remove('hidden')"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </button>
+      </div>
+      <%= hidden_field_tag :address_id, selected_address.slug, id: "selected-address-id" %>
+      
+      <!-- Modal pour changer d'adresse -->
+      <div id="address-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-900">Choisir une adresse</h3>
+            <button type="button" onclick="document.getElementById('address-modal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="p-6 space-y-3" id="addresses-list">
+            <% @addresses.each do |address| %>
+              <label class="flex items-start gap-3 p-4 border-2 rounded-lg cursor-pointer hover:border-[#551694] transition-colors <%= 'border-[#551694] bg-[#551694]/5' if address.slug == selected_address.slug %>">
+                <%= radio_button_tag :address_id_modal, address.slug, address.slug == selected_address.slug, 
+                    class: "mt-1 w-4 h-4 text-[#551694] focus:ring-[#551694]",
+                    onchange: "selectAddress('#{address.slug}', '#{address.street_address.gsub("'", "\\'")}');" %>
+                <div class="flex-1">
+                  <p class="font-semibold text-gray-900"><%= address.street_address %></p>
+                  <p class="text-sm text-gray-600 mt-1"><%= address.city %>, <%= address.postal_code %></p>
+                </div>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Réinitialiser le formulaire %>
+  <%= turbo_stream.update "inline-address-form" do %>
+    <% new_address = current_user.addresses.new %>
+    <%= form_with model: new_address, url: client_addresses_path(from_checkout: true), method: :post, local: false, data: { turbo: true }, class: "space-y-6", id: "inline-address-form" do |addr_form| %>
+      <div class="mb-6">
+        <%= addr_form.label :street_address, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <span>Adresse complète <span class="text-red-500">*</span></span>
+        <% end %>
+        <%= addr_form.text_area :street_address, rows: 3, required: true, class: "block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-gray-50 hover:bg-white", placeholder: "Ex: Rue 10, Immeuble XYZ, Appartement 5" %>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-5 mb-6">
+        <div>
+          <%= addr_form.label :city, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+            <span>Ville <span class="text-red-500">*</span></span>
+          <% end %>
+          <%= addr_form.text_field :city, required: true, class: "block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-gray-50 hover:bg-white", placeholder: "Ex: Dakar" %>
+        </div>
+
+        <div>
+          <%= addr_form.label :postal_code, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <span>Code postal</span>
+          <% end %>
+          <%= addr_form.text_field :postal_code, class: "block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-gray-50 hover:bg-white", placeholder: "Ex: 12345" %>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <%= addr_form.label :country, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Pays <span class="text-red-500">*</span></span>
+        <% end %>
+        <%= addr_form.select :country, [["Sénégal", "SN"]], {}, class: "block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-white cursor-pointer" %>
+      </div>
+
+      <div class="flex items-center p-4 bg-[#551694]/5 rounded-lg border-2 border-[#551694]/20 hover:border-[#551694]/40 transition-colors mb-6">
+        <%= addr_form.check_box :is_default, class: "h-5 w-5 text-[#551694] focus:ring-[#551694] border-gray-300 rounded cursor-pointer transition-all" %>
+        <%= addr_form.label :is_default, class: "ml-3 block text-sm font-medium text-gray-700 cursor-pointer" do %>
+          <span class="font-semibold">Définir comme adresse par défaut</span>
+          <span class="block text-xs text-gray-500 mt-0.5">Cette adresse sera utilisée par défaut pour vos prochaines commandes</span>
+        <% end %>
+      </div>
+
+      <div class="flex gap-3 pt-3 border-t border-gray-200">
+        <button type="button" onclick="toggleNewAddressForm()" class="flex-1 px-5 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all text-sm font-semibold shadow-sm hover:shadow">
+          Annuler
+        </button>
+        <button type="submit" class="flex-1 px-5 py-3 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-all text-sm font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span>Enregistrer l'adresse</span>
+        </button>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%# Réafficher le bouton "Nouvelle adresse" %>
+  <%= turbo_stream.update "toggle-new-address-btn" do %>
+    <button 
+      type="button"
+      id="toggle-new-address-btn"
+      onclick="toggleNewAddressForm()"
+      class="text-sm text-[#551694] hover:text-[#6a1fa8] font-medium flex items-center gap-1 transition-colors"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      <span>Nouvelle adresse</span>
+    </button>
+  <% end %>
+
+  <%# Supprimer le message "pas d'adresse" s'il existe %>
+  <%= turbo_stream.remove "no-addresses-message" %>
+
+  <%# Script pour masquer le message de succès après 3 secondes %>
+  <%= turbo_stream.append "address-section" do %>
+    <script>
+      setTimeout(function() {
+        const msg = document.getElementById('address-success-message');
+        if (msg) {
+          msg.style.transition = 'opacity 0.5s';
+          msg.style.opacity = '0';
+          setTimeout(() => msg.remove(), 500);
+        }
+      }, 3000);
+    </script>
+  <% end %>
+<% else %>
+  <%# Afficher les erreurs %>
+  <%= turbo_stream.update "new-address-form" do %>
+    <div id="new-address-form" class="mb-4 bg-gray-50 border-2 border-red-200 rounded-lg p-4 sm:p-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-4">Ajouter une nouvelle adresse</h3>
+      <%= render "shared/form_errors", object: @address %>
+      <%= form_with model: @address, url: client_addresses_path(from_checkout: true), method: :post, local: false, data: { turbo: true }, class: "space-y-6", id: "inline-address-form" do |addr_form| %>
+        <div class="mb-6">
+          <%= addr_form.label :street_address, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <span>Adresse complète <span class="text-red-500">*</span></span>
+          <% end %>
+          <%= addr_form.text_area :street_address, rows: 3, required: true, class: "block w-full px-4 py-3 text-sm border-2 #{@address.errors[:street_address].any? ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-gray-50 hover:bg-white", placeholder: "Ex: Rue 10, Immeuble XYZ, Appartement 5" %>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-5 mb-6">
+          <div>
+            <%= addr_form.label :city, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+              <span>Ville <span class="text-red-500">*</span></span>
+            <% end %>
+            <%= addr_form.text_field :city, required: true, class: "block w-full px-4 py-3 text-sm border-2 #{@address.errors[:city].any? ? 'border-red-500' : 'border-gray-200'} rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-gray-50 hover:bg-white", placeholder: "Ex: Dakar" %>
+          </div>
+
+          <div>
+            <%= addr_form.label :postal_code, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span>Code postal</span>
+            <% end %>
+            <%= addr_form.text_field :postal_code, class: "block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-gray-50 hover:bg-white", placeholder: "Ex: 12345" %>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <%= addr_form.label :country, class: "block text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2" do %>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Pays <span class="text-red-500">*</span></span>
+          <% end %>
+          <%= addr_form.select :country, [["Sénégal", "SN"]], {}, class: "block w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-all bg-white cursor-pointer" %>
+        </div>
+
+        <div class="flex items-center p-4 bg-[#551694]/5 rounded-lg border-2 border-[#551694]/20 hover:border-[#551694]/40 transition-colors mb-6">
+          <%= addr_form.check_box :is_default, class: "h-5 w-5 text-[#551694] focus:ring-[#551694] border-gray-300 rounded cursor-pointer transition-all" %>
+          <%= addr_form.label :is_default, class: "ml-3 block text-sm font-medium text-gray-700 cursor-pointer" do %>
+            <span class="font-semibold">Définir comme adresse par défaut</span>
+            <span class="block text-xs text-gray-500 mt-0.5">Cette adresse sera utilisée par défaut pour vos prochaines commandes</span>
+          <% end %>
+        </div>
+
+        <div class="flex gap-3 pt-3 border-t border-gray-200">
+          <button type="button" onclick="toggleNewAddressForm()" class="flex-1 px-5 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all text-sm font-semibold shadow-sm hover:shadow">
+            Annuler
+          </button>
+          <button type="submit" class="flex-1 px-5 py-3 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-all text-sm font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <span>Enregistrer l'adresse</span>
+          </button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,40 @@
+<% if item.variants_count > 1 %>
+  <div class="mb-4">
+    <label class="block text-sm font-medium text-gray-700 mb-2">Variantes disponibles</label>
+    <div class="grid grid-cols-1 gap-2">
+      <% item.variants.each do |variant| %>
+        <div class="variant-option border rounded-lg p-3 <%= variant.stock_quantity > 0 ? 'hover:border-indigo-500 cursor-pointer' : 'opacity-50' %>"
+             data-variant-id="<%= variant.id %>"
+             data-price="<%= current_price_for(variant) %>"
+             data-stock="<%= variant.stock_quantity %>">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-medium">
+                <%= variant.display_name.presence || "Variante par défaut" %>
+              </div>
+              <div class="text-sm text-gray-600">
+                <%= number_to_currency(current_price_for(variant), unit: item.currency.symbol, precision: 0) %>
+              </div>
+            </div>
+            <div class="text-sm">
+              <% if variant.stock_quantity > 0 %>
+                <span class="text-green-600">✓ <%= variant.stock_quantity %> en stock</span>
+              <% else %>
+                <span class="text-red-600">✗ Rupture</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <% variant = item.variants.first %>
+  <% if variant %>
+    <div class="text-sm text-gray-600 mb-2">
+      <% if variant.display_name.present? %>
+        <%= variant.display_name %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

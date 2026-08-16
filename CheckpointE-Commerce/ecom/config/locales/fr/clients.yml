@@ -1,0 +1,122 @@
+fr:
+  client:
+    sessions:
+      new:
+        title: "Connectez-vous à votre compte"
+        subtitle: "Accédez à votre espace client"
+        phone_number: "Numéro de téléphone"
+        phone: "Numéro de téléphone"
+        password: "Mot de passe"
+        submit: "Se connecter"
+        forgot_password: "Mot de passe oublié ?"
+        no_account: "Pas encore de compte?"
+        signup: "Inscrivez-vous"
+        login: "Se connecter"
+        create_account: "Créer un compte"
+        vendor_space_prompt: "Vous êtes un vendeur ?"
+        vendor_space_link: "Accédez à votre espace vendeur"
+        employee_space_prompt: "Vous êtes un collaborateur ?"
+        employee_space_link: "Accédez à votre espace collaborateur"
+        placeholders:
+          phone: "77XXXXXXX"
+          password: "Votre mot de passe"
+    
+    registrations:
+      new:
+        title: "Créez votre compte client"
+        subtitle: "Rejoignez-nous en quelques clics"
+        first_name: "Prénom"
+        last_name: "Nom"
+        phone_number: "Numéro de téléphone"
+        email_address: "Email (optionnel)"
+        email: "Email (optionnel)"
+        password: "Mot de passe"
+        password_confirmation: "Confirmer le mot de passe"
+        password_hint: "8 Caractères minimum"
+        submit: "S'inscrire"
+        already_account: "Déjà un compte?"
+        login: "Connectez-vous"
+        vendor_space_prompt: "Vous souhaitez vendre sur aa ?"
+        vendor_space_link: "Créez un compte vendeur"
+        placeholders:
+          first_name: "Votre prénom"
+          last_name: "Votre nom"
+          phone: "77XXXXXXX"
+          email: "exemple@email.com"
+          password: "8 Caractères minimum"
+          password_confirmation: "8 Caractères minimum"
+      create:
+        success: "Compte créé. Vérifiez votre SMS pour le code."
+        success_with_errors: "Compte créé, envoi du code échoué"
+        failure: "Erreur lors de la création du compte"
+    
+    items:
+      show:
+        back_to_catalog: "← Retour au catalogue"
+        product_image: "Image du produit"
+        choose_variant: "Choisir une variante"
+        default_variant: "Variante par défaut"
+        in_stock: "✓ %{count} en stock"
+        out_of_stock: "✗ Rupture"
+        in_stock_available: "✓ En stock (%{count} disponibles)"
+        out_of_stock_message: "✗ Rupture de stock"
+        no_variant: "Aucune variante disponible pour ce produit"
+        shop: "Boutique"
+        quantity: "Quantité"
+        add_to_cart: "Ajouter au panier"
+        update_price: "Mettre à jour l'affichage du prix"
+        update_stock: "Mettre à jour l'affichage du stock"
+        update_hidden_field: "Mettre à jour le champ caché du formulaire"
+    
+    dashboards:
+      show:
+        title: "Tableau de bord"
+        welcome: "Bienvenue, %{name} 👋"
+        total_orders: "Commandes totales"
+        delivered_orders: "Commandes livrées"
+        in_progress: "En cours"
+        recent_orders: "Dernières commandes"
+        recent_orders_subtitle: "Vos commandes récentes"
+        view_all_orders: "Voir toutes les commandes"
+        order_number: "Commande #%{slug}"
+        items: "article"
+        items_plural: "articles"
+        no_orders: "Aucune commande pour le moment"
+        no_orders_message: "Commencez à faire vos achats dès maintenant !"
+        discover_products: "Découvrir les produits"
+    
+    addresses:
+      new:
+        back_to_addresses: "← Retour aux adresses"
+        title: "Nouvelle Adresse"
+        back_to_checkout: "← Retour au checkout"
+      edit:
+        back_to_addresses: "← Retour aux adresses"
+        title: "Modifier l'Adresse"
+    
+    verification:
+      title: "Vérifiez votre compte"
+      subtitle: "Entrez le code de vérification envoyé par SMS"
+      code_label: "Code de vérification"
+      resend: "Renvoyer"
+      no_code: "Vous n'avez pas reçu le code ?"
+      submit: "Vérifier"
+    
+    verifications:
+      new:
+        title: "Vérification de votre compte"
+        subtitle: "Entrez le code de vérification envoyé par SMS"
+        code_label: "Code de vérification"
+        resend: "Renvoyer"
+        no_code: "Vous n'avez pas reçu le code ?"
+        submit: "Vérifier"
+      create:
+        success: "Vérification réussie. Bienvenue!"
+        invalid_code: "Code invalide ou expiré. Veuillez demander un nouveau code."
+        user_not_found: "Utilisateur introuvable"
+        error: "Erreur lors de la vérification. Veuillez réessayer."
+      resend:
+        success: "Code de vérification renvoyé par %{channel}"
+        error: "Erreur lors du renvoi du code: %{error}"
+        user_not_found: "Utilisateur introuvable"
+

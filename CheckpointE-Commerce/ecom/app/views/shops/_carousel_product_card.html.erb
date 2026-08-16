@@ -1,0 +1,34 @@
+<%# Carte produit pour carousel - style Jumia %>
+<% variant = item.default_variant || item.variants.first %>
+<% if variant %>
+<% discount_percent = item.on_sale? ? variant.discount_percentage : 0 %>
+<% original_price = variant.original_price %>
+<% current_price = variant.current_price %>
+
+<div class="flex-shrink-0 w-[44vw] sm:w-44 md:w-48 max-w-[200px] snap-start">
+  <article class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col group focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--primary-color)]" data-item-id="<%= item.id %>" data-item="true">
+    <%= link_to item_path(item), class: "block flex-shrink-0", aria: { label: item.name }, data: { turbo_frame: "_top" } do %>
+      <div class="relative overflow-hidden bg-gray-100 aspect-square flex items-center justify-center">
+        <% if item.has_image? %>
+          <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-contain p-1.5 group-hover:scale-105 transition-transform duration-300", width: 400, height: 400) %>
+        <% else %>
+          <svg class="w-14 h-14 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        <% end %>
+        <% if discount_percent > 0 %>
+          <div class="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 bg-[#dc2626] text-white rounded-full w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center font-bold text-[11px] sm:text-xs shadow" aria-hidden="true">-<%= discount_percent %>%</div>
+        <% end %>
+      </div>
+      <h4 class="text-[13px] sm:text-sm font-semibold text-gray-900 line-clamp-2 mb-1 px-2 pt-1.5 leading-snug min-h-[34px]"><%= item.name %></h4>
+    <% end %>
+    <div class="flex flex-col px-2 pb-2 flex-1 justify-between mt-auto">
+      <div class="flex items-baseline flex-wrap gap-x-1.5 gap-y-0 mb-1.5">
+        <span class="text-[15px] sm:text-base font-bold shop-carousel-price leading-tight"><%= number_to_currency(current_price, unit: "", precision: 0, delimiter: ".", separator: ",") %> F</span>
+        <% if original_price > current_price %>
+          <span class="text-[11px] sm:text-xs text-gray-500 line-through leading-tight"><%= number_to_currency(original_price, unit: "", precision: 0, delimiter: ".", separator: ",") %> F</span>
+        <% end %>
+      </div>
+      <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "primary", show_icon: false %>
+    </div>
+  </article>
+</div>
+<% end %>

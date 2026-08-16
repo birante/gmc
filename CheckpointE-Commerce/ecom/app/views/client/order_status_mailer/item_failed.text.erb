@@ -1,0 +1,15 @@
+Problème avec un article de votre commande
+
+Bonjour <%= @user.first_name %>,
+
+Nous vous informons qu'il y a eu un problème avec un article de votre commande #{@order.order_number} :
+
+- <%= @order_item.item.name %>
+<% if @order_item.item_variant %>
+- Variante : <%= @order_item.item_variant.display_name %>
+<% end %>
+- Quantité : <%= @order_item.quantity %>
+
+Nous travaillons à résoudre ce problème dans les plus brefs délais. Notre service client vous contactera bientôt pour vous tenir informé.
+
+Nous nous excusons pour la gêne occasionnée.

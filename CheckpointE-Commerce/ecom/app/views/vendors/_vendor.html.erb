@@ -1,0 +1,56 @@
+<%= form_with(model: vendor, local: true, class: "w-full sm:w-auto my-5 space-y-5") do |form| %>
+  <% if vendor.errors.any? %>
+    <div id="error_explanation" class="text-red-600">
+      <h2><%= pluralize(vendor.errors.count, "error") %> prevented this vendor from being saved:</h2>
+      <ul>
+        <% vendor.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :first_name, class: "block font-medium mb-1" %>
+    <%= form.text_field :first_name, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :last_name, class: "block font-medium mb-1" %>
+    <%= form.text_field :last_name, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :phone_number, class: "block font-medium mb-1" %>
+    <%= form.text_field :phone_number, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :country_code, class: "block font-medium mb-1" %>
+    <%= form.text_field :country_code, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :email, class: "block font-medium mb-1" %>
+    <%= form.email_field :email, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :password, class: "block font-medium mb-1" %>
+    <%= form.password_field :password, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :password_confirmation, class: "block font-medium mb-1" %>
+    <%= form.password_field :password_confirmation, class: "border rounded w-full p-2" %>
+  </div>
+
+  <div>
+    <%= form.label :status, class: "block font-medium mb-1" %>
+    <%= form.check_box :status %>
+  </div>
+
+  <div>
+    <%= form.submit class: "bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700" %>
+  </div>
+<% end %>

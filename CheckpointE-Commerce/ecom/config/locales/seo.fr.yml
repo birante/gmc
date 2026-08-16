@@ -1,0 +1,61 @@
+fr:
+  seo:
+    site_name: "aa"
+    default_title: "Marketplace e-commerce au Sénégal - aa"
+    default_description: "aa, marketplace sénégalaise : boutiques locales, marques officielles, livraison rapide à Dakar et au Sénégal."
+    default_keywords: "e-commerce sénégal, boutiques dakar, produits locaux, made in senegal, livraison dakar, marketplace sénégal"
+    organization_description: "Marketplace e-commerce au Sénégal - Boutiques locales et marques officielles"
+
+    home:
+      title: "Marketplace e-commerce au Sénégal - aa"
+      description: "aa, marketplace #1 au Sénégal : 1000+ produits, boutiques locales et marques officielles (Samsung, Hisense). Livraison rapide à Dakar, paiement sécurisé."
+      keywords: "aa, e-commerce sénégal, marketplace dakar, boutiques locales, made in senegal, samsung sénégal, livraison dakar"
+
+    shops:
+      index:
+        title: "Boutiques locales et marques officielles - aa"
+        description: "Découvrez toutes les boutiques partenaires aa : marques officielles et boutiques sénégalaises. Trouvez vos produits préférés."
+      show:
+        title: "%{shop_name} - Boutique en ligne sur aa"
+        description: "Découvrez tous les produits %{shop_name} sur aa. %{count} produits disponibles. Livraison rapide au Sénégal."
+      official:
+        title: "Marques officielles - aa"
+        description: "Achetez en toute confiance auprès des marques officielles partenaires aa : Samsung, Hisense et plus."
+      local:
+        title: "Boutiques locales sénégalaises - aa"
+        description: "Soutenez les commerces locaux ! Découvrez les boutiques sénégalaises partenaires aa. Made in Senegal."
+
+    items:
+      index:
+        title: "Tous les produits - aa"
+        description: "Parcourez notre catalogue : électronique, mode, maison et bien plus. Livraison rapide à Dakar."
+      show:
+        title: "%{item_name} - aa"
+        description: "%{item_description}"
+
+    categories:
+      title: "%{category_name} - aa"
+      description: "Découvrez tous les produits de la catégorie %{category_name} sur aa. Livraison rapide au Sénégal."
+      products_count:
+        one: "%{count} produit"
+        other: "%{count} produits"
+    
+    terms:
+      title: "Conditions d'utilisation | aa"
+      description: "Consultez les conditions générales d'utilisation de la marketplace aa."
+    
+    privacy:
+      title: "Politique de confidentialité | aa"
+      description: "Découvrez comment aa protège vos données personnelles et respecte votre vie privée."
+
+  accessibility:
+    skip_to_content: "Aller au contenu principal"
+    breadcrumb: "Fil d'Ariane"
+    home_content: "Contenu de la page d'accueil aa"
+    
+  breadcrumbs:
+    home: "Accueil"
+    shops: "Boutiques"
+    items: "Produits"
+    categories: "Catégories"
+

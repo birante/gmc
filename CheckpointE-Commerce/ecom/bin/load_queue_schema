@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# bin/load_queue_schema
+# Script pour charger le schéma SolidQueue manuellement
+
+require_relative '../config/environment'
+
+queue_schema_path = Rails.root.join("db", "queue_schema.rb")
+
+if File.exist?(queue_schema_path)
+  puts "📦 Chargement du schéma SolidQueue..."
+  begin
+    load queue_schema_path
+    puts "✅ Schéma SolidQueue chargé avec succès"
+  rescue => e
+    puts "❌ Erreur lors du chargement du schéma SolidQueue: #{e.message}"
+    exit 1
+  end
+else
+  puts "⚠️  Fichier queue_schema.rb introuvable"
+  exit 1
+end
+

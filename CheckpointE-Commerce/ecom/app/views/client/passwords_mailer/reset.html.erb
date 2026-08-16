@@ -1,0 +1,13 @@
+<p>Bonjour <%= @user.first_name %>,</p>
+<p>Vous avez demandé à réinitialiser votre mot de passe.</p>
+<% if @code.present? %>
+  <p>Voici votre code de vérification :</p>
+  <p style="font-size: 24px; font-weight: bold; letter-spacing: 4px;"><%= @code %></p>
+  <p>Ce code est valable pendant 15 minutes. Saisissez-le sur la page de réinitialisation de mot de passe.</p>
+<% else %>
+  <p>Pour finaliser la réinitialisation, retournez sur aa et saisissez le code reçu par SMS sur votre téléphone.</p>
+  <p><%= link_to "Continuer la réinitialisation", client_verify_password_url %></p>
+<% end %>
+<p>Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.</p>
+<p>Cordialement,<br>
+  L'équipe aa</p>

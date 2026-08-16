@@ -1,0 +1,98 @@
+<% content_for :client_content do %>
+  <div>
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <nav class="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+        <%= link_to "Accueil", root_path, class: "hover:text-[#551694] transition-colors duration-150" %> 
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mon compte", client_account_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mes commandes", client_orders_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-900 font-medium">#<%= @order.id %></span>
+      </nav>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="mb-4">
+      <%= link_to client_orders_path, class: "inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-[#551694] hover:bg-gray-50 rounded-lg transition-all duration-150 group" do %>
+        <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span class="font-medium">Retour aux commandes</span>
+      <% end %>
+    </div>
+
+    <!-- En-tête avec numéro de commande -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <!-- Partie gauche -->
+        <h1 class="text-xl sm:text-3xl font-bold text-gray-900">#<%= @order.id %></h1>
+        
+        <!-- Partie droite -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4">
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-600">Effectuée le</span>
+            <span class="font-semibold text-base text-gray-900">
+              <%= l(@order.created_at, format: "%d %b, %Y") %>
+            </span>
+          </div>
+
+          <% if @order.payments.any? && @order.payments.first.paydunya_invoice_url.present? %>
+            <%= link_to @order.payments.first.paydunya_invoice_url, target: "_blank", class: "inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-[#551694] hover:text-[#551694] transition-all duration-200 text-sm font-medium shadow-sm" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              <span>Facture</span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suivi de commande (barre de progression et historique) -->
+    <div class="mb-6">
+      <%= render 'client/orders/tracking', order: @order, status_history: @status_history %>
+    </div>
+
+    <!-- Infos de livraison -->
+    <%= render 'client/orders/delivery_info', order: @order %>
+
+    <!-- Récapitulatif de la commande -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+      <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Récapitulatif de la commande</h2>
+      
+      <div class="space-y-3 mb-4">
+        <!-- Sous-total -->
+        <div class="flex justify-between items-center text-sm sm:text-base text-gray-700">
+          <span class="font-medium">Sous-total</span>
+          <span class="font-semibold text-gray-900">
+            <%= number_to_currency(@order.total_amount, unit: @order.currency&.symbol || "FCFA", precision: 0) %>
+          </span>
+        </div>
+
+        <!-- Livraison -->
+        <div class="flex justify-between items-center text-sm sm:text-base text-gray-700">
+          <span class="font-medium">Livraison</span>
+          <span class="font-semibold text-gray-900">
+            <%= number_to_currency(@order.delivery_fee || 0, unit: @order.currency&.symbol || "FCFA", precision: 0) %>
+          </span>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="pt-4 border-t-2 border-gray-200">
+        <div class="flex justify-between items-center">
+          <span class="text-lg sm:text-xl font-bold text-gray-900">Total</span>
+          <span class="text-xl sm:text-2xl font-bold text-[#551694]">
+            <%= number_to_currency(@order.final_amount || @order.total_amount + (@order.delivery_fee || 0), unit: @order.currency&.symbol || "FCFA", precision: 0) %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= render "shared/client_sidebar_wrapper" do %>
+  <%= content_for(:client_content) %>
+<% end %>

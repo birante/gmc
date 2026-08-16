@@ -1,0 +1,16 @@
+<%# Explorer par catégorie - Catégories sélectionnées dans l'ordre %>
+<% primary_color = local_assigns[:primary_color] || shop_primary_color(shop) %>
+<% categories_ordered = section.shop_page_section_categories.ordered.includes(:product_sub_category).map(&:product_sub_category).compact %>
+<% if categories_ordered.any? %>
+  <% shop_categories_with_products = categories_ordered.map { |cat| [ cat, shop.available_items.where(product_sub_category_id: cat.id).limit(12).to_a ] }.to_h.select { |_, prods| prods.any? } %>
+  <% if shop_categories_with_products.any? %>
+    <%= render "shops/categories_carousels", shop: shop, shop_categories_with_products: shop_categories_with_products, primary_color: primary_color, force_show: true %>
+  <% end %>
+<% else %>
+  <%# Fallback : catégories auto-dérivées des produits %>
+  <% base_items = shop.available_items.with_attached_main_image.with_attached_images.includes(:variants, product_sub_category: { icon_attachment: :blob }) %>
+  <% shop_categories_with_products = base_items.where("product_sub_category_id IS NOT NULL").group_by(&:product_sub_category).sort_by { |cat, _| cat.position || 0 }.first(3).to_h %>
+  <% if shop_categories_with_products.any? %>
+    <%= render "shops/categories_carousels", shop: shop, shop_categories_with_products: shop_categories_with_products, primary_color: primary_color, force_show: true %>
+  <% end %>
+<% end %>

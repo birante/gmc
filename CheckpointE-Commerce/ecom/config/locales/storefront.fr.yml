@@ -1,0 +1,132 @@
+fr:
+  storefront:
+    # Hero Slider / Carousel
+    carousel:
+      hero_label: "Promotions et offres spéciales"
+      previous: "Slide précédent"
+      next: "Slide suivant"
+      slides: "Slides"
+      slide_label: "Slide %{current} sur %{total}"
+      pagination: "Navigation des slides"
+      go_to_slide: "Aller au slide %{number}"
+      pause: "Mettre en pause le défilement automatique"
+      play: "Reprendre le défilement automatique"
+      scroll_left: "Faire défiler vers la gauche"
+      scroll_right: "Faire défiler vers la droite"
+
+    # Marquee / Bandeau avantages
+    marquee:
+      label: "Avantages aa"
+      advantages: "Liste des avantages"
+      download_app: "Téléchargez l'app"
+      download_app_full: "Téléchargez l'app aa"
+      download_app_sub: "et bénéficiez de bons plans"
+      free_returns: "Retours gratuits"
+      free_returns_sub: "Sur toutes les commandes"
+      cgv_title: "Conditions Générales de Vente"
+      cgv: "CGV"
+      applicable: "applicables"
+      discount: "Réduction"
+      discount_text: "de Réduction"
+      discount_sub: "Supplémentaire sur votre 1"
+      first_order_sup: "ère"
+      order: "commande"
+      free_delivery: "Livraison gratuite"
+      conditions_title: "Conditions générales"
+      conditions: "Conditions générales"
+
+    # Promo Banners
+    promo_banners:
+      title: "Offres promotionnelles"
+      philips_link: "Voir la Friteuse Connectée Philips Essential XL dès 15000 FCFA"
+      ninja_link: "Voir le Mixeur Ninja 3-en-1 dès 20000 FCFA"
+      xbox_link: "Voir les manettes Xbox avec 20% de remise"
+      xiaomi_link: "Voir le Xiaomi Redmi Note 8 Pro dès 30000 FCFA"
+
+    # Categories Grid
+    categories:
+      explore_title: "Explorer par catégories"
+      nav_label: "Catégories de produits"
+      explore_category: "Explorer la catégorie %{category}"
+      scroll_left: "Faire défiler les catégories vers la gauche"
+      scroll_right: "Faire défiler les catégories vers la droite"
+
+    # Secondary Banners
+    secondary_banners:
+      title: "Catégories en vedette"
+      laser_projector: "Découvrir les Laser Projector"
+      smartphones: "Découvrir les Smartphones"
+      smartphones_tablets: "Découvrir Smartphones & Tablets"
+      appliances: "Découvrir l'Électroménager"
+      smart_home: "Découvrir Smart Home"
+      smart_home_audio: "Découvrir Smart Home & Audio"
+      gaming: "Découvrir Gaming"
+      discover_selection: ""
+
+    # Trending Categories
+    trending:
+      title: "Tendances du moment - Les nouveautés"
+      view_product: "Voir %{product}"
+      view_category: "Voir la catégorie %{category}"
+      explore_category: "Explorer %{category}"
+
+    # Local Shops
+    local_shops:
+      title: "Boutiques Locales"
+      nav_label: "Liste des boutiques locales"
+      visit_shop: "Visiter la boutique %{shop}"
+      local_products: "Produits du terroir"
+      explore_local: "Explorer tous vos produits locaux"
+      see_more: "Voir plus"
+      see_more_products: "Voir plus de produits Made in Senegal"
+      featured_products: "Produits locaux en vedette"
+
+    # Official Brands
+    official_brands:
+      title: "Boutiques officielles"
+      nav_label: "Liste des marques officielles"
+      visit_brand: "Visiter la boutique %{brand}"
+      official_badge: "Boutique Officielle"
+
+    # Newsletter
+    newsletter:
+      title_new: "Nouveau sur"
+      subtitle: "Inscrivez-vous à notre newsletter pour recevoir nos meilleures offres!"
+      form_label: "Inscription à la newsletter"
+      email_label: "Adresse email"
+      email_placeholder: "Entrez votre adresse mail"
+      subscribe: "S'abonner"
+      privacy_notice: "En s'inscrivant vous acceptez nos"
+      terms_link: "Termes & Conditions"
+      success: "Merci! Vérifiez votre email pour confirmer votre inscription."
+      resubscribed: "Vous avez été réabonné à notre newsletter!"
+      invalid_email: "Adresse email invalide"
+      error: "Une erreur est survenue"
+
+    # Products (used in local shops)
+    products:
+      discount: "%{discount}% de réduction"
+      rating: "Note: %{rating} sur 5 étoiles"
+      original_price: "Prix original:"
+      add_to_cart: "Ajouter %{product} au panier"
+      add_to_cart_button: "Ajouter au panier"
+      added_to_cart: "Article ajouté au panier"
+      removed_from_cart: "Article retiré du panier"
+      quantity_increased: "Quantité augmentée"
+      quantity_decreased: "Quantité réduite"
+      decrease_quantity: "Réduire la quantité"
+      increase_quantity: "Augmenter la quantité"
+
+    # Promo Banner Carousel
+    promo_carousel:
+      title: "En Promo"
+      time_left: "Temps restant"
+      days: "Jours"
+      hours: "Heures"
+      minutes: "Minutes"
+      seconds: "Secondes"
+      view_all: "Voir tout"
+      view_product: "Voir %{product}"
+      in_stock: "En stock"
+      out_of_stock: "Rupture de stock"
+

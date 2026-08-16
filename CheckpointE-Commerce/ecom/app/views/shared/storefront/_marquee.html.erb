@@ -1,0 +1,21 @@
+<%# Marquee - Bandeau image uploadée depuis ActiveAdmin %>
+<%
+  desktop_image = marquee_section&.marquee_image
+  mobile_image = marquee_section&.marquee_image_mobile
+  has_desktop = desktop_image&.attached?
+  has_mobile = mobile_image&.attached?
+%>
+<% if has_desktop || has_mobile %>
+  <aside class="overflow-hidden h-[44px] md:h-[51px]" role="region" aria-label="<%= t('storefront.marquee.label', default: 'Avantages aa') %>">
+    <%= image_tag(has_mobile ? mobile_image : desktop_image,
+        alt: marquee_section.title.presence || t('storefront.marquee.label', default: 'Avantages aa'),
+        class: "w-full h-full object-cover block md:hidden",
+        loading: "eager",
+        fetchpriority: "high" ) %>
+    <%= image_tag(desktop_image.presence || mobile_image,
+        alt: marquee_section.title.presence || t('storefront.marquee.label', default: 'Avantages aa'),
+        class: "w-full h-full object-cover hidden md:block",
+        loading: "eager",
+        fetchpriority: "high" ) %>
+  </aside>
+<% end %>

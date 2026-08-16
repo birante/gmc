@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+smartphones:
+  name: Smartphones
+  slug: smartphones
+  description: Mobile phones and accessories
+  is_active: true
+  product_category: electronics
+  position: 1
+
+shirts:
+  name: Shirts
+  slug: shirts
+  description: Casual and formal shirts
+  is_active: true
+  product_category: clothing
+  position: 2

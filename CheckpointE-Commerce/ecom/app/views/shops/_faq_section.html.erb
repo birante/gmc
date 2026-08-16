@@ -1,0 +1,59 @@
+<%# FAQ Section - Compact %>
+<% primary_color = local_assigns[:primary_color] || "#551694" %>
+<div class="bg-white rounded-2xl p-6 md:p-8 border" style="border-color: <%= primary_color %>15;">
+  <h2 class="text-xl font-bold text-gray-900 mb-4">Questions fréquentes</h2>
+
+    <%# FAQ Items %>
+    <div class="space-y-2">
+      <%# Item 1 %>
+      <details class="group rounded-lg p-3 bg-white hover:shadow-md transition-shadow" style="border: 2px solid <%= primary_color %>20;" open>
+        <summary class="flex items-center justify-between cursor-pointer font-semibold text-gray-900">
+          <span>Comment fonctionne la livraison?</span>
+          <svg class="w-5 h-5 text-gray-600 transition-transform group-open:rotate-180" style="color: <%= primary_color %>;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </summary>
+        <p class="text-gray-600 mt-3 text-sm">Tous les articles sont livrés dans les 24-48 heures. Vous recevrez un numéro de suivi par SMS. La livraison est gratuite à partir de 50 000 FCFA.</p>
+      </details>
+
+      <%# Item 2 %>
+      <details class="group rounded-lg p-3 bg-white hover:shadow-md transition-shadow" style="border: 2px solid <%= primary_color %>20;">
+        <summary class="flex items-center justify-between cursor-pointer font-semibold text-gray-900">
+          <span>Quelle est votre politique de retour?</span>
+          <svg class="w-5 h-5 text-gray-600 transition-transform group-open:rotate-180" style="color: <%= primary_color %>;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </summary>
+        <p class="text-gray-600 mt-3 text-sm">Vous avez 14 jours pour retourner un article non utilisé. Le remboursement est effectué dans les 7 jours suivants après réception du retour.</p>
+      </details>
+
+      <%# Item 3 %>
+      <details class="group rounded-lg p-3 bg-white hover:shadow-md transition-shadow" style="border: 2px solid <%= primary_color %>20;">
+        <summary class="flex items-center justify-between cursor-pointer font-semibold text-gray-900">
+          <span>Comment puis-je passer une commande?</span>
+          <svg class="w-5 h-5 text-gray-600 transition-transform group-open:rotate-180" style="color: <%= primary_color %>;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </summary>
+        <p class="text-gray-600 mt-3 text-sm">C'est simple! Parcourez nos produits, ajoutez-les au panier, et procédez à la caisse. Choisissez votre mode de paiement préféré et confirmez la commande.</p>
+      </details>
+
+      <%# Item 4 %>
+      <details class="group rounded-lg p-3 bg-white hover:shadow-md transition-shadow" style="border: 2px solid <%= primary_color %>20;">
+        <summary class="flex items-center justify-between cursor-pointer font-semibold text-gray-900">
+          <span>Vos paiements sont-ils sécurisés?</span>
+          <svg class="w-5 h-5 text-gray-600 transition-transform group-open:rotate-180" style="color: <%= primary_color %>;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </summary>
+        <p class="text-gray-600 mt-3 text-sm">Oui! Nous utilisons le chiffrement SSL et les normes PCI DSS. Vos informations de paiement sont complètement sécurisées et jamais stockées sur nos serveurs.</p>
+      </details>
+    </div>
+
+  <div class="mt-5 p-4 rounded-xl text-center" style="background-color: <%= primary_color %>08; border: 1px solid <%= primary_color %>20;">
+    <p class="text-gray-600 mb-2 text-sm">Vous n'avez pas trouvé votre réponse?</p>
+    <a href="#about" onclick="document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); return false;" class="inline-flex items-center gap-2 font-semibold text-sm hover:underline" style="color: <%= primary_color %>;">
+      Contactez-nous →
+    </a>
+  </div>
+</div>

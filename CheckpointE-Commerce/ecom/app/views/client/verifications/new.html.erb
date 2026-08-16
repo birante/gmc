@@ -1,0 +1,36 @@
+<%= render "shared/auth/auth_header", title: t('.title'), subtitle: t('.subtitle'), extra: @pending_phone || @pending_email %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with url: client_verification_path, method: :post, local: true, data: { turbo: false } do %>
+    <%= hidden_field_tag :email_address, @pending_email if @pending_email.present? %>
+    <%= hidden_field_tag :phone_number, @pending_phone if @pending_phone.present? %>
+
+    <div class="space-y-5">
+      <div class="flex flex-col items-center text-center" data-controller="otp">
+        <div class="flex w-full max-w-xs items-center justify-center gap-2 sm:gap-3">
+          <% 4.times do |i| %>
+            <%= text_field_tag "otp_code_#{i}", nil,
+                autocomplete: "one-time-code",
+                maxlength: 1,
+                pattern: "[0-9]",
+                inputmode: "numeric",
+                data: { otp_target: "input", action: "input->otp#handleInput keydown->otp#handleKeydown paste->otp#handlePaste" },
+                class: "h-11 w-11 sm:h-12 sm:w-12 text-center text-lg font-semibold rounded-md border border-[#E9E9E9] bg-[#F9F9F9] focus:border-[#551694] focus:ring-2 focus:ring-[#551694]/20 focus:outline-none transition-colors" %>
+          <% end %>
+        </div>
+        <p class="mt-2 text-sm text-gray-600">
+          <%= t('.no_code') %>
+          <%# Même formulaire que la vérif — pas de <form> imbriqué (HTML invalide + CSRF per-form Rails 8) %>
+          <%= button_tag t('.resend'), type: :submit, formaction: resend_client_verification_path, formmethod: :post, formnovalidate: true, class: "text-[#551694] hover:text-[#451384] font-medium underline focus:outline-none focus-visible:no-underline bg-transparent border-0 p-0 cursor-pointer" %>
+        </p>
+      </div>
+
+      <%= render "shared/auth/auth_alert", type: :notice, message: flash[:notice] %>
+      <%= render "shared/auth/auth_alert", type: :alert, message: flash[:alert] %>
+    </div>
+
+    <div class="mt-6">
+      <%= submit_tag t('.submit'), class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,9 @@
+<% if params[:frame] == "navbar" %>
+  <turbo-frame id="cart-navbar-section_frame">
+    <%= render "shared/cart_navbar_section" %>
+  </turbo-frame>
+<% elsif params[:frame] == "sheet" %>
+  <turbo-frame id="cart-sheet_frame">
+    <%= render "shared/cart_sheet" %>
+  </turbo-frame>
+<% end %>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Bonjour <%= @user.first_name.presence || @user.email_address %>,</h1>
+    <p>Votre code de validation est : <strong><%= @code %></strong></p>
+    <p>Ce code expire dans <%= distance_of_time_in_words(Time.current, Time.current + Rails.application.config.user_otp.ttl_seconds) %>.</p>
+    <p>Si vous n'avez pas demandé ce code, ignorez cet email.</p>
+    <p>Merci,<br>
+      L'équipe aa</p>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<% content_for :active_tab, 'catalogue' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <% if @item %>
+      <nav class="mb-4 text-sm" aria-label="Fil d'Ariane">
+        <ol class="flex flex-wrap items-center gap-2 text-gray-500">
+          <li>
+            <%= link_to t('vendors.items.index.title'), url_with_shop(employees_items_path, @current_shop), class: "hover:text-gray-900 transition-colors" %>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li class="text-gray-700 font-medium truncate max-w-xs"><%= @item.name %></li>
+        </ol>
+      </nav>
+
+      <!-- Header -->
+      <div class="mb-6 flex flex-wrap items-center gap-3">
+        <%= link_to url_with_shop(employees_items_path, @current_shop), class: "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          <%= t('common.back') %>
+        <% end %>
+        <h1 class="text-lg sm:text-xl font-bold text-gray-900 truncate flex-1 min-w-0"><%= @item.name %></h1>
+        <span class="px-2.5 py-1 rounded-md text-xs font-medium <%= 
+          case @item.validation_status
+          when 'approved' then 'bg-emerald-100 text-emerald-800'
+          when 'pending' then 'bg-amber-100 text-amber-800'
+          else 'bg-red-100 text-red-800'
+          end
+        %>"><%= t("vendors.items.index.statuses.#{@item.validation_status}") %></span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+        <!-- Colonne principale -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Images -->
+          <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4" data-controller="image-gallery">
+            <h2 class="text-sm font-semibold text-gray-900 mb-3">Images</h2>
+            <% if @item.has_image? %>
+              <% all_images = [] %>
+              <% all_images << @item.main_image.blob if @item.main_image.attached? %>
+              <% if @item.images.attached? %>
+                <% @item.images.each do |img| %>
+                  <% all_images << (img.respond_to?(:blob) ? img.blob : img) if img.present? %>
+                <% end %>
+              <% end %>
+              <div class="space-y-3">
+                <!-- Image principale -->
+                <div class="w-full aspect-[4/3] max-h-80 bg-gray-50 rounded-lg overflow-hidden">
+                  <%= storage_image_tag(all_images.first, variant_name: :detail, alt: @item.name, class: "w-full h-full object-contain", width: 600, height: 450, data: { image_gallery_target: "mainImage" }) %>
+                </div>
+                <% if all_images.size > 1 %>
+                  <!-- Vignettes cliquables -->
+                  <div class="flex flex-wrap gap-2">
+                    <% all_images.each_with_index do |img, i| %>
+                      <button type="button"
+                              data-image-gallery-target="thumbnail"
+                              data-detail-url="<%= url_for(img.variant(resize_to_limit: [800, 800], format: :webp)) %>"
+                              data-action="click->image-gallery#select"
+                              class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[#551694]/30 <%= i == 0 ? 'border-[#551694] ring-1 ring-[#551694]/20' : 'border-gray-200 hover:border-gray-300' %>">
+                        <%= storage_image_tag(img, variant_name: :card, alt: "#{@item.name} #{i + 1}", class: "w-full h-full object-cover pointer-events-none") %>
+                      </button>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="w-full aspect-[4/3] max-h-48 bg-gray-50 rounded-lg flex items-center justify-center">
+                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path>
+                </svg>
+              </div>
+            <% end %>
+          </div>
+
+          <% if @variants.any? %>
+            <% is_xof_currency = @item.currency&.code == "XOF" %>
+            <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-900">Variantes</h3>
+                  <p class="text-xs text-gray-500 mt-0.5">Modifiez le prix d'une variante directement, puis cliquez sur ✓ pour enregistrer.</p>
+                </div>
+                <%= link_to "Gérer toutes les variantes",
+                    url_with_shop(employees_item_variants_path(@item), @current_shop),
+                    class: "px-3 py-1.5 bg-[#551694] text-white rounded-lg hover:bg-[#451384] text-xs font-medium" %>
+              </div>
+              <div class="overflow-x-auto -mx-1">
+                <table class="min-w-full divide-y divide-gray-100 text-sm">
+                  <thead class="bg-gray-50/80">
+                    <tr>
+                      <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                      <% @item.item_attributes.ordered.each do |attr| %>
+                        <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= attr.name %></th>
+                      <% end %>
+                      <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Prix (<%= @item.currency.symbol %>)</th>
+                      <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                      <th class="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase">Déf.</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <% @variants.each do |variant| %>
+                      <tr class="hover:bg-gray-50/50">
+                        <td class="px-2 py-2 text-gray-900 font-mono text-xs"><%= variant.sku %></td>
+                        <% @item.item_attributes.ordered.each do |attr| %>
+                          <td class="px-2 py-2">
+                            <% value = variant.attribute_values.find { |av| av.item_attribute_id == attr.id }&.value %>
+                            <% if value %>
+                              <span class="px-1.5 py-0.5 text-xs rounded bg-[#551694]/10 text-[#551694]"><%= value %></span>
+                            <% else %>
+                              <span class="text-gray-300">—</span>
+                            <% end %>
+                          </td>
+                        <% end %>
+                        <td class="px-2 py-2">
+                          <%= form_with model: variant,
+                              url: url_with_shop(employees_item_variant_path(@item, variant), @current_shop),
+                              method: :patch, data: { turbo: false },
+                              class: "flex items-center gap-1" do |vf| %>
+                            <%= hidden_field_tag :return_to, request.fullpath %>
+                            <%= vf.number_field :price,
+                                step: (is_xof_currency ? 1 : 0.01),
+                                min: (is_xof_currency ? 1 : 0.01),
+                                value: (is_xof_currency ? variant.price.to_d.round(0).to_i : variant.price),
+                                "aria-label": "Prix de la variante #{variant.sku}",
+                                class: "w-24 px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-[#551694]" %>
+                            <%= vf.submit "✓",
+                                title: "Enregistrer le prix",
+                                class: "px-2 py-1 bg-[#551694] text-white rounded text-xs font-bold hover:bg-[#451384] cursor-pointer" %>
+                          <% end %>
+                        </td>
+                        <td class="px-2 py-2">
+                          <span class="px-1.5 py-0.5 text-xs rounded <%= variant.stock_quantity > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800' %>"><%= variant.stock_quantity %></span>
+                        </td>
+                        <td class="px-2 py-2">
+                          <% if variant.is_default? %>
+                            <span class="text-[#551694] text-xs font-medium">●</span>
+                          <% else %>
+                            <span class="text-gray-300">—</span>
+                          <% end %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Informations -->
+          <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+            <h2 class="text-sm font-semibold text-gray-900 mb-3">Informations</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-3">
+              <% if @item.product_sub_category %>
+                <div>
+                  <p class="text-xs text-gray-500">Catégorie</p>
+                  <p class="text-sm font-medium text-gray-900"><%= @item.product_sub_category.name %></p>
+                </div>
+              <% end %>
+              <div>
+                <p class="text-xs text-gray-500">Devise</p>
+                <p class="text-sm font-medium text-gray-900"><%= @item.currency.symbol %></p>
+              </div>
+              <% if @item.is_on_sale? %>
+                <div>
+                  <p class="text-xs text-gray-500">Promotion</p>
+                  <span class="text-sm font-medium text-gray-900">Oui</span>
+                  <% if @item.sale_discount_percent.present? && @item.sale_discount_percent > 0 %>
+                    <span class="text-sm text-gray-700"> · <%= @item.sale_discount_percent %>%</span>
+                  <% end %>
+                </div>
+                <% if @item.sale_start_date.present? %>
+                  <div>
+                    <p class="text-xs text-gray-500">Début promo</p>
+                    <p class="text-sm font-medium text-gray-900"><%= l(@item.sale_start_date, format: :short) %></p>
+                  </div>
+                <% end %>
+                <% if @item.sale_end_date.present? %>
+                  <div>
+                    <p class="text-xs text-gray-500">Fin promo</p>
+                    <p class="text-sm font-medium text-gray-900"><%= l(@item.sale_end_date, format: :short) %></p>
+                  </div>
+                <% end %>
+              <% end %>
+              <% if @item.shop.capabilities.ai_background_generation_enabled? %>
+              <div class="col-span-2 sm:col-span-3">
+                <p class="text-xs text-gray-500 mb-1">Enrichissement IA</p>
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold <%= 
+                    case @item.ai_enrichment_status
+                    when 'completed' then 'bg-[#551694]/10 text-[#551694]'
+                    when 'processing' then 'bg-yellow-100 text-yellow-800'
+                    when 'failed' then 'bg-red-100 text-red-800'
+                    else 'bg-gray-100 text-gray-800'
+                    end
+                  %>">
+                    <% case @item.ai_enrichment_status
+                       when 'completed' %>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <span>Contenu prêt</span>
+                    <% when 'processing' %>
+                      <svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      <span>En cours d'optimisation</span>
+                    <% when 'failed' %>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                      <span>Échec</span>
+                    <% else %>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span>En attente</span>
+                    <% end %>
+                  </span>
+                  <% if @item.ai_enrichment_failed? || @item.ai_enrichment_pending? %>
+                    <%= button_to "Relancer l'IA", url_with_shop(retry_ai_enrichment_employees_item_path(@item), @current_shop), 
+                        method: :post,
+                        class: "text-xs text-[#551694] hover:text-[#451384] underline bg-transparent border-0 p-0 cursor-pointer" %>
+                  <% end %>
+                </div>
+              </div>
+              <% end %>
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <div class="flex items-center gap-2 mb-1">
+                <p class="text-xs text-gray-500">Description</p>
+                <% if @item.shop.capabilities.ai_background_generation_enabled? && @item.ai_generated_fields&.dig("description").present? %>
+                  <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-[#551694]/10 text-[#551694]">IA</span>
+                <% end %>
+              </div>
+              <p class="text-sm text-gray-900 leading-relaxed"><%= @item.description.presence || '<em class="text-gray-400">Aucune description</em>'.html_safe %></p>
+            </div>
+
+            <% if @item.shop.capabilities.ai_background_generation_enabled? && (@item.meta_title.present? || @item.meta_description.present?) %>
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <p class="text-xs text-gray-500 mb-2">SEO (IA)</p>
+              <% if @item.meta_title.present? %>
+                <p class="text-xs text-gray-500 mb-0.5">Meta title</p>
+                <p class="text-sm text-gray-900 mb-2"><%= @item.meta_title %></p>
+              <% end %>
+              <% if @item.meta_description.present? %>
+                <p class="text-xs text-gray-500 mb-0.5">Meta description</p>
+                <p class="text-sm text-gray-900"><%= @item.meta_description %></p>
+              <% end %>
+            </div>
+            <% end %>
+          </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-4">
+          <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Résumé</h3>
+            <dl class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Variantes</dt>
+                <dd class="font-medium text-gray-900"><%= @variants.size %></dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Stock total</dt>
+                <dd class="font-medium text-gray-900"><%= @variants.sum(:stock_quantity) %></dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Prix min</dt>
+                <dd class="font-medium text-gray-900"><%= number_to_currency(@variants.minimum(:price) || 0, unit: @item.currency.symbol, precision: 0) %></dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Prix max</dt>
+                <dd class="font-medium text-gray-900"><%= number_to_currency(@variants.maximum(:price) || 0, unit: @item.currency.symbol, precision: 0) %></dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="bg-white rounded-lg border border-gray-100 shadow-sm p-4">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">Navigation</h3>
+            <div class="space-y-2">
+              <%= link_to "Modifier ce produit", url_with_shop(edit_employees_item_path(@item), @current_shop),
+                  class: "block text-center px-3 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] text-xs font-medium" %>
+              <%= link_to "Voir toutes les variantes", url_with_shop(employees_item_variants_path(@item), @current_shop),
+                  class: "block text-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-xs font-medium" %>
+              <%= link_to "Voir en boutique", client_item_path(@item), target: '_blank',
+                  class: "block text-center px-3 py-2 text-[#551694] border border-[#551694] rounded-lg hover:bg-[#551694]/5 text-xs font-medium" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">Produit non trouvé</p>
+        <%= link_to url_with_shop(employees_items_path, @current_shop),
+            class: "inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Retour au catalogue
+        <% end %>
+      </div>
+    <% end %>
+  </main>
+
+</div>

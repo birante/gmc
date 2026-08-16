@@ -1,0 +1,16 @@
+fr:
+  client:
+    orders:
+      index:
+        title: "Mes commandes"
+        order_number: "Commande #%{slug}"
+        items: "Articles"
+        item: "article"
+        items_plural: "articles"
+        total_amount: "Montant total"
+        final_amount: "Montant final (avec livraison)"
+        view_details: "Voir les détails"
+        no_orders_title: "Aucune commande"
+        no_orders_message: "Vous n'avez pas encore passé de commande."
+        view_catalog: "Voir le catalogue"
+

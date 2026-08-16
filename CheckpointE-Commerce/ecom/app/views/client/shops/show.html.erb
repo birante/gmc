@@ -1,0 +1,184 @@
+<%# SEO Meta Tags %>
+<% content_for :title, @page_title %>
+<% content_for :meta_description, @page_description %>
+
+<%# Structured Data %>
+<% content_for :structured_data do %>
+  <%= json_ld_tag(breadcrumb_schema([
+    [t('breadcrumbs.home', default: 'Accueil'), root_url],
+    [t('breadcrumbs.shops', default: 'Boutiques'), client_shops_url],
+    [@shop.name, client_shop_url(@shop)]
+  ])) %>
+  <%= json_ld_tag(shop_schema(@shop)) %>
+<% end %>
+
+<div class="bg-gray-50 min-h-screen">
+  <%# Breadcrumb %>
+  <nav aria-label="<%= t('accessibility.breadcrumb', default: 'Fil d\'Ariane') %>" class="container mx-auto px-4 lg:px-[50px] py-4">
+    <ol class="flex items-center gap-2 text-sm text-gray-600" itemscope itemtype="https://schema.org/BreadcrumbList">
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <%= link_to root_path, itemprop: "item", class: "hover:text-[#551694]" do %>
+          <span itemprop="name"><%= t('breadcrumbs.home', default: 'Accueil') %></span>
+        <% end %>
+        <meta itemprop="position" content="1">
+      </li>
+      <li aria-hidden="true" class="text-gray-400">/</li>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <%= link_to client_shops_path, itemprop: "item", class: "hover:text-[#551694]" do %>
+          <span itemprop="name"><%= t('breadcrumbs.shops', default: 'Boutiques') %></span>
+        <% end %>
+        <meta itemprop="position" content="2">
+      </li>
+      <li aria-hidden="true" class="text-gray-400">/</li>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" aria-current="page">
+        <span itemprop="name" class="text-[#551694] font-medium"><%= @shop.name %></span>
+        <meta itemprop="position" content="3">
+      </li>
+    </ol>
+  </nav>
+
+  <%# Hero Banner %>
+  <header class="relative h-[200px] md:h-[280px] bg-gradient-to-r from-[#551694] to-[#8B5CF6]" aria-labelledby="shop-name">
+    <% if @shop.banner_image.attached? %>
+      <%= storage_image_tag(@shop.banner_image,
+          variant_name: :banner,
+          alt: "Bannière #{@shop.name}",
+          class: "absolute inset-0 w-full h-full object-cover",
+          eager: true,
+          priority: true,
+          width: 1280,
+          height: 400) %>
+      <div class="absolute inset-0 bg-black/40"></div>
+    <% end %>
+    
+    <div class="relative container mx-auto px-4 lg:px-[50px] h-full flex items-end pb-6">
+      <div class="flex items-end gap-4 md:gap-6">
+        <%# Logo %>
+        <div class="w-20 h-20 md:w-28 md:h-28 bg-white rounded-xl shadow-lg p-2 flex items-center justify-center -mb-10 md:-mb-14 relative z-10">
+          <% if @shop.logo.attached? %>
+            <%= storage_image_tag(@shop.logo,
+                variant_name: :logo_medium,
+                alt: "Logo #{@shop.name}",
+                class: "max-w-full max-h-full object-contain",
+                eager: true,
+                priority: true,
+                width: 112,
+                height: 112) %>
+          <% else %>
+            <span class="text-3xl md:text-4xl font-bold text-[#551694]"><%= @shop.name.first.upcase %></span>
+          <% end %>
+        </div>
+        
+        <div class="pb-2">
+          <div class="flex items-center gap-2 mb-1">
+            <h1 id="shop-name" class="text-2xl md:text-4xl font-bold text-white">
+              <%= @shop.name %>
+            </h1>
+            <% if @shop.verified? %>
+              <span class="inline-flex items-center gap-1 bg-white/20 text-white text-xs px-2 py-1 rounded-full" title="<%= t('shops.verified_title', default: 'Boutique vérifiée') %>">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span class="sr-only"><%= t('shops.verified', default: 'Boutique vérifiée') %></span>
+              </span>
+            <% end %>
+          </div>
+          <p class="text-white/80 text-sm md:text-base">
+            <%= pluralize(@available_items_count || @shop.items.available_for_sale.count, t('shops.product_available', default: 'produit disponible'), t('shops.products_available', default: 'produits disponibles')) %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <%# Contenu principal %>
+  <div class="container mx-auto px-4 lg:px-[50px] pt-16 md:pt-20 pb-12">
+    <%# Bannières de la boutique %>
+    <%= render "shared/shops/shop_banners", shop: @shop %>
+
+    <%# Description %>
+    <% if @shop.description.present? %>
+      <div class="mb-8 max-w-3xl" itemprop="description">
+        <p class="text-gray-600 leading-relaxed">
+          <%= @shop.description %>
+        </p>
+      </div>
+    <% end %>
+
+    <%# Section produits %>
+    <section aria-labelledby="products-heading">
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="products-heading" class="text-xl md:text-2xl font-bold text-gray-900">
+          <%= t('shops.products_title', default: 'Produits') %>
+        </h2>
+        
+        <%# TODO: Ajouter tri/filtres %>
+      </div>
+
+      <% if @items.any? %>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <% @items.each do |item| %>
+            <% variant = item.variants.first %>
+            <%= link_to client_item_path(item), class: "group" do %>
+              <article class="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+                <%# Image produit %>
+                <div class="relative h-40 md:h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
+                  <% if item.has_image? %>
+                    <%= storage_image_tag(item.display_image,
+                        variant_name: :card,
+                        alt: item.name,
+                        class: "w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300",
+                        width: 400,
+                        height: 400) %>
+                  <% else %>
+                    <%= image_placeholder(aspect_ratio: "1/1", class: "w-full h-full") %>
+                  <% end %>
+                </div>
+
+                <%# Infos %>
+                <div class="p-3 md:p-4">
+                  <h3 class="text-sm font-medium text-gray-900 line-clamp-2 min-h-[40px] group-hover:text-[#551694] transition-colors">
+                    <%= item.name %>
+                  </h3>
+
+                  <%# Prix %>
+                  <div class="mt-2">
+                    <% if variant %>
+                      <span class="text-lg font-bold text-[#551694]">
+                        <%= number_to_currency(current_price_for(variant), unit: "", precision: 0, delimiter: ".") %> <%= item.currency&.symbol || "FCFA" %>
+                      </span>
+                    <% else %>
+                      <span class="text-gray-400"><%= t('items.price_unavailable', default: 'Prix non disponible') %></span>
+                    <% end %>
+                  </div>
+
+                  <%# Stock %>
+                  <% if variant && variant.stock_quantity.to_i.positive? %>
+                    <p class="mt-1 text-xs text-green-600"><%= t('items.in_stock', default: 'En stock') %></p>
+                  <% else %>
+                    <p class="mt-1 text-xs text-red-500"><%= t('items.out_of_stock', default: 'Rupture de stock') %></p>
+                  <% end %>
+                </div>
+              </article>
+            <% end %>
+          <% end %>
+        </div>
+
+        <%# Pagination %>
+        <% if @items.respond_to?(:total_pages) && @items.total_pages > 1 %>
+          <nav class="mt-8 flex justify-center" aria-label="<%= t('pagination.label', default: 'Pagination') %>">
+            <%= paginate @items %>
+          </nav>
+        <% end %>
+      <% else %>
+        <div class="text-center py-12 bg-white rounded-xl">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <p class="text-gray-500"><%= t('shops.no_products', default: 'Aucun produit disponible pour le moment') %></p>
+        </div>
+      <% end %>
+    </section>
+  </div>
+</div>
+

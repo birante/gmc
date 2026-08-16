@@ -1,0 +1,563 @@
+<% content_for :active_tab, 'catalogue' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <!-- Flash Messages Container for Turbo Streams -->
+    <div id="flash-messages" class="mb-4"></div>
+    
+    <% if @item %>
+      <nav class="mb-4 text-sm" aria-label="Fil d'Ariane">
+        <ol class="flex flex-wrap items-center gap-2 text-gray-500">
+          <li>
+            <%= link_to t('vendors.items.index.title'), url_with_shop(vendors_items_path, @current_shop), class: "hover:text-gray-900 transition-colors" %>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <%= link_to @item.name, url_with_shop(vendors_item_path(@item), @current_shop), class: "hover:text-gray-900 transition-colors truncate max-w-xs" %>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li class="text-gray-700 font-medium"><%= t('common.edit') %></li>
+        </ol>
+      </nav>
+
+      <!-- Header -->
+      <div class="mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+          <%= link_to url_with_shop(vendors_item_path(@item), @current_shop),
+              class: "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium w-fit" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <%= t('common.back') %>
+          <% end %>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 min-w-0">Modifier "<%= @item.name %>"</h1>
+        </div>
+      </div>
+
+      <!-- Variantes (édition rapide) -->
+      <% if @variants&.any? %>
+        <% is_xof_currency = @item.currency&.code == "XOF" %>
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900">Variantes du produit</h2>
+              <p class="text-sm text-gray-500 mt-1">Modifiez le prix d'une variante directement, puis cliquez sur ✓ pour enregistrer.</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <%= link_to "+ Ajouter une variante",
+                  url_with_shop(new_vendors_item_variant_path(@item), @current_shop),
+                  class: "px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium" %>
+              <%= link_to "Gérer toutes les variantes",
+                  url_with_shop(vendors_item_variants_path(@item), @current_shop),
+                  class: "px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors text-sm font-medium" %>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">SKU</th>
+                  <% @item_attributes.each do |attr| %>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase"><%= attr.name %></th>
+                  <% end %>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Prix (<%= @item.currency.symbol %>)</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Stock</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Défaut</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <% @variants.each do |variant| %>
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm text-gray-900 font-mono"><%= variant.sku %></td>
+                    <% @item_attributes.each do |attr| %>
+                      <td class="px-4 py-3 text-sm text-gray-900">
+                        <% value = variant.attribute_values.find { |av| av.item_attribute_id == attr.id }&.value %>
+                        <%= value || '—' %>
+                      </td>
+                    <% end %>
+                    <td class="px-4 py-3">
+                      <%= form_with model: variant,
+                          url: url_with_shop(vendors_item_variant_path(@item, variant), @current_shop),
+                          method: :patch, data: { turbo: false },
+                          class: "flex items-center gap-2" do |vf| %>
+                        <%= hidden_field_tag :return_to, request.fullpath %>
+                        <%= vf.number_field :price,
+                            step: (is_xof_currency ? 1 : 0.01),
+                            min: (is_xof_currency ? 1 : 0.01),
+                            value: (is_xof_currency ? variant.price.to_d.round(0).to_i : variant.price),
+                            "aria-label": "Prix de la variante #{variant.sku}",
+                            class: "w-28 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" %>
+                        <%= vf.submit "✓",
+                            title: "Enregistrer le prix",
+                            class: "px-3 py-1.5 bg-[#551694] text-white rounded-lg text-sm font-bold hover:bg-[#451384] cursor-pointer" %>
+                      <% end %>
+                    </td>
+                    <td class="px-4 py-3 text-sm <%= variant.stock_quantity > 0 ? 'text-green-600' : 'text-red-600' %> font-medium">
+                      <%= variant.stock_quantity %>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                      <% if variant.is_default? %>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">Défaut</span>
+                      <% else %>
+                        <span class="text-gray-400">—</span>
+                      <% end %>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                      <%= link_to "Éditer tout",
+                          url_with_shop(edit_vendors_item_variant_path(@item, variant), @current_shop),
+                          class: "text-[#551694] hover:text-[#451384] font-medium" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 p-3 bg-gray-50 rounded-lg text-sm text-gray-600">
+            <strong><%= @variants.size %></strong> variante(s) |
+            Stock total: <strong><%= @variants.sum(:stock_quantity) %></strong>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Formulaire -->
+      <%= form_with model: [:vendors, @item], url: url_with_shop(vendors_item_path(@item), @current_shop), method: :patch, data: { turbo: true }, class: "space-y-6" do |f| %>
+        <% selected_category_id = @item.product_sub_category&.product_category_id %>
+        <% sub_categories_for_selected_category = if selected_category_id.present?
+             ProductSubCategory.where(product_category_id: selected_category_id, is_active: true)
+           else
+             ProductSubCategory.none
+           end %>
+
+        <div data-controller="category-selector">
+          <% if @categories_json.present? %>
+            <script type="application/json" data-category-selector-categories>
+              <%= raw json_escape(@categories_json) %>
+            </script>
+          <% end %>
+        <% if @item.errors.any? %>
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <h3 class="font-bold mb-2"><%= pluralize(@item.errors.count, 'erreur') %> :</h3>
+            <ul class="list-disc list-inside">
+              <% @item.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Colonne principale -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Informations générales -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h2 class="text-xl font-semibold text-gray-900 mb-4">Informations générales</h2>
+              
+              <div class="space-y-4">
+                <div>
+                  <%= f.label :name, "Nom du produit", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= f.text_field :name, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" %>
+                </div>
+
+                <div>
+                  <%= f.label :description, "Description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= f.text_area :description, rows: 4, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 resize-none" %>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <%= label_tag :product_category_id, "Catégorie", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                    <%= select_tag :product_category_id,
+                        options_from_collection_for_select(@product_categories || ProductCategory.where(is_active: true), :id, :name, selected_category_id),
+                        {
+                          prompt: "Sélectionner une catégorie",
+                          class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20",
+                          data: { category_selector_target: "categorySelect", action: "change->category-selector#updateSubCategories" }
+                        } %>
+                  </div>
+
+                  <div>
+                    <%= f.label :product_sub_category_id, "Sous-catégorie", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                    <%= f.collection_select :product_sub_category_id,
+                        sub_categories_for_selected_category,
+                        :id,
+                        :name,
+                        { prompt: "Sélectionner une sous-catégorie" },
+                        {
+                          class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20",
+                          data: { category_selector_target: "subCategorySelect", prompt: "Sélectionner une sous-catégorie" }
+                        } %>
+                  </div>
+
+                  <div>
+                    <%= f.label :currency_id, "Devise", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                    <%= f.hidden_field :currency_id %>
+                    <%= f.collection_select :currency_id,
+                        (@currencies || Currency.active),
+                        :id,
+                        :symbol,
+                        {},
+                        {
+                          disabled: true,
+                          class: "w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                        } %>
+                    <p class="mt-1 text-xs text-gray-500">La devise est en lecture seule pour un produit existant.</p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Images du produit -->
+            <div class="bg-white rounded-lg shadow p-6" data-controller="image-preview">
+              <h2 class="text-xl font-semibold text-gray-900 mb-4">Images du produit</h2>
+              
+              <!-- Image principale -->
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Image principale</label>
+                <% if @item.main_image.attached? %>
+                  <div class="mb-2" id="main-image-preview">
+                    <%= image_tag url_for(@item.main_image), class: "w-32 h-32 object-cover rounded-lg border border-gray-200" %>
+                  </div>
+                <% else %>
+                  <div id="main-image-preview" class="hidden mb-2">
+                    <img id="main-image-preview-img" src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                  </div>
+                <% end %>
+                <%= f.file_field :main_image, 
+                    accept: "image/*", 
+                    class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#551694] file:text-white hover:file:bg-[#451384]",
+                    data: { action: "change->image-preview#previewMain" } %>
+                <p class="mt-1 text-xs text-gray-500">JPEG, PNG, Maximum 5 MB</p>
+              </div>
+
+              <!-- Images supplémentaires -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Images supplémentaires</label>
+                <div id="additional-images-container">
+                  <% if @item.images.attached? %>
+                    <div id="additional-images-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-4">
+                      <% @item.images.each do |image| %>
+                        <div id="image-<%= image.id %>" class="relative">
+                          <%= image_tag url_for(image), class: "w-full h-24 object-cover rounded-lg border border-gray-200" %>
+                          <%= link_to purge_image_vendors_item_path(@item, image_id: image.id), 
+                              method: :delete,
+                              data: { turbo_method: :delete, turbo_confirm: "Êtes-vous sûr de vouloir supprimer cette image ?" },
+                              class: "absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 text-xs" do %>
+                            ×
+                          <% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+                <%= f.file_field :images, 
+                    multiple: true, 
+                    accept: "image/*", 
+                    class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#551694] file:text-white hover:file:bg-[#451384]",
+                    data: { action: "change->image-preview#previewAdditional" } %>
+                <p class="mt-1 text-xs text-gray-500">Vous pouvez sélectionner plusieurs images. JPEG, PNG, Maximum 5 MB par image</p>
+              </div>
+            </div>
+
+            <!-- Promotions -->
+            <div class="bg-white rounded-lg shadow p-6" data-controller="promo-toggle">
+              <h2 class="text-xl font-semibold text-gray-900 mb-4">Promotions</h2>
+              
+              <div class="space-y-4">
+                <div class="flex items-center">
+                  <%= f.check_box :is_on_sale, 
+                      class: "w-4 h-4 text-[#551694] border-gray-300 rounded focus:ring-[#551694]", 
+                      id: "item_is_on_sale",
+                      data: { 
+                        action: "change->promo-toggle#toggle"
+                      } %>
+                  <%= f.label :is_on_sale, "Mettre ce produit en promotion", class: "ml-2 text-sm font-medium text-gray-700", for: "item_is_on_sale" %>
+                </div>
+
+                <div data-promo-toggle-target="fields" class="<%= 'hidden' unless @item.is_on_sale? %> space-y-4">
+                  <div>
+                    <%= f.label :sale_discount_percent, "Pourcentage de réduction global (%)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                    <%= f.number_field :sale_discount_percent, step: 0.01, min: 0, max: 100, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" %>
+                    <p class="mt-1 text-xs text-gray-500">S'appliquera à toutes les variantes sauf celles avec un prix promo spécifique</p>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <%= f.label :sale_start_date, "Date de début", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                      <%= f.datetime_local_field :sale_start_date, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" %>
+                    </div>
+
+                    <div>
+                      <%= f.label :sale_end_date, "Date de fin", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                      <%= f.datetime_local_field :sale_end_date, class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" %>
+                    </div>
+                  </div>
+
+                  <div class="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-xs text-blue-700">
+                      Astuce : Vous pourrez définir un prix promo spécifique pour chaque variante dans la section "Variantes du produit"
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Étape 1 : Attributs -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h2 class="text-xl font-semibold text-gray-900 mb-4">Etape 1 : Attributs et valeurs</h2>
+              
+              <div id="attributes-container" class="space-y-4">
+                <% @item_attributes.each_with_index do |attribute, attr_index| %>
+                  <div class="p-4 border border-gray-200 rounded-lg bg-gray-50" data-attribute-index="<%= attr_index %>">
+                    <!-- ID caché pour l'attribut existant -->
+                    <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][id]" value="<%= attribute.id %>" />
+                    
+                    <div class="flex justify-between items-start mb-3">
+                      <div class="flex-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nom de l'attribut</label>
+                        <input type="text" 
+                               name="item[item_attributes_attributes][<%= attr_index %>][name]" 
+                               value="<%= attribute.name %>"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" />
+                      </div>
+                      <button type="button" class="ml-2 text-red-600 hover:text-red-700" onclick="markAttributeForDestroy(this)">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                      </button>
+                      <!-- Champ _destroy pour marquer la suppression -->
+                      <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][_destroy]" value="false" class="destroy-field" />
+                    </div>
+
+                    <div class="space-y-2">
+                      <label class="block text-sm font-medium text-gray-700">Valeurs</label>
+                      <div class="space-y-2" data-values-container data-attr-index="<%= attr_index %>">
+                        <% attribute.attribute_values.each_with_index do |value, value_index| %>
+                          <div class="flex gap-2" data-value-index="<%= value_index %>">
+                            <!-- ID caché pour la valeur existante -->
+                            <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][attribute_values_attributes][<%= value_index %>][id]" value="<%= value.id %>" />
+                            <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][attribute_values_attributes][<%= value_index %>][_destroy]" value="false" class="destroy-field" />
+                            <input type="text" 
+                                   name="item[item_attributes_attributes][<%= attr_index %>][attribute_values_attributes][<%= value_index %>][value]" 
+                                   value="<%= value.value %>"
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" 
+                                   placeholder="Valeur" />
+                            <button type="button" class="text-red-600 hover:text-red-700 px-2" onclick="markValueForDestroy(this)">
+                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                              </svg>
+                            </button>
+                          </div>
+                        <% end %>
+                      </div>
+                      
+                      <button type="button" 
+                              class="mt-2 text-sm text-[#551694] hover:text-[#451384] font-medium add-value-btn"
+                              data-attr-index="<%= attr_index %>">
+                        + Ajouter une valeur
+                      </button>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+
+              <button type="button" 
+                      class="mt-4 px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium flex items-center gap-2"
+                      onclick="addAttribute()">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Ajouter un attribut
+              </button>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="lg:col-span-1 space-y-6">
+            <!-- Statut -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Statut</h3>
+              
+              <div class="space-y-3">
+                <% validation_label = case @item.validation_status
+                   when "approved" then "Approuve"
+                   when "rejected" then "Rejete"
+                   else "En attente"
+                   end %>
+                <% validation_badge_class = case @item.validation_status
+                   when "approved" then "bg-green-100 text-green-700"
+                   when "rejected" then "bg-red-100 text-red-700"
+                   else "bg-amber-100 text-amber-700"
+                   end %>
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Statut de validation</p>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold <%= validation_badge_class %>">
+                    <%= validation_label %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="bg-white rounded-lg shadow p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
+              
+              <div class="space-y-2">
+                <%= f.submit "Enregistrer les modifications",
+                    class: "block w-full px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium text-center" %>
+                <%= link_to "Annuler",
+                    url_with_shop(vendors_item_path(@item), @current_shop),
+                    class: "block w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-center" %>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">Produit non trouvé</p>
+        <%= link_to url_with_shop(vendors_items_path, @current_shop),
+            class: "inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          Retour au catalogue
+        <% end %>
+      </div>
+    <% end %>
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>
+
+<script type="module">
+  let attributeCount = <%= @item_attributes.size %>;
+  let valueCounters = {};
+  
+  // Initialiser les compteurs de valeurs pour chaque attribut existant
+  <% @item_attributes.each_with_index do |attribute, attr_index| %>
+    valueCounters[<%= attr_index %>] = <%= attribute.attribute_values.size %>;
+  <% end %>
+
+  // Marquer un attribut pour suppression (au lieu de le supprimer du DOM)
+  function markAttributeForDestroy(button) {
+    const container = button.closest('[data-attribute-index]');
+    const destroyField = container.querySelector('.destroy-field');
+    
+    if (destroyField) {
+      // Attribut existant - marquer pour suppression
+      destroyField.value = 'true';
+      container.style.display = 'none';
+    } else {
+      // Nouvel attribut - supprimer du DOM
+      container.remove();
+    }
+  }
+
+  // Marquer une valeur pour suppression
+  function markValueForDestroy(button) {
+    const container = button.closest('[data-value-index]');
+    const destroyField = container.querySelector('.destroy-field');
+    
+    if (destroyField) {
+      // Valeur existante - marquer pour suppression
+      destroyField.value = 'true';
+      container.style.display = 'none';
+    } else {
+      // Nouvelle valeur - supprimer du DOM
+      container.remove();
+    }
+  }
+
+  function addAttribute() {
+    const container = document.getElementById('attributes-container');
+    const newAttr = document.createElement('div');
+    newAttr.className = 'p-4 border border-gray-200 rounded-lg bg-gray-50';
+    newAttr.setAttribute('data-attribute-index', attributeCount);
+    
+    // Initialiser le compteur de valeurs pour ce nouvel attribut
+    valueCounters[attributeCount] = 0;
+    
+    newAttr.innerHTML = `
+      <div class="flex justify-between items-start mb-3">
+        <div class="flex-1">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nom de l'attribut</label>
+          <input type="text" 
+                 name="item[item_attributes_attributes][${attributeCount}][name]" 
+                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" 
+                 placeholder="Ex: Couleur, Taille, etc." />
+        </div>
+        <button type="button" class="ml-2 text-red-600 hover:text-red-700" onclick="this.closest('[data-attribute-index]').remove()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Valeurs</label>
+        <div class="space-y-2" data-values-container data-attr-index="${attributeCount}">
+          <div class="flex gap-2" data-value-index="0">
+            <input type="text" 
+                   name="item[item_attributes_attributes][${attributeCount}][attribute_values_attributes][0][value]" 
+                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" 
+                   placeholder="Valeur" />
+            <button type="button" class="text-red-600 hover:text-red-700 px-2" onclick="this.closest('[data-value-index]').remove()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button type="button" 
+                class="mt-2 text-sm text-[#551694] hover:text-[#451384] font-medium add-value-btn"
+                data-attr-index="${attributeCount}">
+          + Ajouter une valeur
+        </button>
+      </div>
+    `;
+    container.appendChild(newAttr);
+    valueCounters[attributeCount] = 1;
+    attributeCount++;
+  }
+
+  function addValue(attrIndex) {
+    const container = document.querySelector(`[data-values-container][data-attr-index="${attrIndex}"]`);
+    if (!container) return;
+    
+    const valueIndex = valueCounters[attrIndex] || 0;
+    valueCounters[attrIndex] = valueIndex + 1;
+    
+    const newValue = document.createElement('div');
+    newValue.className = 'flex gap-2';
+    newValue.setAttribute('data-value-index', valueIndex);
+    newValue.innerHTML = `
+      <input type="text" 
+             name="item[item_attributes_attributes][${attrIndex}][attribute_values_attributes][${valueIndex}][value]" 
+             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" 
+             placeholder="Valeur" />
+      <button type="button" class="text-red-600 hover:text-red-700 px-2" onclick="this.closest('[data-value-index]').remove()">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    `;
+    container.appendChild(newValue);
+  }
+
+  window.addAttribute = addAttribute;
+  window.markAttributeForDestroy = markAttributeForDestroy;
+  window.markValueForDestroy = markValueForDestroy;
+
+  // Gestionnaire d'événements pour les boutons "Ajouter une valeur"
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('add-value-btn') || e.target.closest('.add-value-btn')) {
+      const btn = e.target.classList.contains('add-value-btn') ? e.target : e.target.closest('.add-value-btn');
+      const attrIndex = btn.getAttribute('data-attr-index');
+      addValue(parseInt(attrIndex));
+    }
+  });
+</script>

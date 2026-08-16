@@ -1,0 +1,126 @@
+en:
+  storefront:
+    # Hero Slider / Carousel
+    carousel:
+      hero_label: "Promotions and special offers"
+      previous: "Previous slide"
+      next: "Next slide"
+      slides: "Slides"
+      slide_label: "Slide %{current} of %{total}"
+      pagination: "Slide navigation"
+      go_to_slide: "Go to slide %{number}"
+      pause: "Pause automatic slideshow"
+      play: "Resume automatic slideshow"
+      scroll_left: "Scroll left"
+      scroll_right: "Scroll right"
+
+    # Marquee / Advantages banner
+    marquee:
+      label: "aa Benefits"
+      advantages: "List of benefits"
+      download_app: "Download the app"
+      download_app_full: "Download aa app"
+      download_app_sub: "and get great deals"
+      free_returns: "Free returns"
+      free_returns_sub: "On all orders"
+      cgv_title: "Terms and Conditions"
+      cgv: "T&C"
+      applicable: "applicable"
+      discount: "Discount"
+      discount_text: "Discount"
+      discount_sub: "Extra on your 1"
+      first_order_sup: "st"
+      order: "order"
+      free_delivery: "Free delivery"
+      conditions_title: "General conditions"
+      conditions: "General conditions"
+
+    # Promo Banners
+    promo_banners:
+      title: "Promotional offers"
+      philips_link: "View Philips Essential XL Air Fryer from 15000 FCFA"
+      ninja_link: "View Ninja 3-in-1 Blender from 20000 FCFA"
+      xbox_link: "View Xbox controllers with 20% off"
+      xiaomi_link: "View Xiaomi Redmi Note 8 Pro from 30000 FCFA"
+
+    # Categories Grid
+    categories:
+      explore_title: "Explore by categories"
+      nav_label: "Product categories"
+      explore_category: "Explore %{category} category"
+      scroll_left: "Scroll categories left"
+      scroll_right: "Scroll categories right"
+
+    # Secondary Banners
+    secondary_banners:
+      title: "Featured categories"
+      laser_projector: "Discover Laser Projectors"
+      smartphones: "Discover Smartphones"
+      smartphones_tablets: "Discover Smartphones & Tablets"
+      appliances: "Discover Home Appliances"
+      smart_home: "Discover Smart Home"
+      smart_home_audio: "Discover Smart Home & Audio"
+      gaming: "Discover Gaming"
+      discover_selection: "Discover our selection"
+
+    # Trending Categories
+    trending:
+      title: "Trending Now - New Arrivals"
+      view_product: "View %{product}"
+      view_category: "View %{category} category"
+      explore_category: "Explore %{category}"
+
+    # Local Shops
+    local_shops:
+      title: "Local Shops"
+      nav_label: "List of local shops"
+      visit_shop: "Visit %{shop} shop"
+      local_products: "Local products"
+      explore_local: "Explore all your local products"
+      see_more: "See more"
+      see_more_products: "See more Made in Senegal products"
+      featured_products: "Featured local products"
+
+    # Official Brands
+    official_brands:
+      title: "Official Stores"
+      nav_label: "List of official brands"
+      visit_brand: "Visit %{brand} store"
+      official_badge: "Official Store"
+
+    # Newsletter
+    newsletter:
+      title_new: "New to"
+      subtitle: "Subscribe to our newsletter to receive our best offers!"
+      form_label: "Newsletter subscription"
+      email_label: "Email address"
+      email_placeholder: "Enter your email address"
+      subscribe: "Subscribe"
+      privacy_notice: "By subscribing you accept our"
+      terms_link: "Terms & Conditions"
+      success: "Thank you! Check your email to confirm your subscription."
+      resubscribed: "You have been resubscribed to our newsletter!"
+      invalid_email: "Invalid email address"
+      error: "An error occurred"
+
+    # Products (used in local shops)
+    products:
+      discount: "%{discount}% off"
+      rating: "Rating: %{rating} out of 5 stars"
+      original_price: "Original price:"
+      add_to_cart: "Add %{product} to cart"
+      add_to_cart_button: "Add to cart"
+
+    # Promo Banner Carousel
+    promo_carousel:
+      title: "On Sale"
+      time_left: "Time left"
+      days: "Days"
+      hours: "Hours"
+      minutes: "Minutes"
+      seconds: "Seconds"
+      view_all: "View all"
+      view_product: "View %{product}"
+      in_stock: "In stock"
+      out_of_stock: "Out of stock"
+

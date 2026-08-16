@@ -1,0 +1,86 @@
+<% variant = cart_item.variant %>
+<% max_quantity = [variant&.stock_quantity.to_i, cart_item.quantity].max %>
+
+<div id="cart-sheet-item-<%= cart_item.id %>"
+     class="relative flex flex-col gap-2 p-3 border border-[#dbdfe9] rounded-[15px] group"
+     data-controller="cart-quantity"
+     data-cart-quantity-max-value="<%= max_quantity %>"
+     data-cart-quantity-current-value="<%= cart_item.quantity %>"
+     data-action="click->cart-sheet#stopPropagation">
+  <!-- Image -->
+  <div class="w-full h-[60px] border border-[#dbdfe9] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden bg-[rgba(244,244,245,0.9)]">
+    <% if cart_item.item.has_image? %>
+      <%= storage_image_tag(cart_item.item.display_image, variant_name: :thumbnail, alt: cart_item.item.name, class: "w-full h-full object-cover", width: 80, height: 80) %>
+    <% else %>
+      <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    <% end %>
+  </div>
+
+  <!-- Informations produit -->
+  <div class="flex-1 min-w-0 flex flex-col gap-1.5">
+    <h3 class="text-[11px] font-medium text-black leading-tight line-clamp-2"><%= cart_item.item.name %></h3>
+
+    <!-- Prix (toujours visible, pas de débordement) -->
+    <p class="text-[12px] font-bold text-[#551694] leading-none" id="total-price-sheet-<%= cart_item.id %>">
+      <%= number_to_currency(cart_item.total_price, unit: cart_item.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </p>
+
+    <!-- Contrôle de quantité -->
+    <div class="bg-white border border-[#e4e7e9] rounded-full px-2 py-1 flex items-center justify-center gap-1.5 w-fit">
+      <%= form_with url: client_cart_item_path(cart_item), method: :patch, id: "cart-sheet-item-form-#{cart_item.id}", class: "flex items-center gap-1.5", data: { turbo: true, 'cart-quantity-target': 'form' } do |form| %>
+        <%= form.hidden_field :quantity, value: 1, id: "quantity_sheet_#{cart_item.id}", data: { 'cart-quantity-target': 'hidden' } %>
+        
+        <button 
+          type="button"
+          id="decrease_sheet_<%= cart_item.id %>"
+          class="w-[12px] h-[12px] flex items-center justify-center text-[#99a1b7] hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+          data-action="click->cart-quantity#decrease"
+          data-cart-quantity-target="decrease"
+        >
+          <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path>
+          </svg>
+        </button>
+        
+        <span class="text-[12px] font-semibold text-[#475156] text-center min-w-[18px] flex-shrink-0 inline-flex items-center justify-center" data-cart-quantity-target="display">
+          <%= cart_item.quantity %>
+        </span>
+        
+        <input 
+          type="hidden" 
+          id="quantity_input_sheet_<%= cart_item.id %>" 
+          value="<%= cart_item.quantity %>" 
+          min="1" 
+          max="<%= max_quantity %>"
+          data-current="<%= cart_item.quantity %>"
+          data-cart-quantity-target="input"
+          data-action="change->cart-quantity#validate input->cart-quantity#validate"
+        />
+        
+        <button 
+          type="button"
+          id="increase_sheet_<%= cart_item.id %>"
+          class="w-[12px] h-[12px] flex items-center justify-center text-[#99a1b7] hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+          data-action="click->cart-quantity#increase"
+          data-cart-quantity-target="increase"
+        >
+          <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+          </svg>
+        </button>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Bouton suppression (position absolute top-right) -->
+  <%= button_to client_cart_item_path(cart_item), method: :delete, 
+      class: "absolute top-[-6px] right-[-6px] w-[22px] h-[22px] border-2 border-white rounded-full bg-red-100 flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer z-10",
+      data: { turbo: true } do %>
+    <svg class="w-[10px] h-[10px] text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+  <% end %>
+</div>
+

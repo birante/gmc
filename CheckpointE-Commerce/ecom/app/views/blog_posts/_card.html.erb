@@ -1,0 +1,23 @@
+<%= link_to blog_post_path(post.slug), class: "group block bg-white border border-[#EBEEF6] rounded-2xl overflow-hidden hover:shadow-lg transition-shadow" do %>
+  <article>
+    <div class="aspect-[16/10] bg-[#EEEAF8] overflow-hidden">
+      <% if post.cover_image.attached? %>
+        <%= image_tag post.cover_image,
+            alt: post.title,
+            class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
+            loading: "lazy" %>
+      <% end %>
+    </div>
+    <div class="p-5">
+      <time class="block text-xs text-[#6B7280] mb-2">
+        <%= l(post.published_at || post.created_at, format: :long) rescue (post.published_at || post.created_at).strftime("%-d %B %Y") %>
+      </time>
+      <h3 class="text-base font-semibold text-[#551694] leading-snug mb-2 line-clamp-2">
+        <%= post.title %>
+      </h3>
+      <% if post.excerpt.present? %>
+        <p class="text-sm text-[#4B5675] leading-6 line-clamp-2"><%= post.excerpt %></p>
+      <% end %>
+    </div>
+  </article>
+<% end %>

@@ -1,0 +1,7 @@
+<% unless skip_sidebar? || sidebar_sections_for_action.blank? %>
+  <div class="filters-sidebar-column js-filters-sidebar-column" id="filters-sidebar-column" role="complementary" aria-label="Filtres">
+    <div class="filters-sidebar-column__inner space-y-8">
+      <%= render "active_admin/shared/sidebar_sections" %>
+    </div>
+  </div>
+<% end %>

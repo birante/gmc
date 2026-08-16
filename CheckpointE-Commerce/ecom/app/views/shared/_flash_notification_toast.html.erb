@@ -1,0 +1,40 @@
+<%# Notification toast pour Turbo Stream (ex: ajout au panier). Locals: message (requis), type: 'success' (défaut) ou 'error' %>
+<% message ||= local_assigns[:message] %>
+<% type = local_assigns[:type].presence || 'success' %>
+<% autoclose = type == 'error' ? 7000 : 5000 %>
+
+<% if type == 'error' %>
+  <div class="flash-notification flash-notification-error bg-white border-l-4 border-red-500 shadow-lg rounded-lg p-4 flex items-start gap-3 animate-slide-in-right" data-controller="flash-notification" data-flash-notification-autoclose-value="<%= autoclose %>">
+    <div class="flex-shrink-0 mt-0.5">
+      <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-semibold text-gray-900 mb-0.5">Erreur</p>
+      <p class="text-sm text-gray-700 leading-relaxed"><%= message %></p>
+    </div>
+    <button type="button" data-action="click->flash-notification#close" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded p-1" aria-label="Fermer la notification">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+<% else %>
+  <div class="flash-notification flash-notification-success bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 flex items-start gap-3 animate-slide-in-right" data-controller="flash-notification" data-flash-notification-autoclose-value="<%= autoclose %>">
+    <div class="flex-shrink-0 mt-0.5">
+      <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-semibold text-gray-900 mb-0.5">Succès</p>
+      <p class="text-sm text-gray-700 leading-relaxed"><%= message %></p>
+    </div>
+    <button type="button" data-action="click->flash-notification#close" class="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 rounded p-1" aria-label="Fermer la notification">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+<% end %>

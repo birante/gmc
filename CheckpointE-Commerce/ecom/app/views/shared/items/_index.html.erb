@@ -1,0 +1,207 @@
+<%# Partial partagé : catalogue produits (vendor + employees).
+     Locals attendus :
+       items_index_path           String   URL de la page d'index (form filtres / lien retour)
+       item_path_for              Proc     ->(item) URL d'affichage d'un produit
+       new_item_path              String?  URL de création d'un produit (peut être nil)
+       dashboard_path             String   URL du dashboard (lien fallback)
+       signup_path                String?  Lien d'inscription (vendor uniquement)
+       signup_label               String?  Libellé du bouton ci-dessus
+       can_manage_items_buttons   Boolean  Affiche les boutons d'import en masse / ajout (défaut true)
+       show_bulk_upload_panel     Boolean  Inclut le panel d'import vendor (défaut false côté employee)
+       show_limit_alert           Boolean  Inclut l'encart de limites du plan (défaut false côté employee)
+     Instance vars : @vendor, @items, @current_shop %>
+<%
+  can_manage_items_buttons = local_assigns.fetch(:can_manage_items_buttons, true)
+  show_bulk_upload_panel   = local_assigns.fetch(:show_bulk_upload_panel, false)
+  show_limit_alert         = local_assigns.fetch(:show_limit_alert, false)
+  new_item_path            = local_assigns[:new_item_path]
+  signup_path              = local_assigns[:signup_path]
+  signup_label             = local_assigns[:signup_label]
+%>
+
+<% if @vendor %>
+  <!-- En-tête -->
+  <div class="w-full flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
+    <div>
+      <h1 class="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+        <%= t('vendors.items.index.title') %>
+      </h1>
+      <p class="text-sm text-gray-500 mt-0.5">
+        <%= t('vendors.items.index.subtitle') %>
+      </p>
+      <% if @current_shop %>
+        <p class="text-xs text-gray-400 mt-1">
+          <%= @current_shop.name %>
+          <% max_products = max_products_for(@current_shop) %>
+          <% current_products = @current_shop.items_count.to_i %>
+          · <%= current_products %> produit<%= current_products != 1 ? 's' : '' %>
+          <% if max_products %>
+            / <%= max_products.to_i %>
+          <% else %>
+            <span class="text-emerald-600">(illimité)</span>
+          <% end %>
+        </p>
+      <% end %>
+    </div>
+
+    <% if can_manage_items_buttons %>
+      <div class="shrink-0 flex flex-wrap items-center gap-2">
+        <% if show_bulk_upload_panel %>
+          <button type="button"
+                  onclick="document.dispatchEvent(new CustomEvent('bulk-upload-panel:open'))"
+                  class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-[#551694] text-[#551694] rounded-lg hover:bg-[#551694]/5 transition-colors font-medium text-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+            <%= t('vendors.items.index.bulk_upload_button') %>
+          </button>
+        <% end %>
+
+        <% if new_item_path %>
+          <%= link_to new_item_path,
+              class: "inline-flex items-center gap-2 px-5 py-2.5 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium text-sm shadow-sm" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <%= t('vendors.items.index.add_product') %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if show_bulk_upload_panel %>
+    <%# Panel d'import en masse (vendor uniquement) %>
+    <%= render "vendors/items/bulk_upload_panel" %>
+  <% end %>
+
+  <% if show_limit_alert && @current_shop %>
+    <%= render "vendors/shared/limit_alert", shop: @current_shop %>
+  <% end %>
+
+  <!-- Recherche et filtres -->
+  <%= form_with url: items_index_path, method: :get, class: "mb-6 flex flex-col sm:flex-row gap-3", data: { turbo_frame: "_top" } do |f| %>
+    <div class="flex-1 relative">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input type="text"
+             name="search"
+             value="<%= params[:search] %>"
+             placeholder="<%= t('vendors.items.index.search_placeholder') %>"
+             class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-[#551694]/20 focus:border-[#551694] text-sm" />
+    </div>
+    <select name="validation_status"
+            class="px-4 py-2.5 border border-gray-200 rounded-lg bg-white text-gray-700 text-sm focus:ring-2 focus:ring-[#551694]/20 focus:border-[#551694]">
+      <option value=""><%= t('vendors.orders.index.all') %></option>
+      <option value="approved" <%= 'selected' if params[:validation_status] == 'approved' %>><%= t('vendors.items.index.filters.approved') %></option>
+      <option value="pending" <%= 'selected' if params[:validation_status] == 'pending' %>><%= t('vendors.items.index.filters.pending') %></option>
+      <option value="rejected" <%= 'selected' if params[:validation_status] == 'rejected' %>><%= t('vendors.items.index.filters.rejected') %></option>
+    </select>
+    <%= hidden_field_tag :shop_slug, params[:shop_slug] if params[:shop_slug].present? %>
+    <%= hidden_field_tag :shop_id,   params[:shop_id]   if params[:shop_id].present? %>
+    <button type="submit" class="px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 text-sm font-medium">
+      <%= t('vendors.orders.index.filter') %>
+    </button>
+  <% end %>
+
+  <!-- Liste des produits -->
+  <% if @items.any? %>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+      <% @items.each do |item| %>
+        <% default_variant = item.default_variant %>
+        <article class="bg-white rounded-lg border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all duration-200 overflow-hidden flex flex-col group">
+          <!-- Image -->
+          <div class="h-28 sm:h-32 bg-gray-50 flex items-center justify-center overflow-hidden relative">
+            <% if item.has_image? %>
+              <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300", width: 400, height: 400) %>
+            <% else %>
+              <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            <% end %>
+            <div class="absolute top-1 right-1 flex gap-0.5">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-medium shadow-sm <%=
+                case item.validation_status
+                when 'approved'  then 'bg-emerald-500/90 text-white'
+                when 'pending'   then 'bg-amber-500/90 text-white'
+                when 'rejected'  then 'bg-red-500/90 text-white'
+                else                  'bg-gray-500/80 text-white'
+                end %>">
+                <%= t("vendors.items.index.statuses.#{item.validation_status}") %>
+              </span>
+            </div>
+          </div>
+
+          <!-- Contenu -->
+          <div class="p-2.5 flex-1 flex flex-col min-h-0">
+            <h3 class="font-medium text-gray-900 text-sm mb-0.5 line-clamp-2 leading-tight"><%= item.name %></h3>
+            <% if item.product_sub_category %>
+              <p class="text-[11px] text-gray-500 mb-1 truncate"><%= item.product_sub_category.name %></p>
+            <% end %>
+            <p class="text-xs text-gray-600 line-clamp-1 mb-1.5 flex-1 min-h-0"><%= item.description.presence || t('vendors.items.index.no_description') %></p>
+
+            <!-- Prix -->
+            <div class="mb-2">
+              <span class="text-sm font-bold text-[#551694]">
+                <% if default_variant %>
+                  <%= number_to_currency(default_variant.price, unit: item.currency.symbol, precision: 0) %>
+                <% else %>
+                  N/A
+                <% end %>
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col gap-1">
+              <%= link_to t('vendors.items.index.view'), item_path_for.call(item),
+                  class: "block w-full text-center px-2 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors text-xs font-medium" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+
+    <% if defined?(Kaminari) && @items.respond_to?(:current_page) %>
+      <div class="mt-6">
+        <%= paginate @items %>
+      </div>
+    <% end %>
+  <% else %>
+    <!-- État vide ou aucun résultat -->
+    <div class="bg-white rounded-xl border border-gray-100 shadow-sm py-16 sm:py-24 px-6 text-center">
+      <div class="max-w-sm mx-auto">
+        <% if params[:search].present? || params[:validation_status].present? %>
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Aucun produit trouvé</h3>
+          <p class="text-sm text-gray-500 mb-6">Essayez de modifier vos critères de recherche ou de filtre.</p>
+          <%= link_to "Réinitialiser les filtres", items_index_path,
+              class: "inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium" %>
+        <% else %>
+          <div class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-[#551694]/10 flex items-center justify-center">
+            <svg class="w-12 h-12 text-[#551694]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8 4-8-4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2"><%= t('vendors.items.index.no_products') %></h3>
+          <p class="text-sm text-gray-500 mb-6"><%= t('vendors.items.index.no_products_description') %></p>
+          <%= link_to "Retour au tableau de bord", dashboard_path,
+              class: "inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-sm" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+<% else %>
+  <!-- État d'erreur si pas de vendeur -->
+  <div class="text-center py-12">
+    <p class="text-gray-500 mb-4"><%= t('vendors.items.index.error_vendor_not_found') %></p>
+    <% if signup_path.present? %>
+      <%= link_to (signup_label || t('vendors.items.index.signup')), signup_path, class: "inline-block px-6 py-3 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors" %>
+    <% end %>
+  </div>
+<% end %>

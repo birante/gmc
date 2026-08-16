@@ -1,0 +1,43 @@
+Génère un contenu SEO optimisé pour ce produit e-commerce.
+
+## Informations du produit
+
+**Nom:** <%= @item_name %>
+
+<% if @category.present? %>
+**Catégorie:** <%= @category %>
+<% end %>
+
+<% if @sub_category.present? %>
+**Sous-catégorie:** <%= @sub_category %>
+<% end %>
+
+<% if @price.present? && @currency.present? %>
+**Prix:** <%= @price %> <%= @currency %>
+<% end %>
+
+<% if @current_description.present? %>
+**Description actuelle:**
+<%= @current_description %>
+<% end %>
+
+## Tâche
+
+Génère un contenu enrichi pour ce produit au format JSON avec les champs suivants:
+
+1. **name** (string): Nom optimisé du produit (peut être identique ou amélioré)
+2. **description** (text): Description longue, détaillée et SEO-friendly (150-300 mots)
+3. **meta_title** (string): Titre SEO pour les meta tags (50-60 caractères max)
+4. **meta_description** (string): Description SEO pour les meta tags (150-160 caractères max)
+5. **slug_suggestion** (string): Suggestion de slug SEO-friendly
+6. **keywords** (array of strings): Liste de 8 à 15 mots-clés ou expressions courtes (recherche produit, sans doublons)
+
+Important:
+- Tout le contenu doit être en français
+- Le meta_title doit être accrocheur et contenir des mots-clés pertinents
+- La meta_description doit être persuasive et inciter au clic
+- La description doit être structurée avec des paragraphes courts
+- Le slug doit être en minuscules, sans accents, avec des tirets
+
+Réponds UNIQUEMENT avec un JSON valide, sans markdown, sans code blocks, juste le JSON brut.
+

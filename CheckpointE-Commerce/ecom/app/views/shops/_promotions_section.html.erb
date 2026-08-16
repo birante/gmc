@@ -1,0 +1,128 @@
+<%# Section Promotions - Bannières et produits en vedette %>
+<div>
+  <div class="mb-6">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+          </svg>
+          <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Promotions & Offres spéciales</h2>
+        </div>
+        <p class="text-sm text-gray-600">Découvrez nos meilleures offres du moment avec des réductions exclusives</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <%# Bannière promotionnelle gauche - Gaming/AC Unit %>
+    <div class="bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm">
+      <div class="relative h-64 bg-gradient-to-br from-gray-800 to-gray-900">
+        <% if shop.banner_image.attached? %>
+          <%= storage_image_tag(shop.banner_image, variant_name: :banner, alt: "Promotion", class: "absolute inset-0 w-full h-full object-cover opacity-50", width: 1280, height: 400) %>
+        <% end %>
+        <div class="relative p-6 h-full flex flex-col justify-between text-white">
+          <div>
+            <h3 class="text-xl font-bold mb-2">Le meilleur du gaming</h3>
+            <p class="text-sm text-white/80 mb-2"><%= shop.name %> - 1.25 CV</p>
+            <p class="text-sm text-white/70">Économisez jusqu'à 50% sur une sélection de consoles Xbox.</p>
+          </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div class="text-2xl sm:text-3xl font-bold" style="color: <%= primary_color %>;">300.000 F</div>
+            <button class="text-sm px-3 py-1.5 sm:px-4 sm:py-2 bg-white text-gray-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+              PROFITER DE L'OFFRE →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <%# Bannière promotionnelle droite - Deals du mois %>
+    <div class="space-y-4">
+      <h3 class="text-xl font-bold text-gray-900">DEALS DU MOIS</h3>
+      
+      <%# Produit promo 1 %>
+      <% promo_item_1 = promo_items&.sample %>
+      <%= render "promo_item_card", promo_item: promo_item_1, primary_color: primary_color, show_discount_badge: true %>
+      
+      <%# Produit promo 2 %>
+      <% promo_item_2 = promo_items&.reject { |item| item.id == promo_item_1&.id }&.sample %>
+      <%= render "promo_item_card", promo_item: promo_item_2, primary_color: primary_color, show_discount_badge: false %>
+    </div>
+  </div>
+  
+  <%# Section avec countdown et produits en promo %>
+  <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+      <div>
+        <h3 class="text-lg font-bold text-gray-900 mb-1">Ventes Flash en cours</h3>
+        <p class="text-sm text-gray-600">Profitez de réductions exceptionnelles</p>
+      </div>
+      <%# Countdown timer %>
+      <div class="flex gap-1 sm:gap-2">
+        <div class="bg-gray-900 text-white px-2 sm:px-4 py-2 rounded-lg text-center min-w-[48px] sm:min-w-[60px]">
+          <div class="text-lg sm:text-2xl font-bold">01</div>
+          <div class="text-xs text-gray-400">Jours</div>
+        </div>
+        <div class="bg-gray-900 text-white px-2 sm:px-4 py-2 rounded-lg text-center min-w-[48px] sm:min-w-[60px]">
+          <div class="text-lg sm:text-2xl font-bold">16</div>
+          <div class="text-xs text-gray-400">Heures</div>
+        </div>
+        <div class="bg-gray-900 text-white px-2 sm:px-4 py-2 rounded-lg text-center min-w-[48px] sm:min-w-[60px]">
+          <div class="text-lg sm:text-2xl font-bold">37</div>
+          <div class="text-xs text-gray-400">Min</div>
+        </div>
+        <div class="bg-gray-900 text-white px-2 sm:px-4 py-2 rounded-lg text-center min-w-[48px] sm:min-w-[60px]">
+          <div class="text-lg sm:text-2xl font-bold">37</div>
+          <div class="text-xs text-gray-400">Sec</div>
+        </div>
+      </div>
+    </div>
+    
+    <%# Carousel de produits (simplifié pour l'instant) %>
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <% items.limit(6).each do |item| %>
+        <% variant = item.variants.first %>
+        <%= link_to item_path(item), class: "group", data: { turbo_frame: "_top" } do %>
+          <div class="bg-gray-50 rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition-shadow">
+            <div class="relative h-32 bg-gray-100 flex items-center justify-center overflow-hidden">
+              <% if item.has_image? %>
+                <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-contain p-2 group-hover:scale-105 transition-transform", width: 400, height: 400) %>
+              <% end %>
+              <span class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">11%</span>
+              <button class="absolute top-1 left-1 w-8 h-8 bg-white rounded-full flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity shadow-sm">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+              </button>
+            </div>
+            <div class="p-2">
+              <% if item.average_rating.present? %>
+                <% rounded_rating = item.average_rating.round %>
+                <div class="flex items-center gap-1 mb-1" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_rating) %>">
+                  <div class="flex items-center" aria-hidden="true">
+                    <% 5.times do |i| %>
+                      <svg class="w-3 h-3 <%= i < rounded_rating ? 'text-yellow-400' : 'text-gray-300' %>" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                  <span class="text-[11px] text-gray-500 ml-0.5"><%= item.average_rating.round(1) %></span>
+                </div>
+              <% end %>
+              <% if variant %>
+                <div class="text-sm font-bold mb-1" style="color: <%= primary_color %>;">
+                  <%= number_to_currency(current_price_for(variant), unit: "", precision: 0, delimiter: ".") %> FCFA
+                </div>
+                <div class="text-xs text-gray-400 line-through">59.990 FCFA</div>
+              <% end %>
+              <button class="mt-2 w-full text-xs font-semibold py-1.5 rounded bg-gray-100 hover:bg-gray-200 transition-colors">
+                Ajouter au panier
+              </button>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

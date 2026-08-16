@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+default:
+  id: 1
+  code: XOF
+  symbol: FCFA
+  name: West African CFA franc
+  thousands_separator: " "
+  decimal_separator: ","
+  symbol_precedes_amount: false
+  is_active: true
+
+usd:
+  code: USD
+  symbol: $
+  name: US Dollar
+  thousands_separator: ","
+  decimal_separator: "."
+  symbol_precedes_amount: true
+  is_active: true
+
+eur:
+  code: EUR
+  symbol: €
+  name: Euro
+  thousands_separator: " "
+  decimal_separator: ","
+  symbol_precedes_amount: false
+  is_active: true

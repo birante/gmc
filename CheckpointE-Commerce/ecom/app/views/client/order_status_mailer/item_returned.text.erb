@@ -1,0 +1,15 @@
+Un article de votre commande a été retourné
+
+Bonjour <%= @user.first_name %>,
+
+Nous vous informons qu'un article de votre commande #{@order.order_number} a été retourné :
+
+- <%= @order_item.item.name %>
+<% if @order_item.item_variant %>
+- Variante : <%= @order_item.item_variant.display_name %>
+<% end %>
+- Quantité : <%= @order_item.quantity %>
+
+Si vous avez des questions concernant ce retour, n'hésitez pas à contacter notre service client.
+
+Merci pour votre compréhension.

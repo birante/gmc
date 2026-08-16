@@ -1,0 +1,91 @@
+<%# Header digitalisé : carousel de slides (photo + lien + bouton par slide) %>
+<% primary_color = local_assigns[:primary_color] || shop_primary_color(shop) %>
+<% slides_with_image = slides.select { |s| s.image.attached? } %>
+<% slides_with_image = slides if slides_with_image.empty? %>
+
+<% if slides_with_image.any? %>
+  <section class="relative rounded-2xl overflow-hidden shadow-lg mt-4" style="height: 420px;" aria-label="<%= t('shops.header_carousel_label', default: 'Bannière de la boutique') %>">
+    <div class="relative w-full h-full" data-carousel>
+      <% slides_with_image.each_with_index do |slide, idx| %>
+        <%
+          desktop_img = slide.image.attached? ? slide.image : nil
+          tablet_img  = slide.image_tablet.attached? ? slide.image_tablet : desktop_img
+          mobile_img  = slide.image_mobile.attached? ? slide.image_mobile : tablet_img
+        %>
+        <div class="header-slide absolute inset-0 transition-opacity duration-700" data-slide="<%= idx %>" style="opacity: <%= idx == 0 ? 1 : 0 %>;">
+          <%= link_to "#products-section", class: "block relative w-full h-full" do %>
+            <% if desktop_img.present? %>
+              <% if mobile_img.present? %>
+                <%= image_tag webp_variant(mobile_img, max_width: 768, max_height: 420),
+                    alt: shop.name,
+                    class: "w-full h-full object-cover md:hidden",
+                    loading: idx == 0 ? "eager" : "lazy",
+                    decoding: "async",
+                    width: 768,
+                    height: 420 %>
+              <% end %>
+              <% if tablet_img.present? %>
+                <%= image_tag webp_variant(tablet_img, max_width: 1024, max_height: 420),
+                    alt: shop.name,
+                    class: "w-full h-full object-cover hidden md:block lg:hidden",
+                    loading: idx == 0 ? "eager" : "lazy",
+                    decoding: "async",
+                    width: 1024,
+                    height: 420 %>
+              <% end %>
+              <%= image_tag webp_variant(desktop_img, max_width: 1600, max_height: 420),
+                  alt: shop.name,
+                  class: "w-full h-full object-cover hidden lg:block",
+                  loading: idx == 0 ? "eager" : "lazy",
+                  decoding: "async",
+                  width: 1600,
+                  height: 420 %>
+            <% else %>
+              <div class="w-full h-full" style="background: linear-gradient(135deg, <%= primary_color %>, <%= primary_color %>99);"></div>
+            <% end %>
+            <div class="absolute inset-0 bg-black/20 hover:bg-black/30 transition-colors cursor-pointer" aria-hidden="true"></div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if slides_with_image.size > 1 %>
+        <button type="button" class="header-carousel-prev absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 text-white rounded-full p-2 transition-all" aria-label="Slide précédente">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button type="button" class="header-carousel-next absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 text-white rounded-full p-2 transition-all" aria-label="Slide suivante">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+          <% slides_with_image.each_with_index do |_, i| %>
+            <button type="button" class="header-indicator w-2 h-2 rounded-full transition-all" data-slide="<%= i %>" style="background: <%= i == 0 ? 'white' : 'rgba(255,255,255,0.5)' %>;" aria-label="Aller à la slide <%= i + 1 %>"></button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <% if slides_with_image.size > 1 %>
+    <script>
+      (function() {
+        const container = document.querySelector('[data-carousel]');
+        if (!container) return;
+        const slides = container.querySelectorAll('.header-slide');
+        const indicators = container.querySelectorAll('.header-indicator');
+        const prev = container.querySelector('.header-carousel-prev');
+        const next = container.querySelector('.header-carousel-next');
+        if (slides.length <= 1) return;
+
+        let current = 0;
+        function show(n) {
+          current = (n + slides.length) % slides.length;
+          slides.forEach((s, i) => { s.style.opacity = i === current ? 1 : 0; });
+          indicators.forEach((ind, i) => { ind.style.background = i === current ? 'white' : 'rgba(255,255,255,0.5)'; });
+        }
+        prev?.addEventListener('click', () => show(current - 1));
+        next?.addEventListener('click', () => show(current + 1));
+        indicators.forEach((ind, i) => { ind.addEventListener('click', () => show(i)); });
+        setInterval(() => show(current + 1), 6000);
+      })();
+    </script>
+  <% end %>
+<% end %>

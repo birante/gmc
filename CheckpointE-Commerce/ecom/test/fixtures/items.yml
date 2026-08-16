@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  shop: one
+  product_sub_category: smartphones
+  currency: usd
+  name: MyString
+  validation_status: approved
+  position: 1
+  slug: MyString
+  description: MyText
+
+two:
+  shop: two
+  product_sub_category: shirts
+  currency: eur
+  name: MyString
+  validation_status: pending
+  position: 1
+  slug: MyString
+  description: MyText

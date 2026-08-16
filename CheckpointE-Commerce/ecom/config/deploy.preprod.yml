@@ -1,0 +1,166 @@
+# Name of your application. Used to uniquely configure containers.
+service: aaapps
+
+# Name of the container image.
+# Using GitHub Container Registry format: ghcr.io/OWNER/IMAGE_NAME
+image: okemamy/aaapps
+
+# Deploy to these servers.
+servers:
+  web:
+    - 0.0.0.0
+  job:
+    hosts:
+      - 0.0.0.0
+    cmd: bin/jobs
+
+# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
+# Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
+#
+# Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
+proxy:
+  ssl: true
+  hosts:
+    - preprod.aa.com
+    - www.preprod.aa.com
+
+# Credentials for your image host.
+registry:
+  # Using GitHub Container Registry (ghcr.io) - Free alternative to Docker Hub
+  # For local deployments, you can use: server: localhost:5555
+  # server: ghcr.io
+  # username: okemamy
+  server: localhost:5555
+  # Use GITHUB_TOKEN for GitHub Actions, or a Personal Access Token for local deployments
+  # password:
+  #   - KAMAL_REGISTRY_PASSWORD
+
+# Inject ENV variables into containers (secrets come from .kamal/secrets).
+env:
+  secret:
+    - RAILS_MASTER_KEY
+    - POSTGRES_PASSWORD
+    - REDIS_PASSWORD
+    - REDIS_URL
+    - ANALYTICS_ENABLED
+    - AHOY_ENABLED
+    - AMPLITUDE_ENABLED
+    - GA_ENABLED
+    - PAYDUNYA_MASTER_KEY
+    - PAYDUNYA_PRIVATE_KEY
+    - PAYDUNYA_TOKEN
+    - PAYDUNYA_PUBLIC_KEY
+    - PAYDUNYA_MODE
+    - PAYDUNYA_STORE_NAME
+    - PAYDUNYA_STORE_TAGLINE
+    - PAYDUNYA_STORE_PHONE
+    - PAYDUNYA_STORE_ADDRESS
+    - PAYDUNYA_STORE_URL
+    - PAYDUNYA_STORE_LOGO
+    - SEND_SMS_ENABLED
+    - SMS_PROVIDER
+    - LAM_API_URL
+    - LAM_SENDER
+    - LAM_ACCOUNT_ID
+    - LAM_PASSWORD
+    - LAM_RET_ID
+    - LAM_RET_URL
+    - ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+    - ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+    - ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+    - CACHE_ENABLED
+    - CACHE_MAX_AGE_SECONDS
+    - CACHE_ASSETS_MAX_AGE_SECONDS
+    - CACHE_HTTP_MAX_AGE_SECONDS
+    - CACHE_HTTP_STALE_REVALIDATE_SECONDS
+    - SENTRY_DSN
+    # - SEND_WHATSAPP_ENABLED
+    # - WHATSAPP_PROVIDER
+    # - WHATSAPP_API_URL
+    # - WHATSAPP_PHONE_NUMBER_ID
+    # - WHATSAPP_BUSINESS_ACCOUNT_ID
+    # - WHATSAPP_ACCESS_TOKEN
+    # - WHATSAPP_VERIFY_TOKEN
+  clear:
+    # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
+    # When you start using multiple servers, you should split out job processing to a dedicated machine.
+    SOLID_QUEUE_IN_PUMA: true
+
+    # Set number of processes dedicated to Solid Queue (default: 1)
+    # JOB_CONCURRENCY: 3
+
+    # Set number of cores available to the application on each server (default: 1).
+    # WEB_CONCURRENCY: 2
+
+    # Configure Active Record to connect to the Postgres accessory over the Kamal network
+    # Use the accessory container DNS name
+    DB_HOST: aaapps-postgres
+
+    # Log everything from Rails
+    # RAILS_LOG_LEVEL: debug
+
+# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
+# "bin/kamal logs -r job" will tail logs from the first server in the job section.
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+
+
+# Use a persistent storage volume for sqlite database files and local Active Storage files.
+# Recommended to change this to a mounted volume path that is backed up off server.
+volumes:
+  - "aaapps_storage:/rails/storage"
+
+
+# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
+# hitting 404 on in-flight requests. Combines all files from new and old
+# version inside the asset_path.
+asset_path: /rails/public/assets
+
+# Configure the image builder.
+builder:
+  arch: amd64
+
+  # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
+  # remote: ssh://docker@docker-builder-server
+  #
+  # # Pass arguments and secrets to the Docker build process
+  # args:
+  #   RUBY_VERSION: ruby-3.4.5
+  # secrets:
+  #   - GITHUB_TOKEN
+  #   - RAILS_MASTER_KEY
+
+# Use a different ssh user than root
+# ssh:
+#   user: app
+
+# Use accessory services (secrets come from .kamal/secrets).
+accessories:
+  postgres:
+    image: postgres:16-alpine
+    host: 0.0.0.0
+    port: 5432
+    env:
+      clear:
+        POSTGRES_USER: postgres
+        POSTGRES_DB: aaapps_production
+      secret:
+        - POSTGRES_PASSWORD
+    files:
+      - config/init.sql:/docker-entrypoint-initdb.d/init.sql
+    volumes:
+      - /var/lib/postgresql/aaapps_production:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    host: 0.0.0.0
+    port: 6379
+    env:
+      secret:
+        - REDIS_PASSWORD
+    cmd: "sh -c 'redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru --save 60 1000 --requirepass \"$REDIS_PASSWORD\"'"
+    volumes:
+      - /var/lib/redis/aaapps_production:/data

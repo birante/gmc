@@ -1,0 +1,261 @@
+<%# Promo Banner avec Carousel - Section EnPromo avec accessibilité %>
+<%
+  # Configuration par défaut
+  promo_items = local_assigns[:promo_items]
+  promo_settings = local_assigns[:promo_settings] || {}
+  promo_settings = promo_settings.to_h if promo_settings.respond_to?(:to_h)
+  
+  promo_items ||= []
+  promo_items = promo_items.to_a if promo_items.respond_to?(:to_a)
+  
+  # Date de fin de promo
+  end_date = promo_settings["countdown_date"].presence || local_assigns[:end_date]
+  
+  # Configuration de la promo
+  promo_config = {
+    category_label: promo_settings["category_label"].presence,
+    title: promo_settings["title"].presence,
+    description: promo_settings["subtitle"].presence || promo_settings["description"].presence,
+    discount_text: promo_settings["discount_text"].presence,
+    discount_suffix: promo_settings["discount_suffix"].presence
+  }
+
+  promo_image = promo_settings["image"].presence
+
+  has_promo_content = promo_items.any? || promo_config.values.any?(&:present?) || promo_image.present? || end_date.present?
+%>
+
+<% if has_promo_content %>
+<!-- Section avec même fond que Tendances du moment -->
+<section class="bg-[rgba(75,86,117,0.09)] py-6 md:py-8 lg:pt-[70px] lg:pb-8" aria-labelledby="promo-carousel-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="relative bg-[#551694] rounded-lg overflow-hidden lg:overflow-visible h-auto lg:h-[485px]"
+         data-controller="countdown promo-carousel"
+         data-countdown-end-date-value="<%= end_date %>"
+         role="region"
+         aria-label="<%= t('storefront.promo_carousel.label', default: 'Produits en promotion') %>">
+      
+      <!-- ===== SECTION GAUCHE: Info Promo (positionnée en absolu sur desktop) ===== -->
+      <div class="relative lg:absolute lg:left-0 lg:top-0 lg:bottom-0 lg:w-[250px] p-4 sm:p-5 lg:p-6 z-10
+                  grid grid-cols-2 gap-4 items-center
+                  lg:flex lg:flex-col lg:justify-between lg:items-stretch lg:gap-0">
+        <!-- En-tête -->
+        <div class="space-y-1 min-w-0">
+          <!-- Label catégorie -->
+          <% if promo_config[:category_label].present? %>
+            <p class="text-yellow-400 text-[10px] sm:text-xs font-semibold uppercase tracking-wide">
+              <%= promo_config[:category_label] %>
+            </p>
+          <% end %>
+
+          <!-- Titre principal -->
+          <% if promo_config[:title].present? %>
+            <h2 id="promo-carousel-heading" class="text-white text-xl sm:text-2xl md:text-[28px] lg:text-[32px] font-black italic leading-tight">
+              <%= promo_config[:title] %>
+            </h2>
+          <% end %>
+
+          <!-- Description -->
+          <% if promo_config[:description].present? %>
+            <p class="text-[#ebebee] text-xs sm:text-sm md:text-[15px] line-clamp-2 lg:line-clamp-none">
+              <%= promo_config[:description] %>
+            </p>
+          <% end %>
+        </div>
+
+        <!-- Bloc actions (col 2 mobile, réparti verticalement sur desktop) -->
+        <div class="flex flex-col items-start gap-2.5 min-w-0 lg:contents">
+          <!-- Badge de réduction -->
+          <% if promo_config[:discount_text].present? || promo_config[:discount_suffix].present? %>
+            <div class="lg:my-4">
+              <div class="inline-flex items-center bg-white rounded-full px-2.5 py-1.5 lg:px-3 lg:py-2 whitespace-nowrap">
+                <% if promo_config[:discount_text].present? %>
+                  <span class="text-red-600 font-bold italic text-xs sm:text-sm"><%= promo_config[:discount_text] %></span>
+                <% end %>
+                <% if promo_config[:discount_suffix].present? %>
+                  <span class="text-[#191c1f] font-bold italic text-xs sm:text-sm ml-1"><%= promo_config[:discount_suffix] %></span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Image produit promo (cachée sur mobile/tablette) -->
+          <% if promo_image.present? %>
+            <div class="hidden lg:block relative h-[140px] md:h-[168px] mb-4">
+              <%= image_tag webp_variant(promo_image, max_width: 600, max_height: 360),
+                  alt: "Produits en promotion",
+                  class: "w-full h-full object-cover object-left",
+                  loading: "lazy" %>
+            </div>
+          <% end %>
+
+          <!-- Countdown Timer -->
+          <% if end_date.present? %>
+            <div class="space-y-1.5 lg:space-y-2">
+              <p class="text-[#d8d8d8] text-[10px] sm:text-[11px]">
+                Reste jusqu'à la fin de l'offre
+              </p>
+              <div class="flex items-center gap-1">
+                <div class="bg-yellow-400 rounded-md w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+                  <span class="text-black text-[12px] sm:text-[13px] font-semibold" data-countdown-target="days">00</span>
+                </div>
+                <div class="bg-yellow-400 rounded-md w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+                  <span class="text-black text-[12px] sm:text-[13px] font-semibold" data-countdown-target="hours">00</span>
+                </div>
+                <div class="bg-yellow-400 rounded-md w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+                  <span class="text-black text-[12px] sm:text-[13px] font-semibold" data-countdown-target="minutes">00</span>
+                </div>
+                <span class="text-white text-sm sm:text-base mx-0.5">:</span>
+                <div class="bg-yellow-400 rounded-md w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center">
+                  <span class="text-black text-[12px] sm:text-[13px] font-semibold" data-countdown-target="seconds">00</span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- ===== SECTION DROITE: Carousel Produits ===== -->
+      <% if promo_items.any? %>
+      <div class="relative lg:ml-[250px] py-4 lg:py-0 lg:h-full flex items-center lg:-mt-[40px] lg:-mb-[40px]">
+        <!-- Bouton Précédent -->
+        <button type="button"
+                class="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all opacity-0 pointer-events-none"
+                data-promo-carousel-target="prevButton"
+                data-action="click->promo-carousel#previous"
+                aria-label="Produits précédents">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        
+        <!-- Bouton Suivant -->
+        <button type="button"
+                class="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all opacity-0 pointer-events-none"
+                data-promo-carousel-target="nextButton"
+                data-action="click->promo-carousel#next"
+                aria-label="Produits suivants">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+
+        <!-- Products Container -->
+        <div data-promo-carousel-target="container"
+             class="flex gap-2.5 items-stretch lg:items-center overflow-x-auto px-4 lg:px-8 scrollbar-hide w-full"
+             style="scrollbar-width: none; -ms-overflow-style: none;">
+          
+          <% promo_items.each_with_index do |item, index| %>
+            <% variant = item.variants.first %>
+            <% discount_percent = variant ? discount_percentage_for(variant) : 0 %>
+            <% has_discount = discount_percent > 0 %>
+            
+            <div class="flex-shrink-0 w-[200px] md:w-[250px]" data-promo-carousel-target="item">
+              <div class="bg-white border border-gray-200 rounded-[20px] overflow-hidden flex flex-col min-h-[340px] md:h-[402px] w-full">
+                <!-- Image Container -->
+                <div class="relative bg-[#e3e3ec] h-[180px] md:h-[224px] flex items-center justify-center rounded-t-[20px]">
+                  <%= link_to item_path(item), class: "block w-full h-full flex items-center justify-center" do %>
+                    <% if item.has_image? %>
+                      <%= storage_image_tag(item.display_image,
+                          variant_name: :card,
+                          alt: item.name,
+                          class: "w-full h-full object-cover",
+                          width: 200,
+                          height: 224, disable_lazy: true) %>
+                    <% else %>
+                      <!-- Placeholder -->
+                      <svg class="w-14 h-14 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <% end %>
+                  <% end %>
+                  
+                  <!-- Badge de réduction -->
+                  <% if variant %>
+                    <% discount_percent = discount_percentage_for(variant) %>
+                    <% if discount_percent > 0 %>
+                      <div class="absolute top-5 left-3.5 bg-red-600 text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-l-[14px] rounded-r-[40px]">
+                        <%= discount_percent %>%
+                      </div>
+                    <% end %>
+                  <% end %>
+                  
+                </div>
+                
+                <!-- Product Info -->
+                <div class="p-3 sm:p-3.5 flex-1 flex flex-col">
+                  <!-- Titre produit -->
+                  <%= link_to item_path(item), class: "block mb-1" do %>
+                    <h3 class="text-[13px] sm:text-[14px] font-medium text-gray-950 line-clamp-2 leading-[1.3] hover:text-[#551694] transition-colors tracking-[-0.28px]">
+                      <%= item.name %>
+                    </h3>
+                  <% end %>
+
+                  <!-- Rating -->
+                  <% if item.average_rating.present? %>
+                    <% rounded_rating = item.average_rating.round %>
+                    <div class="flex items-center gap-1 mb-1.5 sm:mb-2" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_rating) %>">
+                      <div class="flex" aria-hidden="true">
+                        <% 5.times do |i| %>
+                          <svg class="w-[11px] h-[11px] <%= i < rounded_rating ? 'text-yellow-400' : 'text-gray-300' %>" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          </svg>
+                        <% end %>
+                      </div>
+                      <span class="text-[12px] text-gray-500"><%= item.average_rating.round(1) %></span>
+                    </div>
+                  <% end %>
+                  
+                  <!-- Prix -->
+                  <div class="flex items-end flex-wrap gap-x-2 gap-y-0.5 sm:gap-2.5 mb-2 sm:mb-3">
+                    <% if variant %>
+                      <% current_price = current_price_for(variant) %>
+                      <% original_price = original_price_for(variant) %>
+                      <% discount_percent = discount_percentage_for(variant) %>
+                      <span class="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-red-600 leading-tight md:leading-[22px] tracking-[-0.44px]">
+                        <%= number_to_currency(current_price, unit: "", precision: 0, delimiter: ".") %> F
+                      </span>
+                      <% if discount_percent > 0 && original_price > current_price %>
+                        <span class="text-[13px] sm:text-[14px] md:text-[16px] text-gray-900 line-through leading-tight md:leading-[16px]">
+                          <%= number_to_currency(original_price, unit: "", precision: 0, delimiter: ".") %> F
+                        </span>
+                      <% end %>
+                    <% else %>
+                      <span class="text-[18px] sm:text-[20px] md:text-[22px] font-bold text-red-600 leading-tight md:leading-[22px] tracking-[-0.44px]">N/A</span>
+                    <% end %>
+                  </div>
+                  
+                  <!-- Bouton Ajouter au panier -->
+                  <div class="mt-auto">
+                    <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "outline" %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <% end %>
+      
+      <!-- Pagination Dots -->
+      <% if promo_items.any? %>
+        <div class="relative mt-3 mb-4 flex justify-center
+                    lg:absolute lg:bottom-4 lg:z-10 lg:right-1/2 lg:mr-[-125px]
+                    lg:mt-0 lg:mb-0 lg:left-auto lg:translate-x-0 lg:block">
+          <div class="bg-white rounded-full px-1.5 py-1.5 flex items-center gap-1 shadow-sm">
+            <% [(promo_items.count / 4.0).ceil, 5].min.times do |i| %>
+              <button type="button" 
+                      class="w-[7px] h-[7px] rounded-full transition-colors"
+                      data-promo-carousel-target="dot"
+                      data-action="click->promo-carousel#goToPage"
+                      data-page="<%= i %>"
+                      aria-label="Page <%= i + 1 %>">
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+<% end %>

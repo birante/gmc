@@ -1,0 +1,53 @@
+<%= render "shared/auth/auth_header", title: t('.title'), subtitle: t('.subtitle') %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with model: @user, url: client_registration_path, local: true, data: { turbo: false, controller: "submit-once", action: "submit->submit-once#guard" } do |f| %>
+    <%= render "shared/auth/auth_errors", error_object: f.object %>
+
+    <div class="space-y-5">
+      <div class="flex flex-col sm:flex-row gap-5 sm:gap-4">
+        <div class="flex-1">
+          <%= f.label :first_name, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+            <%= t('.first_name') %>
+            <span class="text-red-500">*</span>
+          <% end %>
+          <%= f.text_field :first_name, placeholder: t('.placeholders.first_name'), required: true, class: "block w-full rounded-md border border-[#E9E9E9] bg-[#F9F9F9] px-3 py-3 text-base focus:border-[#551694] focus:ring-2 focus:ring-[#551694]/20 focus:outline-none transition-colors" %>
+        </div>
+        <div class="flex-1">
+          <%= f.label :last_name, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+            <%= t('.last_name') %>
+            <span class="text-red-500">*</span>
+          <% end %>
+          <%= f.text_field :last_name, placeholder: t('.placeholders.last_name'), required: true, class: "block w-full rounded-md border border-[#E9E9E9] bg-[#F9F9F9] px-3 py-3 text-base focus:border-[#551694] focus:ring-2 focus:ring-[#551694]/20 focus:outline-none transition-colors" %>
+        </div>
+      </div>
+
+      <%= render "shared/phone_field", form: f, error_object: f.object, label_text: t('.phone_number'), placeholder: t('.placeholders.phone'), required: true %>
+
+      <div>
+        <%= f.label :email_address, t('.email_address'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.email_field :email_address, placeholder: t('.placeholders.email'), class: "block w-full rounded-md border border-[#E9E9E9] bg-[#F9F9F9] px-3 py-3 text-base focus:border-[#551694] focus:ring-2 focus:ring-[#551694]/20 focus:outline-none transition-colors" %>
+      </div>
+
+      <%= render "shared/password_field", form: f, field_name: :password, label_text: t('.password'), placeholder: t('.placeholders.password'), autocomplete_value: "new-password", error_object: f.object, required: true, minlength: 8, helper_text: t('.password_hint') %>
+      <%= render "shared/password_field", form: f, field_name: :password_confirmation, label_text: t('.password_confirmation'), placeholder: t('.placeholders.password_confirmation'), autocomplete_value: "new-password", error_object: f.object, required: true, minlength: 8 %>
+    </div>
+
+    <div class="mt-6">
+      <%= f.submit t('.submit'), data: { submit_once_target: "button" }, class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-gray-200 text-center space-y-3">
+      <p class="text-sm text-gray-600">
+        <%= t('.already_account') %>
+        <%= link_to t('.login'), new_client_session_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+      </p>
+      <div class="pt-2 border-t border-gray-100">
+        <p class="text-sm text-gray-500">
+          <%= t('.vendor_space_prompt') %>
+          <%= link_to t('.vendor_space_link'), new_vendors_registration_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</div>

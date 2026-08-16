@@ -1,0 +1,97 @@
+fr:
+  employees:
+    authentication:
+      must_be_logged_in: "Vous devez vous connecter pour accéder à cette page."
+      no_permission: "Vous n'avez pas les permissions nécessaires."
+
+    sessions:
+      new:
+        title: "Espace Collaborateur"
+        subtitle: "Connectez-vous pour accéder à votre espace de travail"
+        email: "Adresse email"
+        password: "Mot de passe"
+        submit: "Se connecter"
+        client_space: "Vous êtes un client ?"
+        access_client_space: "Accéder à l'espace client"
+        vendor_space: "Vous êtes un vendeur ?"
+        access_vendor_space: "Accéder à l'espace vendeur"
+        help: "📞 Besoin d'aide ? Contactez votre responsable"
+      create:
+        success: "Bienvenue %{name} !"
+        account_disabled: "Votre compte a été désactivé. Contactez votre responsable."
+        failure: "Email ou mot de passe incorrect."
+      destroy:
+        success: "Vous avez été déconnecté."
+
+    orders:
+      not_found: "Commande non trouvée ou accès refusé"
+      status_updated: "Statut de la commande mis à jour"
+      status_update_failed: "Impossible de mettre à jour le statut. Transition invalide ou commande non trouvée."
+      delivery_status_updated: "Statut de livraison mis à jour"
+      delivery_status_update_failed: "Impossible de mettre à jour le statut : %{errors}"
+      invalid_transition: "Transition de statut invalide"
+      no_permission: "Vous n'avez pas la permission de gérer les commandes."
+
+    analytics:
+      shop_not_found: "Boutique non trouvée"
+
+    dashboards:
+      show:
+        title: "Tableau de bord"
+        subtitle: "Bienvenue sur votre espace de travail"
+        greeting: "Bonjour, %{name} !"
+        logout: "Déconnexion"
+        error_no_shop: "Aucune boutique associée. Contactez votre responsable."
+
+        stats:
+          views: "Total des commandes"
+          sessions: "Articles en catalogue"
+          traffic: "Trafic de ce mois"
+          traffic_desc: "Nombre de commandes du mois en cours"
+          traffic_witness: "Commandes du mois"
+          cart_abandoned: "Paniers en attente"
+          orders_pending: "Commandes en attente"
+          new_clients: "Nouveaux clients"
+          heroes_title: "Meilleurs clients"
+          sales_volume: "Volume de ventes"
+          sales_revenue: "Revenus du mois en cours"
+          sales_vs_previous: "vs mois précédent"
+
+        recent_orders: "Dernières commandes"
+        article: "Article"
+        quantity: "Quantité"
+        price: "Prix unitaire"
+        total: "Total"
+        article_label: "Réf"
+        no_orders_for: "Aucune commande pour"
+
+        # Anciennes traductions conservées pour compatibilité
+        pending_orders: "Commandes en attente"
+        pending_deliveries: "Livraisons en attente"
+        low_stock_items: "Articles en rupture"
+        today_sales: "Ventes du jour"
+        status: "Statut"
+        active: "Actif"
+        inactive: "Inactif"
+        shop: "Boutique"
+        quick_actions: "Actions rapides"
+        view_orders: "Voir les commandes"
+        manage_products: "Gérer les produits"
+        manage_stock: "Gérer le stock"
+        view_reports: "Voir les rapports"
+        my_info: "Mes informations"
+        full_name: "Nom complet"
+        email: "Email"
+        phone: "Téléphone"
+        role: "Rôle"
+
+    shared:
+      topbar:
+        employee: "Collaborateur"
+        dashboard: "Tableau de bord"
+        logout: "Déconnexion"
+        logout_confirm: "Êtes-vous sûr de vouloir vous déconnecter ?"
+
+    layouts:
+      employee:
+        title: "aaapps - Collaborateur"

@@ -1,0 +1,142 @@
+<%# SEO Meta Tags %>
+<% content_for :title, @page_title %>
+<% content_for :meta_description, @page_description %>
+<% content_for :canonical_url, shops_url %>
+
+<%# Structured Data %>
+<% content_for :structured_data do %>
+  <%= json_ld_tag(breadcrumb_schema([
+    [t('breadcrumbs.home', default: 'Accueil'), root_url],
+    [t('breadcrumbs.shops', default: 'Boutiques'), shops_url]
+  ])) %>
+<% end %>
+
+<div class="bg-gray-50 min-h-screen">
+  <%# Breadcrumb %>
+  <nav aria-label="<%= t('accessibility.breadcrumb', default: 'Fil d\'Ariane') %>" class="container mx-auto px-4 lg:px-[50px] py-4">
+    <ol class="flex items-center gap-2 text-sm text-gray-600" itemscope itemtype="https://schema.org/BreadcrumbList">
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <%= link_to root_path, itemprop: "item", class: "hover:text-[#551694]" do %>
+          <span itemprop="name"><%= t('breadcrumbs.home', default: 'Accueil') %></span>
+        <% end %>
+        <meta itemprop="position" content="1">
+      </li>
+      <li aria-hidden="true" class="text-gray-400">/</li>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" aria-current="page">
+        <span itemprop="name" class="text-[#551694] font-medium"><%= t('breadcrumbs.shops', default: 'Boutiques') %></span>
+        <meta itemprop="position" content="2">
+      </li>
+    </ol>
+  </nav>
+
+  <%# Header %>
+  <header class="container mx-auto px-4 lg:px-[50px] py-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+      <%= t('shops.index.title', default: 'Toutes les boutiques') %>
+    </h1>
+    <p class="text-gray-600">
+      <%= t('shops.index.description', default: 'Découvrez nos boutiques partenaires et leurs produits') %>
+    </p>
+
+    <%# Filtres %>
+    <div class="flex flex-wrap gap-3 mt-6">
+      <%= link_to shops_path,
+          class: "px-4 py-2 rounded-full text-sm font-medium transition-colors #{params[:action] == 'index' && !params[:type] ? 'bg-[#551694] text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-[#551694]'}" do %>
+        <%= t('shops.filters.all', default: 'Toutes') %>
+      <% end %>
+      <%= link_to official_client_shops_path,
+          class: "px-4 py-2 rounded-full text-sm font-medium transition-colors #{params[:action] == 'official' ? 'bg-[#551694] text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-[#551694]'}" do %>
+        <span class="flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <%= t('shops.filters.official', default: 'Officielles') %>
+        </span>
+      <% end %>
+      <%= link_to local_client_shops_path,
+          class: "px-4 py-2 rounded-full text-sm font-medium transition-colors #{params[:action] == 'local' ? 'bg-[#551694] text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-[#551694]'}" do %>
+        <%= t('shops.filters.local', default: 'Locales') %>
+      <% end %>
+    </div>
+  </header>
+
+  <%# Grille des boutiques %>
+  <section class="container mx-auto px-4 lg:px-[50px] py-8" aria-labelledby="shops-heading">
+    <h2 id="shops-heading" class="sr-only"><%= t('shops.index.list_title', default: 'Liste des boutiques') %></h2>
+    
+    <% if @shops.any? %>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <% @shops.each do |shop| %>
+          <%= link_to shop_path(shop), class: "group" do %>
+            <article class="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+              <%# Banner / Image %>
+              <div class="relative h-32 md:h-40 bg-gradient-to-br from-[#551694] to-[#8B5CF6]">
+                <% if shop.banner_image.attached? %>
+                  <%= storage_image_tag(shop.banner_image,
+                      variant_name: :banner,
+                      alt: "",
+                      role: "presentation",
+                      class: "absolute inset-0 w-full h-full object-cover",
+                      width: 1280,
+                      height: 400) %>
+                  <div class="absolute inset-0 bg-black/30"></div>
+                <% end %>
+                
+                <%# Logo %>
+                <div class="absolute -bottom-8 left-4 w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl shadow-lg p-2 flex items-center justify-center">
+                  <% if shop.logo.attached? %>
+                    <%= storage_image_tag(shop.logo,
+                        variant_name: :logo_small,
+                        alt: "Logo #{shop.name}",
+                        class: "max-w-full max-h-full object-contain",
+                        width: 80,
+                        height: 80,
+                        loading: "lazy") %>
+                  <% else %>
+                    <span class="text-2xl font-bold text-[#551694]"><%= shop.name.first.upcase %></span>
+                  <% end %>
+                </div>
+
+                <%# Badge vérifié %>
+                <% if shop.verified? %>
+                  <div class="absolute top-2 right-2 bg-white/90 text-[#551694] text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <span class="sr-only md:not-sr-only"><%= t('shops.verified', default: 'Vérifiée') %></span>
+                  </div>
+                <% end %>
+              </div>
+
+              <%# Infos %>
+              <div class="pt-10 md:pt-12 px-4 pb-4">
+                <h3 class="font-semibold text-gray-900 group-hover:text-[#551694] transition-colors truncate">
+                  <%= shop.name %>
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">
+                  <% products_count = (@available_items_counts && @available_items_counts[shop.id]).to_i %>
+                  <%= pluralize(products_count, t('shops.product', default: 'produit'), t('shops.products', default: 'produits')) %>
+                </p>
+              </div>
+            </article>
+          <% end %>
+        <% end %>
+      </div>
+
+      <%# Pagination %>
+      <% if @shops.respond_to?(:total_pages) && @shops.total_pages > 1 %>
+        <nav class="mt-8 flex justify-center" aria-label="<%= t('pagination.label', default: 'Pagination') %>">
+          <%= paginate @shops %>
+        </nav>
+      <% end %>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        <p class="text-gray-500"><%= t('shops.no_results', default: 'Aucune boutique trouvée') %></p>
+      </div>
+    <% end %>
+  </section>
+</div>
+

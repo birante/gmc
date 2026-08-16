@@ -1,0 +1,15 @@
+fr:
+  users:
+    new:
+      title: "Créer un compte"
+      first_name: "Prénom"
+      last_name: "Nom"
+      phone_number: "Numéro de téléphone"
+      phone_placeholder: "77XXXXXXX"
+      email_optional: "Email (optionnel)"
+      password: "Mot de passe"
+      password_confirmation: "Confirmation du mot de passe"
+      submit: "Créer mon compte"
+      errors_prevent: "%{count} erreur ont empêché la création du compte :"
+      errors_prevent_plural: "%{count} erreurs ont empêché la création du compte :"
+

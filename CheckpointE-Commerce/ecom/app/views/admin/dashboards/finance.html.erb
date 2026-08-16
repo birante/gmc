@@ -1,0 +1,324 @@
+<% content_for :page_title, "Finance" %>
+<% v = "#6C3FD6" %>
+
+<%# ────────────────────────────────────────────────────────────────────
+    FILTRE DATE — compact
+──────────────────────────────────────────────────────────────────── %>
+<div class="mb-5 bg-white rounded-2xl border border-gray-100 px-4 py-3"
+     style="box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+  <%= form_with url: admin_hub_finance_path, method: :get, data: { turbo: false },
+      html: { class: "flex flex-wrap items-center gap-2" } do %>
+    <%= hidden_field_tag :locale, params[:locale] if params[:locale].present? %>
+    <span class="text-gray-400 mr-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    </span>
+    <%= date_field_tag :start_date, d_start,
+        class: "text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none w-[140px]",
+        style: "outline-color: #{v}" %>
+    <span class="text-gray-300 text-sm">→</span>
+    <%= date_field_tag :end_date, d_end,
+        class: "text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none w-[140px]",
+        style: "outline-color: #{v}" %>
+    <div class="flex items-center gap-1.5 ml-1">
+      <%= submit_tag "Filtrer", class: "px-4 py-1.5 text-white text-sm font-semibold rounded-lg cursor-pointer", style: "background: #{v};" %>
+      <%= link_to "✕", admin_hub_finance_path, class: "px-3 py-1.5 text-sm text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors", data: { turbo: false } %>
+    </div>
+    <div class="flex items-center gap-1 pl-3 ml-1 border-l border-gray-100">
+      <% [["7j", 7.days.ago.to_date, Date.current], ["30j", 30.days.ago.to_date, Date.current], ["Mois", Date.current.beginning_of_month, Date.current], ["M-1", 1.month.ago.beginning_of_month.to_date, 1.month.ago.end_of_month.to_date]].each do |label, ds, de| %>
+        <% active = d_start == ds && d_end == de %>
+        <%= link_to label, admin_hub_finance_path(start_date: ds.to_s, end_date: de.to_s, locale: params[:locale]),
+            class: "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all whitespace-nowrap #{active ? "text-white" : "text-gray-500 hover:bg-gray-100"}",
+            style: active ? "background: #{v};" : "", data: { turbo: false } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    KPIs FINANCE — 4 cartes avec barre accent
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+  <% fin_kpis = [
+    {
+      label: "Chiffre d'affaires", sub: "Commandes livrées",
+      val: number_with_delimiter((@total_ca || 0).to_i), unit: "FCFA",
+      accent: "#10b981", gradient: "linear-gradient(135deg,#10b981,#059669)",
+      icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+    },
+    {
+      label: "Total commandes", sub: "#{@delivered_orders || 0} livrées · #{(@total_orders || 0) - (@delivered_orders || 0)} autres",
+      val: number_with_delimiter(@total_orders || 0), unit: nil,
+      accent: v, gradient: "linear-gradient(135deg,#6C3FD6,#9b6dff)",
+      icon: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 7H4l1-7z"
+    },
+    {
+      label: "Montant en attente", sub: "Commandes non traitées",
+      val: number_with_delimiter((@pending_amount || 0).to_i), unit: "FCFA",
+      accent: "#f59e0b", gradient: "linear-gradient(135deg,#f59e0b,#d97706)",
+      icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+    },
+    {
+      label: "Virements",
+      sub: nil,
+      val: nil, unit: nil,
+      accent: "#3b82f6", gradient: "linear-gradient(135deg,#3b82f6,#1d4ed8)",
+      icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+      custom: true
+    }
+  ] %>
+  <% fin_kpis.each do |k| %>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4 relative overflow-hidden"
+         style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+      <div class="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style="background: <%= k[:accent] %>;"></div>
+      <div class="w-11 h-11 rounded-2xl flex items-center justify-center" style="background: <%= k[:gradient] %>;">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="<%= k[:icon] %>"/>
+        </svg>
+      </div>
+      <% if k[:custom] %>
+        <div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-[26px] font-black text-green-600 leading-none"><%= @payouts_paid || 0 %></span>
+            <span class="text-base text-gray-300">/</span>
+            <span class="text-xl font-black text-amber-500"><%= @payouts_pending || 0 %></span>
+          </div>
+          <p class="text-sm font-semibold text-gray-700 mt-1.5">Virements</p>
+          <div class="flex gap-3 mt-1">
+            <span class="text-xs text-green-600 font-medium">✓ Payés</span>
+            <span class="text-xs text-amber-500 font-medium">⏳ En attente</span>
+          </div>
+        </div>
+      <% else %>
+        <div>
+          <p class="text-[26px] font-black leading-none text-gray-900 tracking-tight">
+            <%= k[:val] %><% if k[:unit] %><span class="text-sm font-semibold text-gray-400 ml-1"><%= k[:unit] %></span><% end %>
+          </p>
+          <p class="text-sm font-semibold text-gray-700 mt-1.5"><%= k[:label] %></p>
+          <p class="text-xs text-gray-400 mt-0.5"><%= k[:sub] %></p>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    GRAPHIQUE CA + RÉPARTITION PAR STATUT
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+  <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5"
+       style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h3 class="text-sm font-bold text-gray-900">CA quotidien</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Commandes livrées uniquement</p>
+      </div>
+      <span class="text-xs font-bold px-3 py-1 rounded-full text-white" style="background: #10b981;">
+        <%= number_with_delimiter((@total_ca || 0).to_i) %> FCFA
+      </span>
+    </div>
+    <% ca_labeled = (@ca_by_day || {}).sort.to_h.transform_keys { |d| d.respond_to?(:strftime) ? d.strftime("%d/%m") : d.to_s } %>
+    <%= area_chart ca_labeled.presence || { "—" => 0 },
+        suffix: " FCFA", thousands: ",", colors: ["#10b981"], height: "200px",
+        library: {
+          elements: { line: { fill: true, tension: 0.4, borderWidth: 2 }, point: { radius: 0, hoverRadius: 4 } },
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: "#9ca3af", font: { size: 11 } } },
+            y: { grid: { color: "#f3f4f6" }, ticks: { color: "#9ca3af", font: { size: 11 } } }
+          }
+        } %>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-5"
+       style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <h3 class="text-sm font-bold text-gray-900 mb-4">Répartition par statut</h3>
+    <% rev_dist = (@revenue_distribution || {}).reject { |_, amount| amount.to_i.zero? } %>
+    <% rev_total = rev_dist.values.sum.to_f; rev_total = 1 if rev_total.zero? %>
+    <% dist_colors = ["#10b981","#3b82f6","#8b5cf6","#ef4444","#eab308","#6b7280"] %>
+    <%= pie_chart rev_dist.presence || { "Aucune donnée" => 0 }, donut: true, height: "140px",
+        colors: dist_colors,
+        library: { plugins: { legend: { display: false } } } %>
+    <div class="mt-4 space-y-2">
+      <% rev_dist.sort_by { |_, a| -a.to_i }.each_with_index do |(status, amount), idx| %>
+        <div class="flex items-center justify-between py-1 px-2 rounded-lg" style="background: <%= dist_colors[idx % 6] %>0D;">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full flex-shrink-0" style="background: <%= dist_colors[idx % 6] %>;"></span>
+            <span class="text-xs font-medium text-gray-700"><%= status %></span>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-black" style="color: <%= dist_colors[idx % 6] %>;"><%= number_with_delimiter(amount.to_i) %> FCFA</span>
+            <span class="text-[10px] text-gray-400 block"><%= (amount.to_f / rev_total * 100).round %>%</span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    PAIEMENTS + BALANCES BOUTIQUES
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+  <div class="bg-white rounded-2xl border border-gray-100 p-5" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-bold text-gray-900">Méthodes de paiement</h3>
+      <span class="text-xs text-gray-400">Sur la période</span>
+    </div>
+    <%= bar_chart @pay_methods.presence || { "Aucune méthode" => 0 },
+        colors: [v], height: "160px", horizontal: true,
+        library: {
+          plugins: { legend: { display: false } },
+          scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
+        } %>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+      <div>
+        <h3 class="text-sm font-bold text-gray-900">Balances boutiques</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Top 10 soldes actuels</p>
+      </div>
+      <%= link_to "Voir →", admin_shops_path(locale: params[:locale]), class: "text-xs font-semibold hover:underline flex-shrink-0", style: "color: #{v};" %>
+    </div>
+    <% shops_bal = @shop_balances.presence || [] %>
+    <% max_bal = shops_bal.map { |s| s.balance.to_f }.max.to_f; max_bal = 1 if max_bal.zero? %>
+    <div class="divide-y divide-gray-50 max-h-64 overflow-y-auto">
+      <% if shops_bal.any? %>
+        <% shops_bal.each_with_index do |shop, idx| %>
+          <div class="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50/60 transition-colors">
+            <span class="text-xs font-bold text-gray-300 w-4 flex-shrink-0"><%= idx + 1 %></span>
+            <div class="flex-1 min-w-0">
+              <%= link_to shop.name, admin_shop_path(shop, locale: params[:locale]),
+                  class: "text-xs font-semibold text-gray-900 hover:underline block truncate" %>
+              <div class="mt-1 w-full bg-gray-100 rounded-full h-1 overflow-hidden">
+                <div class="h-1 rounded-full" style="width: <%= (shop.balance.to_f / max_bal * 100).to_i %>%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+              </div>
+            </div>
+            <span class="text-xs font-black text-green-600 flex-shrink-0"><%= number_with_delimiter(shop.balance.to_i) %> FCFA</span>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="py-8 text-center text-sm text-gray-300">Aucune boutique active</div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    TRANSACTIONS + VIREMENTS RÉCENTS
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+  <%# Transactions %>
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: #F5F0FF;">
+          <svg class="w-4 h-4" style="color: #{v};" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <h3 class="text-sm font-bold text-gray-900">Transactions</h3>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+          <%= @transactions.respond_to?(:total_count) ? @transactions.total_count : @transactions&.size || 0 %>
+        </span>
+      </div>
+      <%= link_to "Voir →", admin_shop_transactions_path(locale: params[:locale]), class: "text-xs font-semibold hover:underline", style: "color: #{v};" rescue nil %>
+    </div>
+    <% txns = @transactions.respond_to?(:to_a) ? @transactions.to_a.compact : [] %>
+    <% if txns.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead>
+            <tr style="background: #FAFAFA;">
+              <th class="px-5 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Boutique</th>
+              <th class="px-5 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</th>
+              <th class="px-5 py-2.5 text-right text-[10px] font-bold text-gray-400 uppercase tracking-wider">Montant</th>
+              <th class="px-5 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider">Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            <% txns.first(12).each do |tx| %>
+              <tr class="hover:bg-gray-50/60 transition-colors">
+                <td class="px-5 py-3">
+                  <span class="text-sm font-semibold text-gray-900 block truncate max-w-[130px]"><%= tx.shop&.name || "—" %></span>
+                </td>
+                <td class="px-5 py-3">
+                  <% type_color = tx.transaction_type == "credit" ? "bg-green-50 text-green-700" : tx.transaction_type == "debit" ? "bg-blue-50 text-blue-700" : "bg-red-50 text-red-600" %>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full <%= type_color %>">
+                    <%= tx.transaction_type&.capitalize %>
+                  </span>
+                </td>
+                <td class="px-5 py-3 text-right">
+                  <span class="text-sm font-black text-green-600"><%= number_with_delimiter(tx.amount.to_i) %></span>
+                  <span class="text-xs text-gray-400"> <%= tx.currency&.symbol %></span>
+                </td>
+                <td class="px-5 py-3">
+                  <span class="text-xs text-gray-500 block"><%= tx.created_at.strftime("%d/%m/%y") rescue "—" %></span>
+                  <span class="text-[10px] text-gray-300"><%= time_ago_in_words(tx.created_at) rescue "" %></span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="py-12 text-center">
+        <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center mx-auto mb-2">
+          <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+        </div>
+        <p class="text-sm text-gray-300">Aucune transaction sur la période</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Virements récents %>
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center bg-green-50">
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-sm font-bold text-gray-900">Virements récents</h3>
+        <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><%= @payouts_pending || 0 %> en attente</span>
+      </div>
+      <%= link_to "Voir →", admin_payouts_path(locale: params[:locale]), class: "text-xs font-semibold hover:underline flex-shrink-0", style: "color: #{v};" %>
+    </div>
+    <% payouts = @recent_payouts.respond_to?(:to_a) ? @recent_payouts.to_a.compact : [] %>
+    <% if payouts.any? %>
+      <div class="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
+        <% payouts.each do |payout| %>
+          <div class="flex items-center gap-3 px-5 py-3 hover:bg-gray-50/60 transition-colors">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white text-xs font-black flex-shrink-0"
+                 style="background: <%= payout.status == "paid" ? "linear-gradient(135deg,#10b981,#059669)" : "linear-gradient(135deg,#f59e0b,#d97706)" %>;">
+              <%= (payout.shop&.name || "?")[0].upcase %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-900 truncate"><%= payout.shop&.name || "—" %></p>
+              <p class="text-xs text-gray-400"><%= payout.created_at.strftime("%d/%m/%y à %H:%M") rescue "—" %></p>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <p class="text-sm font-black text-green-600">
+                <%= number_with_delimiter(payout.amount.to_i) %> <span class="text-xs font-semibold"><%= payout.currency&.symbol %></span>
+              </p>
+              <% if payout.status == "paid" %>
+                <span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full">✓ Payé</span>
+              <% else %>
+                <span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded-full">⏳ Attente</span>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="py-12 text-center">
+        <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center mx-auto mb-2">
+          <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <p class="text-sm text-gray-300">Aucun virement sur la période</p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<%# 
+  Partial réutilisable pour les breadcrumbs avec structured data Schema.org
+  Usage: <%= render "shared/breadcrumbs", crumbs: [["Accueil", root_path], ["Catégories", items_path], ["Mode", category_path("mode")]]
+%>
+<% crumbs ||= [] %>
+<% unless crumbs.empty? %>
+
+<nav aria-label="<%= t('accessibility.breadcrumb', default: 'Fil d\'Ariane') %>" class="mb-4 md:mb-6">
+  <ol class="flex items-center gap-2 text-sm text-gray-600 flex-wrap" itemscope itemtype="https://schema.org/BreadcrumbList">
+    <% crumbs.each_with_index do |(name, url), index| %>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" class="flex items-center">
+        <% if index < crumbs.length - 1 %>
+          <%= link_to url, itemprop: "item", class: "hover:text-[#551694] transition-colors" do %>
+            <span itemprop="name"><%= name %></span>
+          <% end %>
+        <% else %>
+          <span itemprop="name" aria-current="page" class="text-[#551694] font-medium"><%= name %></span>
+        <% end %>
+        <meta itemprop="position" content="<%= index + 1 %>">
+      </li>
+      <% unless index == crumbs.length - 1 %>
+        <li class="flex items-center">
+          <span class="mx-2 text-gray-400" aria-hidden="true">/</span>
+        </li>
+      <% end %>
+    <% end %>
+  </ol>
+</nav>
+
+<%# Structured Data JSON-LD - Ajout au content_for existant %>
+<% existing_structured_data = content_for(:structured_data) %>
+<% content_for :structured_data do %>
+  <%= existing_structured_data.html_safe if existing_structured_data.present? %>
+  <%= json_ld_tag(breadcrumb_schema(crumbs)) %>
+<% end %>
+<% end %>
+

@@ -1,0 +1,12 @@
+<% content_for :active_tab, 'commandes' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/orders/index",
+        orders_path: vendors_orders_path,
+        signup_path: new_vendors_registration_path,
+        signup_label: t('vendors.orders.index.signup') %>
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>

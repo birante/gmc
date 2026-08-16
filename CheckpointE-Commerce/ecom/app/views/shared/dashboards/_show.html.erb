@@ -1,0 +1,529 @@
+<%# Partial partagé : dashboard (vendor + employees).
+     Locals attendus :
+       items_index_path                  String   /vendors/items  ou /employees/items (lien « Gérer mes produits »)
+       item_path_for                     Proc     ->(item) renvoie l'URL d'édition d'un produit
+       orders_index_path_for             Proc     ->() renvoie l'URL de l'index des commandes (peut utiliser @current_shop)
+       order_path_for                    Proc     ->(order) renvoie l'URL du détail d'une commande
+       employees_index_path              String   liste des collaborateurs
+       new_employee_path                 String   création d'un collaborateur
+       finances_path_for                 Proc     ->() renvoie l'URL des finances (utilisée uniquement si @shop_balance défini)
+       signup_path                       String?  fallback (branche d'erreur vendor)
+       signup_label                      String?  libellé du bouton fallback
+       can_manage_items_buttons          Boolean  affichage des boutons CRUD produit (défaut true)
+       can_manage_employees_buttons      Boolean  affichage du bouton « Créer un collaborateur » (défaut true)
+     Instance vars utilisées (mises par le contrôleur) :
+       @vendor, @current_shop, @stats, @top_articles, @weekly_data, @top_clients,
+       @recent_items, @recent_orders,
+       @total_employees, @active_employees, @recent_employees,
+       optionnel : @shop_balance, @pending_payout %>
+<%
+  can_manage_items_buttons     = local_assigns.fetch(:can_manage_items_buttons, true)
+  can_manage_employees_buttons = local_assigns.fetch(:can_manage_employees_buttons, true)
+  signup_path  = local_assigns[:signup_path]
+  signup_label = local_assigns[:signup_label]
+  finances_path_for = local_assigns[:finances_path_for]
+%>
+
+<% if @vendor %>
+  <!-- En-tête -->
+  <div class="mb-6">
+    <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+      <%= t('vendors.dashboards.show.title') %>
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">
+      <%= t('vendors.dashboards.show.subtitle') %>
+    </p>
+  </div>
+
+  <!-- Solde disponible (vendor uniquement : ne s'affiche que si le contrôleur définit @shop_balance) -->
+  <% if defined?(@shop_balance) && @shop_balance && finances_path_for %>
+    <div class="bg-gradient-to-r from-[#551694] to-[#7c1fc4] rounded-lg shadow-lg p-4 sm:p-6 mb-6 text-white">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm opacity-90 mb-1">Solde disponible</p>
+          <p class="text-3xl md:text-4xl font-bold">
+            <%= number_with_delimiter(@shop_balance, delimiter: ' ') %> FCFA
+          </p>
+          <% if defined?(@pending_payout) && @pending_payout && @pending_payout > 0 %>
+            <p class="text-sm opacity-75 mt-2">
+              <%= number_with_delimiter(@pending_payout, delimiter: ' ') %> FCFA en attente de reversement
+            </p>
+          <% end %>
+        </div>
+        <div class="mt-1 sm:mt-0">
+          <%= link_to finances_path_for.call,
+              class: "inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-md text-sm font-medium text-gray-900 transition-colors" do %>
+            Voir les finances
+            <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Widget des limites du plan -->
+  <% if @current_shop %>
+    <div class="mb-6">
+      <%= render "vendors/shared/plan_limits", shop: @current_shop %>
+    </div>
+  <% end %>
+
+  <!-- Grille de statistiques -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+    <!-- Carte 1 : Donut Chart (Top articles vendus) -->
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+      <div class="flex items-baseline gap-2 mb-1">
+        <p class="text-2xl md:text-3xl font-bold text-gray-900"><%= number_with_delimiter(@stats[:total_views]) %></p>
+        <% if @stats[:views_change] != 0 %>
+          <span class="text-xs font-medium <%= @stats[:views_change] > 0 ? 'text-green-500' : 'text-red-500' %>">
+            <%= @stats[:views_change] > 0 ? '↑' : '↓' %> <%= @stats[:views_change].abs %>%
+          </span>
+        <% end %>
+      </div>
+      <p class="text-xs text-gray-500 mb-4"><%= t('vendors.dashboards.show.stats.views') %></p>
+
+      <% if @top_articles.any? { |a| a[:value] > 0 } %>
+        <div class="mb-3">
+          <%= pie_chart @top_articles.select { |a| a[:value] > 0 }.map { |a| [ a[:name], a[:value] ] },
+              donut: true,
+              colors: @top_articles.select { |a| a[:value] > 0 }.map { |a| a[:color] },
+              legend: false,
+              height: "160px",
+              library: { cutout: '70%', plugins: { tooltip: { enabled: true } } } %>
+        </div>
+        <div class="space-y-1.5">
+          <p class="text-xs font-semibold text-gray-700 mb-2">Top articles vendus</p>
+          <% @top_articles.select { |a| a[:value] > 0 }.each do |article| %>
+            <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="h-2 w-2 rounded-full" style="background-color: <%= article[:color] %>"></span>
+                <span class="text-gray-600 truncate"><%= article[:name] %></span>
+              </div>
+              <span class="font-medium text-gray-900"><%= number_with_delimiter(article[:value]) %> unités</span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="mb-3 h-40 flex items-center justify-center bg-gray-50 rounded">
+          <p class="text-xs text-gray-400">Aucune vente pour le moment</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Carte 2 : Bar Chart (Ventes 7 derniers jours) -->
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+      <div class="flex items-baseline gap-2 mb-1">
+        <p class="text-2xl md:text-3xl font-bold text-gray-900"><%= number_with_delimiter(@stats[:total_sessions]) %></p>
+        <% if @stats[:sessions_change] != 0 %>
+          <span class="text-xs font-medium <%= @stats[:sessions_change] > 0 ? 'text-green-500' : 'text-red-500' %>">
+            <%= @stats[:sessions_change] > 0 ? '↑' : '↓' %> <%= @stats[:sessions_change].abs %>%
+          </span>
+        <% end %>
+      </div>
+      <p class="text-xs text-gray-500 mb-4"><%= t('vendors.dashboards.show.stats.sessions') %></p>
+
+      <% if @weekly_data[:values].sum > 0 %>
+        <%= column_chart Hash[@weekly_data[:labels].zip(@weekly_data[:values])],
+            colors: [ "#551694" ],
+            legend: false,
+            height: "160px",
+            library: {
+              scales: {
+                y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+                x: { grid: { display: false } }
+              },
+              borderRadius: 4
+            } %>
+        <p class="text-xs text-gray-500 mt-2 text-center">Unités vendues par jour</p>
+        <p class="text-xs text-gray-500 mt-1 text-center">Articles en catalogue: <%= number_with_delimiter(@stats[:catalog_items_count] || 0) %></p>
+      <% else %>
+        <div class="h-40 flex items-center justify-center bg-gray-50 rounded">
+          <p class="text-xs text-gray-400">Aucune vente cette semaine</p>
+        </div>
+        <p class="text-xs text-gray-500 mt-2 text-center">Articles en catalogue: <%= number_with_delimiter(@stats[:catalog_items_count] || 0) %></p>
+      <% end %>
+    </div>
+
+    <!-- Carte 3 : Commandes de ce mois -->
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+      <div class="flex-1">
+        <h3 class="text-sm font-semibold text-gray-700 mb-1"><%= t('vendors.dashboards.show.stats.traffic') %></h3>
+        <p class="text-xs text-gray-500 mb-3"><%= t('vendors.dashboards.show.stats.traffic_desc') %></p>
+        <p class="text-2xl md:text-3xl font-bold text-gray-900"><%= number_with_delimiter(@stats[:monthly_traffic]) %></p>
+        <p class="text-xs text-gray-500 mt-1"><%= t('vendors.dashboards.show.stats.traffic_witness') %></p>
+      </div>
+    </div>
+
+    <!-- Carte 4 : Panier en attente -->
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+      <div class="flex items-baseline gap-2 mb-1">
+        <p class="text-2xl md:text-3xl font-bold text-gray-900"><%= number_with_delimiter(@stats[:cart_abandoned]) %></p>
+        <% if @stats[:cart_change] != 0 %>
+          <span class="text-xs font-medium <%= @stats[:cart_change] > 0 ? 'text-green-500' : 'text-red-500' %>">
+            <%= @stats[:cart_change] > 0 ? '↑' : '↓' %> <%= @stats[:cart_change].abs %>%
+          </span>
+        <% end %>
+      </div>
+      <p class="text-xs text-gray-500 mb-4"><%= t('vendors.dashboards.show.stats.cart_abandoned') %></p>
+      <div class="space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-gray-600 font-medium"><%= @stats[:cart_pending] %> <%= t('vendors.dashboards.show.stats.orders_pending') %></span>
+          <span class="font-semibold text-gray-900"><%= @stats[:cart_pending_percent] %>%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+          <div class="bg-[#551694] h-full rounded-full transition-all duration-500" style="width: <%= @stats[:cart_pending_percent] %>%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte 5 : Nouveaux clients -->
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-1"><%= t('vendors.dashboards.show.stats.new_clients') %></h3>
+      <p class="text-xs text-gray-500 mb-3">Clients ayant passé leur première commande ce mois</p>
+      <div class="flex items-baseline gap-2 mb-4">
+        <p class="text-2xl md:text-3xl font-bold text-gray-900"><%= number_with_delimiter(@stats[:new_clients]) %></p>
+      </div>
+
+      <% if @top_clients.any? { |c| c[:initial] != '?' } %>
+        <div>
+          <p class="text-sm font-semibold text-gray-700 mb-3"><%= t('vendors.dashboards.show.stats.heroes_title') %></p>
+          <div class="flex -space-x-2">
+            <% @top_clients.select { |c| c[:initial] != '?' }.first(6).each do |client| %>
+              <div class="h-9 w-9 rounded-full <%= client[:color] %> flex items-center justify-center text-white text-xs font-semibold border-2 border-white shadow-sm" title="Client">
+                <%= client[:initial] %>
+              </div>
+            <% end %>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">Clients les plus actifs ce mois</p>
+        </div>
+      <% else %>
+        <div class="text-center py-4">
+          <p class="text-xs text-gray-400">Aucun client actif ce mois</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Carte 6 : Revenus du mois -->
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+      <h3 class="text-sm font-semibold text-gray-700 mb-1"><%= t('vendors.dashboards.show.stats.sales_volume') %></h3>
+      <p class="text-xs text-gray-500 mb-3"><%= t('vendors.dashboards.show.stats.sales_revenue') %></p>
+      <div class="flex items-baseline gap-2 mb-1">
+        <p class="text-2xl md:text-3xl font-bold text-gray-900">
+          <%= number_to_currency(@stats[:sales_volume], unit: "FCFA", format: "%n %u", precision: 0, delimiter: ' ') %>
+        </p>
+        <% if @stats[:sales_change] != 0 %>
+          <span class="text-xs font-medium <%= @stats[:sales_change] > 0 ? 'text-green-500' : 'text-red-500' %>">
+            <%= @stats[:sales_change] > 0 ? '↑' : '↓' %> <%= @stats[:sales_change].abs %>%
+          </span>
+        <% end %>
+      </div>
+      <p class="text-xs text-gray-500"><%= t('vendors.dashboards.show.stats.sales_vs_previous') %></p>
+    </div>
+  </div>
+
+  <!-- Section Mes Produits récents -->
+  <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">Mes produits récents</h2>
+        <p class="text-sm text-gray-500 mt-1">Derniers produits créés dans votre boutique</p>
+      </div>
+      <% if can_manage_items_buttons %>
+        <div class="flex gap-2">
+          <%= link_to "Gérer mes produits", items_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @recent_items.present? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <% @recent_items.each do |item| %>
+          <% default_variant = item.default_variant %>
+          <div class="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow overflow-hidden flex flex-col">
+            <div class="h-36 bg-gray-100 flex items-center justify-center overflow-hidden">
+              <% if item.has_image? %>
+                <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-cover", width: 300, height: 300) %>
+              <% else %>
+                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              <% end %>
+            </div>
+            <div class="p-4 flex-1 flex flex-col">
+              <div class="flex-1">
+                <h3 class="font-semibold text-base mb-1 text-gray-900"><%= item.name %></h3>
+                <p class="text-xs text-gray-500 mb-2"><%= item.product_sub_category&.name %></p>
+                <div class="flex items-center justify-between">
+                  <span class="text-lg font-bold text-[#551694]">
+                    <% if default_variant %>
+                      <%= number_to_currency(default_variant.price, unit: item.currency.symbol, precision: 0) %>
+                    <% else %>
+                      N/A
+                    <% end %>
+                  </span>
+                  <% if item.validation_status == 'approved' %>
+                    <span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-medium">Approuvé</span>
+                  <% else %>
+                    <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-medium">En attente</span>
+                  <% end %>
+                </div>
+              </div>
+              <div class="border-t pt-3 mt-3 flex gap-2">
+                <% if can_manage_items_buttons %>
+                  <%= link_to "Éditer", item_path_for.call(item),
+                      class: "flex-1 text-center px-3 py-2 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors text-sm font-medium" %>
+                <% end %>
+                <%= link_to "Voir", client_item_path(item),
+                    class: "flex-1 text-center px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-sm font-medium",
+                    target: "_blank" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">Aucun produit pour l'instant.</p>
+        <% if can_manage_items_buttons %>
+          <%= link_to "Ajouter un produit", items_index_path,
+              class: "inline-block px-6 py-3 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Section Mes Collaborateurs -->
+  <% if multi_users_enabled?(@current_shop) %>
+    <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900"><%= t('vendors.dashboards.show.my_collaborators') %></h2>
+          <p class="text-sm text-gray-500 mt-1"><%= t('vendors.dashboards.show.collaborators_count', total: @total_employees, active: @active_employees) %></p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <%= link_to employees_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" do %>
+            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <%= t('vendors.dashboards.show.view_all_collaborators') %>
+          <% end %>
+          <% if can_manage_employees_buttons && @vendor.shops.any? %>
+            <%= link_to new_employee_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#551694] hover:bg-[#4a1468]" do %>
+              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <%= t('vendors.dashboards.show.create_collaborator') %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @recent_employees.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr class="text-left text-xs text-gray-500 uppercase tracking-wider">
+                <th class="pb-3 pr-4"><%= t('vendors.dashboards.show.collaborator') %></th>
+                <th class="hidden md:table-cell pb-3 px-2"><%= t('vendors.dashboards.show.shop') %></th>
+                <th class="hidden sm:table-cell pb-3 px-2"><%= t('vendors.dashboards.show.role') %></th>
+                <th class="hidden sm:table-cell pb-3 px-2"><%= t('vendors.dashboards.show.contact') %></th>
+                <th class="pb-3 pl-2"><%= t('vendors.dashboards.show.collaborator_status') %></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <% @recent_employees.each do |employee| %>
+                <tr class="hover:bg-gray-50">
+                  <td class="py-3 pr-4">
+                    <div class="flex items-center gap-3">
+                      <div class="h-10 w-10 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold flex-shrink-0">
+                        <%= employee.first_name.first.upcase %>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="font-medium text-gray-900 truncate"><%= employee.full_name %></p>
+                        <p class="text-xs text-gray-500 truncate"><%= employee.email %></p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="hidden md:table-cell py-3 px-2">
+                    <% if employee.shops.any? %>
+                      <div class="flex flex-wrap gap-1">
+                        <% employee.shops.first(2).each do |shop| %>
+                          <span class="px-2 py-1 text-xs rounded bg-gray-100 text-gray-800"><%= shop.name %></span>
+                        <% end %>
+                        <% if employee.shops.size > 2 %>
+                          <span class="text-xs text-gray-500">+<%= employee.shops.size - 2 %></span>
+                        <% end %>
+                      </div>
+                    <% else %>
+                      <span class="text-sm text-gray-400">-</span>
+                    <% end %>
+                  </td>
+                  <td class="hidden sm:table-cell py-3 px-2">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                      <%= case employee.role
+                          when 'manager' then 'bg-purple-100 text-purple-800'
+                          when 'cashier' then 'bg-blue-100 text-blue-800'
+                          when 'stock_manager' then 'bg-green-100 text-green-800'
+                          when 'delivery' then 'bg-yellow-100 text-yellow-800'
+                          end %>">
+                      <%= employee.role_name %>
+                    </span>
+                  </td>
+                  <td class="hidden sm:table-cell py-3 px-2 text-sm text-gray-500"><%= employee.formatted_phone_number %></td>
+                  <td class="py-3 pl-2">
+                    <% if employee.active? %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        <%= t('vendors.dashboards.show.active') %>
+                      </span>
+                    <% else %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        <%= t('vendors.dashboards.show.inactive') %>
+                      </span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="text-center py-8">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900"><%= t('vendors.dashboards.show.no_collaborators') %></h3>
+          <p class="mt-1 text-sm text-gray-500"><%= t('vendors.dashboards.show.no_collaborators_message') %></p>
+          <% if can_manage_employees_buttons && @vendor.shops.any? %>
+            <%= link_to new_employee_path,
+                class: "mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#551694] hover:bg-[#4a1468]" do %>
+              <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <%= t('vendors.dashboards.show.create_collaborator') %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render 'vendors/shared/feature_unavailable', shop: @current_shop, feature_code: 'max_employees' do %>
+      <div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 mb-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900"><%= t('vendors.dashboards.show.my_collaborators') %></h2>
+            <p class="text-sm text-gray-500 mt-1"><%= t('vendors.dashboards.show.collaborators_count', total: @total_employees, active: @active_employees) %></p>
+          </div>
+        </div>
+        <div class="text-center py-8">
+          <p class="text-gray-400">Contenu non disponible</p>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <!-- Section Dernières commandes -->
+  <div class="bg-white rounded-lg shadow mb-6">
+    <div class="px-4 md:px-6 py-4 border-b border-gray-200">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 class="text-lg font-semibold text-gray-900"><%= t('vendors.dashboards.show.recent_orders') %></h2>
+        <% if @recent_orders.any? %>
+          <%= link_to orders_index_path_for.call, class: "self-start sm:self-auto inline-flex items-center px-4 py-2 border border-[#551694] rounded-md text-sm font-medium text-[#551694] bg-white hover:bg-[#551694] hover:text-white transition-colors duration-200" do %>
+            <%= t('vendors.dashboards.show.view_all') %>
+            <svg class="ml-2 -mr-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @recent_orders.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.order_number') %></th>
+              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.client') %></th>
+              <th scope="col" class="hidden sm:table-cell px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.date') %></th>
+              <th scope="col" class="hidden md:table-cell px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.items_count') %></th>
+              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.amount') %></th>
+              <th scope="col" class="px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.status') %></th>
+              <th scope="col" class="px-4 md:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"><%= t('vendors.dashboards.show.action') %></th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @recent_orders.each do |order| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#<%= order.id %></td>
+                <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-8 w-8">
+                      <div class="h-8 w-8 rounded-full bg-[#551694] flex items-center justify-center text-white text-xs font-semibold">
+                        <%= order.user.first_name.first.upcase %>
+                      </div>
+                    </div>
+                    <div class="ml-3">
+                      <div class="text-sm font-medium text-gray-900"><%= order.user.first_name %> <%= order.user.last_name %></div>
+                    </div>
+                  </div>
+                </td>
+                <td class="hidden sm:table-cell px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= l(order.created_at, format: :short) %></td>
+                <td class="hidden md:table-cell px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <%= order.order_items.size > 0 ? order.order_items.sum { |oi| oi.quantity } : 0 %> <%= t('vendors.dashboards.show.items') %>
+                </td>
+                <td class="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                  <%= number_with_delimiter(order.total_amount, delimiter: ' ') %> FCFA
+                </td>
+                <td class="px-4 md:px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                    <%= case order.status
+                        when 'pending' then 'bg-yellow-100 text-yellow-800'
+                        when 'processing' then 'bg-blue-100 text-blue-800'
+                        when 'shipped' then 'bg-indigo-100 text-indigo-800'
+                        when 'delivered' then 'bg-green-100 text-green-800'
+                        when 'canceled' then 'bg-red-100 text-red-800'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                    <%= t("vendors.orders.index.#{order.status}", default: order.status.humanize) %>
+                  </span>
+                </td>
+                <td class="px-4 md:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <%= link_to order_path_for.call(order), class: "inline-flex items-center px-3 py-1.5 border border-[#551694] rounded-md text-xs font-medium text-[#551694] bg-white hover:bg-[#551694] hover:text-white transition-colors duration-200", data: { turbo_frame: "_top" } do %>
+                    <svg class="mr-1.5 w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    <%= t('vendors.dashboards.show.view') %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="text-center py-12 px-4">
+        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2"><%= t('vendors.dashboards.show.no_orders_yet', default: 'Aucune commande pour le moment') %></h3>
+        <p class="text-gray-500 mb-6"><%= t('vendors.dashboards.show.no_orders_description', default: 'Les commandes de vos clients apparaîtront ici') %></p>
+        <%= link_to t('vendors.dashboards.show.view_all_orders', default: 'Voir toutes les commandes'), orders_index_path_for.call, class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+      </div>
+    <% end %>
+  </div>
+
+<% else %>
+  <!-- État d'erreur si pas de vendeur (branche vendor uniquement) -->
+  <div class="text-center py-12">
+    <p class="text-gray-500 mb-4"><%= t('vendors.dashboards.show.error_vendor_not_found') %></p>
+    <% if signup_path.present? %>
+      <%= link_to (signup_label || t('vendors.dashboards.show.signup')), signup_path, class: "inline-block px-6 py-3 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors" %>
+    <% end %>
+  </div>
+<% end %>

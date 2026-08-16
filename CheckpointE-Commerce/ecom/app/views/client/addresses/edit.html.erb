@@ -1,0 +1,36 @@
+<% content_for :client_content do %>
+  <div>
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <nav class="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+        <%= link_to "Accueil", root_path, class: "hover:text-[#551694] transition-colors duration-150" %> 
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mon compte", client_account_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mes adresses", client_addresses_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-900 font-medium">Modifier l'adresse</span>
+      </nav>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="mb-4">
+      <%= link_to client_addresses_path, class: "inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-[#551694] hover:bg-gray-50 rounded-lg transition-all duration-150 group" do %>
+        <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span class="font-medium">Retour aux adresses</span>
+      <% end %>
+    </div>
+
+    <!-- Titre et formulaire -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Modifier l'adresse</h1>
+      <%= render "form", address: @address, url: client_address_path(@address) %>
+    </div>
+  </div>
+<% end %>
+
+<%= render "shared/client_sidebar_wrapper" do %>
+  <%= content_for(:client_content) %>
+<% end %>

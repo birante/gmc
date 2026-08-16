@@ -1,0 +1,59 @@
+<%
+  # Paramètres
+  title ||= nil
+  subtitle ||= nil
+  value ||= 0
+  change_percent ||= nil
+  show_menu ||= false
+%>
+
+<div class="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4 md:p-6">
+  <!-- En-tête de la carte -->
+  <div class="flex items-start justify-between mb-2">
+    <div class="flex-1">
+      <!-- Titre optionnel -->
+      <% if title %>
+        <h3 class="text-sm font-semibold text-gray-700 mb-1"><%= title %></h3>
+      <% end %>
+      
+      <!-- Valeur principale + pourcentage de changement -->
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <p class="text-2xl md:text-3xl font-bold text-gray-900">
+          <%= number_with_delimiter(value, delimiter: ',') %>
+        </p>
+        
+        <% if change_percent %>
+          <span class="text-xs font-medium <%= change_percent.to_f > 0 ? 'text-green-500' : 'text-red-500' %>">
+            <%= change_percent.to_f > 0 ? '↑' : '↓' %> <%= change_percent.abs %>%
+          </span>
+        <% end %>
+      </div>
+      
+      <!-- Sous-titre optionnel -->
+      <% if subtitle %>
+        <p class="text-xs text-gray-500 mt-1"><%= subtitle %></p>
+      <% end %>
+    </div>
+    
+    <!-- Menu 3 points optionnel -->
+    <% if show_menu %>
+      <%= button_tag type: 'button', class: 'text-gray-400 hover:text-gray-600 focus:outline-none p-1 flex-shrink-0' do %>
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+        </svg>
+      <% end %>
+    <% end %>
+  </div>
+  
+  <!-- Zone pour contenu additionnel (graphique, progress bar, etc.) -->
+  <% if content_for?(:card_content) %>
+    <div class="mt-4">
+      <%= yield :card_content %>
+    </div>
+  <% elsif block_given? %>
+    <div class="mt-4">
+      <%= yield %>
+    </div>
+  <% end %>
+</div>
+

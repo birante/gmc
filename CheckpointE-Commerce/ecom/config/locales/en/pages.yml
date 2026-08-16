@@ -1,0 +1,119 @@
+en:
+  pages:
+    editorial_nav: "Editorial navigation"
+    coming_soon:
+      page_title: "This page is coming soon | aa"
+      meta_description: "This section of aa 2.0 is still being finalized. Check back very soon."
+      title: "This page is coming soon."
+      lead_line_1: "You're exploring aa 2.0 in early access."
+      lead_line_2: "Some sections are still being finalized."
+      thanks: "Thanks for being one of our first users."
+      back_home: "Back to home"
+      explore_products: "Browse products"
+    about:
+      nav_label: "About"
+      meta:
+        title: "About aa | Senegal's e-commerce marketplace"
+        description: "aa makes e-commerce simple in Senegal. Discover our mission, our story and our values."
+      hero:
+        title_part_1: "Buy online with"
+        highlight_1: "total"
+        title_part_2: "confidence."
+        title_part_3: "Sell online,"
+        highlight_2: "without complexity."
+        subtitle: "aa is the marketplace built for Senegalese buyers and sellers. A simple, secure and local platform."
+        cta_buy: "Browse products"
+        cta_sell: "Become a seller"
+      intro:
+        tag: "Our purpose"
+        title: "About"
+        body_1: "aa is a 100%% Senegalese marketplace bringing together thousands of local and official shops. Our ambition is to make e-commerce accessible to everyone, everywhere in Senegal."
+        body_2: "From listing a product to last-mile delivery, we simplify every step so that sellers and buyers can focus on what really matters."
+      mission:
+        tag: "Our mission"
+        body: "Because selling online in Senegal shouldn't be complicated, aa simplifies every e-commerce step, for sellers and buyers alike."
+      stats:
+        shops_value: "+1000"
+        shops_label: "Active shops"
+        products_value: "+50k"
+        products_label: "Products listed"
+        cities_value: "14"
+        cities_label: "Regions covered"
+        support_value: "24/7"
+        support_label: "Customer support"
+      history:
+        tag: "Our origins"
+        title: "Our"
+        title_highlight: "story"
+        body_1: "Founded in Dakar in 2024, aa was born from a simple observation: craftsmen, neighbourhood shops and Senegalese brands needed a tool built for their reality."
+        body_2: "We're building a platform that speaks their language, accepts their payment methods (Wave, Orange Money, etc.) and delivers to every neighbourhood."
+      values:
+        tag: "Our values"
+        title_part_1: "What we"
+        title_highlight: "believe in"
+        accessibility_title: "Accessibility"
+        accessibility_body: "An easy-to-use platform, accessible from any phone, in everyone's language."
+        performance_title: "Performance"
+        performance_body: "Effective tools to sell fast, deliver better, and grow your business."
+        trust_title: "Trust"
+        trust_body: "Secure payments and responsive support for stress-free transactions."
+    contact:
+      nav_label: "Contact"
+      meta:
+        title: "Contact | aa"
+        description: "Got a question? The aa team is here to help. Reach us by phone, email or via the form."
+      hero:
+        title_part_1: "Get in"
+        title_highlight: "touch."
+        subtitle: "Our team answers Monday to Saturday, 9am to 6pm."
+      info:
+        title: "Need help or have a question?"
+        subtitle: "Several channels to reach us, pick the one that suits you."
+        address_label: "Address"
+        phone_label: "Phone"
+        email_label: "Email"
+        follow_us: "Follow us"
+      form:
+        title: "Send us a message"
+        subtitle: "We typically reply within 24 hours."
+        first_name: "First name"
+        last_name: "Last name"
+        email: "Email"
+        phone: "Phone"
+        subject: "Subject"
+        message: "Message"
+        required_hint: "* At least an email or phone number is required so we can reply."
+        submit: "Send"
+      flash:
+        success: "Thanks, your message was sent. We'll get back to you shortly."
+        error: "Please fix the errors below."
+      faq:
+        title: "We answer your questions"
+        q1: "How do I order on aa?"
+        a1: "Browse products, add them to your cart and check out in a few clicks. You'll be delivered directly."
+        q2: "How does delivery work?"
+        a2: "Depending on your area, delivery takes between 24h and 72h, anywhere in Senegal."
+        q3: "Which payment methods are available?"
+        a3: "Wave, Orange Money, Free Money, bank card or cash on delivery — depending on the shop."
+        q4: "Are sellers verified?"
+        a4: "Yes, every shop goes through a verification process before being published."
+    blog:
+      nav_label: "Blog"
+      meta:
+        title: "Blog & articles | aa"
+        description: "Tips, tutorials and e-commerce news in Senegal by the aa team."
+      index:
+        title: "Blog & articles"
+        all_tab: "All"
+        empty: "No published articles yet. Check back very soon."
+        read_more: "Read article"
+      show:
+        minutes_read: "min read"
+        related_title: "Related articles"
+  activerecord:
+    errors:
+      models:
+        contact_message:
+          attributes:
+            base:
+              email_or_phone_required: "Please provide an email or phone number so we can reply."

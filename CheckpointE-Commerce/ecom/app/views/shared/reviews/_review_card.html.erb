@@ -1,0 +1,96 @@
+<%# Carte d'avis individuel %>
+<% review = local_assigns[:review] %>
+
+<% if review.present? %>
+  <article class="rounded-lg border border-gray-100 bg-gray-50/40 p-3 md:p-4 hover:border-gray-200 transition-colors">
+    <%# En-tête : avatar + nom + note %>
+    <div class="flex items-center gap-2.5 mb-2">
+      <div class="w-7 h-7 rounded-full bg-[#551694] flex items-center justify-center flex-shrink-0">
+        <span class="text-white font-semibold text-xs">
+          <%= review.user.first_name&.first&.upcase || 'U' %>
+        </span>
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <h4 class="font-medium text-gray-900 text-sm truncate leading-tight">
+          <%= review.user.first_name %> <%= review.user.last_name&.first %><%= '.' if review.user.last_name.present? %>
+        </h4>
+        <p class="text-[11px] text-gray-400 leading-tight"><%= time_ago_in_words(review.created_at) %></p>
+      </div>
+
+      <%# Étoiles compactes %>
+      <div class="flex items-center gap-0.5 flex-shrink-0" aria-label="<%= review.rating %>/5">
+        <% 5.times do |i| %>
+          <svg class="w-3.5 h-3.5 <%= i < review.rating ? 'text-yellow-400' : 'text-gray-200' %> fill-current" viewBox="0 0 20 20">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+          </svg>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Commentaire (tronqué à 4 lignes) %>
+    <% if review.comment.present? %>
+      <p class="text-sm text-gray-700 leading-snug line-clamp-4"><%= review.comment %></p>
+    <% end %>
+
+    <%# Photos compactes (max 3 visibles, badge "+N" sinon) %>
+    <% if review.images.attached? && review.images.any? %>
+      <div class="flex gap-1.5 mt-2 flex-wrap">
+        <% review.images.first(3).each do |image| %>
+          <%= image_tag url_for(image),
+              alt: "Photo avis",
+              loading: "lazy",
+              class: "w-12 h-12 object-cover rounded-md border border-gray-200 cursor-pointer hover:opacity-80 transition-opacity",
+              onclick: "openImageModal(this.src)" %>
+        <% end %>
+        <% if review.images.size > 3 %>
+          <div class="w-12 h-12 rounded-md border border-gray-200 bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
+            +<%= review.images.size - 3 %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Action "Utile" minimaliste %>
+    <div class="mt-2 pt-2 border-t border-gray-100">
+      <button type="button"
+              onclick="markAsHelpful(<%= review.id %>)"
+              class="inline-flex items-center gap-1 text-[11px] text-gray-500 hover:text-[#551694] transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
+        </svg>
+        Utile (<span id="helpful-count-<%= review.id %>"><%= review.helpful_count %></span>)
+      </button>
+    </div>
+  </article>
+
+  <script>
+    function markAsHelpful(reviewId) {
+      fetch(`/fr/client/reviews/${reviewId}/mark_as_helpful`, {
+        method: 'POST',
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+      })
+      .then(response => response.json())
+      .then(data => {
+        const countElement = document.getElementById(`helpful-count-${reviewId}`);
+        if (countElement) {
+          countElement.textContent = data.helpful_count;
+        }
+      })
+      .catch(error => {
+        console.error('Erreur:', error);
+      });
+    }
+
+    function openImageModal(imageSrc) {
+      // Ouvrir une modale pour voir l'image en grand
+      // Implémentation simple - peut être améliorée avec une librairie
+      window.open(imageSrc, '_blank');
+    }
+  </script>
+<% end %>

@@ -1,0 +1,15 @@
+Un article de votre commande a été expédié
+
+Bonjour <%= @user.first_name %>,
+
+Nous vous informons qu'un article de votre commande #{@order.order_number} a été expédié :
+
+- <%= @order_item.item.name %>
+<% if @order_item.item_variant %>
+- Variante : <%= @order_item.item_variant.display_name %>
+<% end %>
+- Quantité : <%= @order_item.quantity %>
+
+Votre article est maintenant en cours de livraison et arrivera bientôt à destination.
+
+Merci pour votre confiance !

@@ -1,0 +1,60 @@
+<%# Analytics, Tracking & Security Scripts - Inclus dans tous les layouts %>
+<% if Analytics.enabled? %>
+  <%# ── Ahoy (first-party) – chargé automatiquement via la gem + concern Trackable %>
+  <%# ── Google Analytics 4 ── %>
+  <% if Analytics.configuration.tracker_enabled?(:google_analytics) %>
+    <% ga_id = ENV["GA_MEASUREMENT_ID"].presence || "G-KZNWX6KFVD" %>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= ga_id %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '<%= ga_id %>', {
+        'page_path': '<%= request.path %>',
+        'page_title': '<%= content_for(:title) || "aa" %>',
+        'page_location': '<%= request.original_url %>'
+      });
+      document.addEventListener('turbo:load', function() {
+        gtag('config', '<%= ga_id %>', {
+          'page_path': window.location.pathname,
+          'page_title': document.title,
+          'page_location': window.location.href
+        });
+      });
+    </script>
+  <% end %>
+  <%# ── Facebook Pixel ── %>
+  <% if Analytics.configuration.tracker_enabled?(:facebook_pixel) %>
+    <% fb_pixel_id = ENV["FB_PIXEL_ID"].presence || "1019822239013589" %>
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '<%= fb_pixel_id %>');
+      fbq('track', 'PageView');
+      document.addEventListener('turbo:load', function() {
+        if (window.fbq) { fbq('track', 'PageView'); }
+      });
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=<%= fb_pixel_id %>&ev=PageView&noscript=1"/></noscript>
+  <% end %>
+  <%# ── Amplitude SDK v2 avec Session Replay ── %>
+  <% if Analytics.configuration.tracker_enabled?(:amplitude) %>
+    <% amp_key = ENV["AMPLITUDE_API_KEY"].presence || "34776e091644c16b48f480c7815fc46" %>
+    <script src="https://cdn.amplitude.com/script/<%= amp_key %>.js"></script>
+    <script>
+      (function(){var amp=window.amplitude;var sr=window.sessionReplay;if(!amp||typeof amp.init!=="function"){return;}if(sr&&typeof sr.plugin==="function"&&typeof amp.add==="function"){amp.add(sr.plugin({sampleRate: 1}));}amp.init('<%= amp_key %>', {"fetchRemoteConfig":true,"autocapture":{"attribution":true,"fileDownloads":true,"formInteractions":true,"pageViews":true,"sessions":true,"elementInteractions":true,"networkTracking":true,"webVitals":true,"frustrationInteractions":{"thrashedCursor":true,"errorClicks":true,"deadClicks":true,"rageClicks":true}}});})();
+    </script>
+  <% end %>
+  <%# ── Debug (dev uniquement) ── %>
+  <% if Analytics.configuration.debug_mode && Rails.env.development? %>
+    <script>
+      console.log('📊 Analytics Configuration:', {
+        enabled: <%= Analytics.enabled? %>,
+        google_analytics: <%= Analytics.configuration.tracker_enabled?(:google_analytics) %>,
+        amplitude: <%= Analytics.configuration.tracker_enabled?(:amplitude) %>,
+        facebook_pixel: <%= Analytics.configuration.tracker_enabled?(:facebook_pixel) %>
+      });
+    </script>
+  <% end %>
+<% end %>
+<%# reCAPTCHA extrait dans shared/_recaptcha.html.erb — chaque layout décide s'il
+    veut le charger (exclu des layouts authentifiés vendor/employee/admin). %>

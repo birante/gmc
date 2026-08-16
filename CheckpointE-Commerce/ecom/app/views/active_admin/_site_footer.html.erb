@@ -1,0 +1,12 @@
+<div class="text-sm text-center mt-12 mx-8 pt-8 pb-8 text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800">
+  <p class="mb-2">
+    <%= I18n.t(
+          "active_admin.powered_by",
+          active_admin: link_to("Active Admin", "https://activeadmin.info", class: "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 no-underline font-medium transition-colors", target: "_blank", rel: "noopener"),
+          version: ActiveAdmin::VERSION
+        ).html_safe %>
+  </p>
+  <p class="text-xs text-gray-400 dark:text-gray-500">
+    © <%= Date.current.year %> aa. Tous droits réservés.
+  </p>
+</div>

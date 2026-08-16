@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= html_head_site_title %></title>
+    <%# Favicon avec fallback vers public/ ou placeholder %>
+    <% begin %>
+      <% icon_png = asset_path('icon.png') %>
+      <link rel="icon" type="image/png" href="<%= icon_png %>">
+      <% rescue Propshaft::MissingAssetError, Sprockets::Rails::Helper::AssetNotFound, ActionView::Template::Error => e %>
+      <%# Fallback vers public/ ou placeholder %>
+      <% if File.exist?(Rails.root.join('public', 'icon.png')) %>
+        <link rel="icon" type="image/png" href="/icon.png">
+      <% else %>
+        <%# Placeholder SVG favicon avec initiale Y pour aa %>
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23551694'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold'>Y</text></svg>">
+    <% end %>
+  <% end %>
+  <% begin %>
+    <% icon_svg = asset_path('icon.svg') %>
+    <link rel="icon" type="image/svg+xml" href="<%= icon_svg %>">
+    <% rescue Propshaft::MissingAssetError, Sprockets::Rails::Helper::AssetNotFound, ActionView::Template::Error => e %>
+    <%# Fallback vers public/ %>
+    <% if File.exist?(Rails.root.join('public', 'icon.svg')) %>
+      <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <% end %>
+  <% end %>
+  <%= render "active_admin/html_head" %>
+  <%# Chart.js pour Chartkick avec adaptateur de dates %>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartkick@5.0.1/dist/chartkick.min.js"></script>
+  <style>
+    /* Ensure charts render properly */
+    canvas {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    /* Fix panel width */
+    #main_content .panel,
+    [data-test-page-content] .panel {
+      max-width: none !important;
+    }
+
+    /* Panel styling for dark mode */
+    .dark .panel {
+      background-color: rgb(31 41 55) !important; /* gray-800 */
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5) !important;
+    }
+
+    .dark .panel h3,
+    .dark .panel h2 {
+      color: white !important;
+    }
+
+    /* ========== Design Figma : tableaux Active Admin v4 (classes réelles: .data-table, .status-tag) ========== */
+    .data-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      background-color: #fff !important;
+    }
+    .dark .data-table { background-color: rgb(31 41 55) !important; }
+    .data-table thead th {
+      background-color: #fff !important;
+      color: #6B7280 !important;
+      font-weight: 400 !important;
+      text-transform: none !important;
+      text-align: left !important;
+      padding: 14px 16px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      font-size: 0.875rem !important;
+    }
+    .dark .data-table thead th {
+      background-color: rgb(55 65 81) !important;
+      color: rgb(209 213 219) !important;
+      border-bottom-color: rgb(75 85 99) !important;
+    }
+    .data-table tbody td,
+    .data-table .aa-index-tbody td {
+      background-color: #fff !important;
+      color: #374151 !important;
+      padding: 14px 16px !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      vertical-align: middle !important;
+    }
+    .dark .data-table tbody td,
+    .dark .data-table .aa-index-tbody td {
+      background-color: rgb(31 41 55) !important;
+      color: rgb(229 231 235) !important;
+      border-bottom-color: rgb(55 65 81) !important;
+    }
+    .data-table tbody tr:hover td,
+    .data-table .aa-index-row:hover td { background-color: #F9FAFB !important; }
+    .dark .data-table tbody tr:hover td,
+    .dark .data-table .aa-index-row:hover td { background-color: rgb(55 65 81) !important; }
+    .data-table a, .data-table a:link, .data-table a:visited {
+      color: #8B5CF6 !important;
+      text-decoration: none !important;
+    }
+    .data-table a:hover { color: #7C3AED !important; text-decoration: underline !important; }
+    .dark .data-table a, .dark .data-table a:link, .dark .data-table a:visited { color: rgb(196 181 253) !important; }
+    .dark .data-table a:hover { color: rgb(167 139 250) !important; }
+    /* Pills Active Admin v4 : classe .status-tag (tiret) */
+    .status-tag {
+      display: inline-block !important;
+      padding: 6px 12px !important;
+      border-radius: 9999px !important;
+      font-size: 12px !important;
+      font-weight: 500 !important;
+      border: none !important;
+    }
+    .status-tag.pending, .status-tag.orange { background-color: #FEF3C7 !important; color: #F59E0B !important; }
+    .status-tag.processing, .status-tag.blue, .status-tag.ok { background-color: #DBEAFE !important; color: #3B82F6 !important; }
+    .status-tag.delivered, .status-tag.shipped, .status-tag.green { background-color: #D1FAE5 !important; color: #10B981 !important; }
+    .status-tag.canceled, .status-tag.cancelled, .status-tag.error, .status-tag.red, .status-tag.rejected { background-color: #FEE2E2 !important; color: #EF4444 !important; }
+    .status-tag.approved, .status-tag.no { background-color: #DBEAFE !important; color: #3B82F6 !important; }
+    .status-tag.warning { background-color: #FEF3C7 !important; color: #F59E0B !important; }
+    .status-tag.info { background-color: #DBEAFE !important; color: #3B82F6 !important; }
+    .dark .status-tag.pending, .dark .status-tag.orange { background-color: rgba(245,158,11,0.25) !important; color: rgb(252 211 77) !important; }
+    .dark .status-tag.processing, .dark .status-tag.blue, .dark .status-tag.ok { background-color: rgba(59,130,246,0.25) !important; color: rgb(147 197 253) !important; }
+    .dark .status-tag.delivered, .dark .status-tag.shipped, .dark .status-tag.green { background-color: rgba(16,185,129,0.25) !important; color: rgb(110 231 183) !important; }
+    .dark .status-tag.canceled, .dark .status-tag.cancelled, .dark .status-tag.error, .dark .status-tag.red, .dark .status-tag.rejected { background-color: rgba(239,68,68,0.25) !important; color: rgb(252 165 165) !important; }
+    .dark .status-tag.approved, .dark .status-tag.no { background-color: rgba(59,130,246,0.25) !important; color: rgb(147 197 253) !important; }
+    .dark .status-tag.warning { background-color: rgba(245,158,11,0.25) !important; color: rgb(252 211 77) !important; }
+    .dark .status-tag.info { background-color: rgba(59,130,246,0.25) !important; color: rgb(147 197 253) !important; }
+
+    /* Ensure gradients work with Tailwind */
+    .bg-gradient-to-r {
+      background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
+    }
+
+    .bg-gradient-to-br {
+      background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)) !important;
+    }
+
+    /* Chart.js dark mode compatibility */
+    .dark canvas {
+      filter: brightness(0.95);
+    }
+
+    /* Pagination for dark mode */
+    .dark .pagination a,
+    .dark .pagination span {
+      color: rgb(229 231 235) !important;
+      background-color: rgb(55 65 81) !important;
+      border-color: rgb(75 85 99) !important;
+    }
+
+    .dark .pagination a:hover {
+      background-color: rgb(75 85 99) !important;
+    }
+
+    .dark .pagination .current {
+      background-color: rgb(99 102 241) !important; /* indigo-600 */
+    }
+
+    /* Amélioration de la navigation principale */
+    #main_navigation {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .dark #main_navigation {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Amélioration des menus */
+    #main_navigation ul li a {
+      transition: all 0.2s ease;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin: 2px 0;
+    }
+
+    #main_navigation ul li a:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+      transform: translateX(4px);
+    }
+
+    .dark #main_navigation ul li a:hover {
+      background-color: rgba(59, 130, 246, 0.2);
+    }
+
+    #main_navigation ul li.current > a {
+      background-color: rgba(59, 130, 246, 0.15);
+      font-weight: 600;
+    }
+
+    .dark #main_navigation ul li.current > a {
+      background-color: rgba(59, 130, 246, 0.3);
+    }
+
+    /* Panel collapsible styles améliorés */
+    .panel {
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .panel:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .dark .panel:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    .panel > h3 {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      padding-right: 40px;
+      transition: background-color 0.2s ease;
+    }
+
+    .panel > h3:hover {
+      background-color: rgba(59, 130, 246, 0.05);
+    }
+
+    .dark .panel > h3:hover {
+      background-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .panel > h3::after {
+      content: '▼';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      transition: transform 0.3s ease;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .dark .panel > h3::after {
+      color: #999;
+    }
+
+    .panel.collapsed > h3::after {
+      transform: translateY(-50%) rotate(-90deg);
+    }
+
+    .panel.collapsed > .panel_contents {
+      display: none;
+    }
+
+    .panel_contents {
+      transition: opacity 0.3s ease;
+    }
+
+    /* Améliorations générales */
+    .active_admin {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    /* Meilleure lisibilité des tableaux */
+    .index_table tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    /* Amélioration des inputs focus */
+    .formtastic input:focus,
+    .formtastic textarea:focus,
+    .formtastic select:focus {
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    /* Amélioration des boutons hover */
+    .button:hover,
+    input[type="submit"]:hover {
+      transform: translateY(-1px);
+    }
+
+    .button:active,
+    input[type="submit"]:active {
+      transform: translateY(0);
+    }
+
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Amélioration de la sidebar */
+    #sidebar {
+      transition: all 0.3s ease;
+    }
+  </style>
+  <script>
+    // Configure Chart.js defaults for dark mode dynamically
+    function updateChartDefaults() {
+      if (typeof Chart !== 'undefined') {
+        const isDark = document.documentElement.classList.contains('dark');
+
+        if (isDark) {
+          Chart.defaults.color = '#e5e7eb'; // gray-200
+          Chart.defaults.borderColor = '#374151'; // gray-700
+          Chart.defaults.backgroundColor = 'rgba(107, 114, 128, 0.1)'; // gray-500 with opacity
+          if (Chart.defaults.scale && Chart.defaults.scale.grid) {
+            Chart.defaults.scale.grid.color = 'rgba(75, 85, 99, 0.3)'; // gray-600
+          }
+        } else {
+          Chart.defaults.color = '#666666';
+          Chart.defaults.borderColor = '#e5e7eb';
+          Chart.defaults.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+          if (Chart.defaults.scale && Chart.defaults.scale.grid) {
+            Chart.defaults.scale.grid.color = 'rgba(0, 0, 0, 0.1)';
+          }
+        }
+      }
+    }
+
+    // Initialize charts on page load
+    function initializeCharts() {
+      updateChartDefaults();
+
+      // Re-render all Chartkick charts
+      if (typeof Chartkick !== 'undefined') {
+        // Wait a bit for DOM to be ready
+        setTimeout(function() {
+          Chartkick.eachChart(function(chart) {
+            chart.redraw();
+          });
+        }, 100);
+      }
+    }
+
+    // Update on page load
+    document.addEventListener('DOMContentLoaded', initializeCharts);
+
+    // Handle Turbo navigation (for single page app behavior)
+    document.addEventListener('turbo:load', initializeCharts);
+    document.addEventListener('turbo:render', initializeCharts);
+
+    // Make panels collapsible
+    function makePanelsCollapsible() {
+      document.querySelectorAll('.panel > h3').forEach(function(header) {
+        if (!header.dataset.collapsibleInitialized) {
+          header.dataset.collapsibleInitialized = 'true';
+          header.style.cursor = 'pointer';
+
+          header.addEventListener('click', function() {
+            const panel = this.closest('.panel');
+            panel.classList.toggle('collapsed');
+          });
+        }
+      });
+    }
+
+    // Initialize collapsible panels
+    document.addEventListener('DOMContentLoaded', makePanelsCollapsible);
+    document.addEventListener('turbo:load', makePanelsCollapsible);
+    document.addEventListener('turbo:render', makePanelsCollapsible);
+
+    // Toggle barre de filtres (transition + transform)
+    function initFiltersSidebarToggle() {
+      var column = document.getElementById('filters-sidebar-column');
+      var toggleRow = document.getElementById('filters-toggle-row');
+      var toggleBtn = document.getElementById('filters-sidebar-toggle');
+      if (!column || !toggleRow || !toggleBtn) return;
+
+      toggleRow.style.display = 'flex';
+      toggleRow.setAttribute('aria-hidden', 'false');
+
+      var labelEl = toggleBtn.querySelector('.filters-sidebar-toggle-label');
+      var iconOpen = toggleBtn.querySelector('.filters-sidebar-toggle-icon--open');
+      var iconClosed = toggleBtn.querySelector('.filters-sidebar-toggle-icon--closed');
+      var labelShow = labelEl && labelEl.getAttribute('data-label-show') || 'Afficher les filtres';
+      var labelHide = labelEl && labelEl.getAttribute('data-label-hide') || 'Masquer les filtres';
+
+      var pageContent = column.closest('[data-test-page-content]');
+      function syncGridCollapsed(isCollapsed) {
+        if (pageContent) {
+          if (isCollapsed) pageContent.classList.add('filters-sidebar-collapsed');
+          else pageContent.classList.remove('filters-sidebar-collapsed');
+        }
+      }
+
+      var stored = typeof localStorage !== 'undefined' && localStorage.getItem('active_admin_filters_collapsed');
+      if (stored === 'true') {
+        column.classList.add('is-collapsed');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        if (labelEl) labelEl.textContent = labelShow;
+        if (iconOpen) iconOpen.classList.add('hidden');
+        if (iconClosed) iconClosed.classList.remove('hidden');
+        syncGridCollapsed(true);
+      }
+
+      toggleBtn.addEventListener('click', function() {
+        var isCollapsed = column.classList.toggle('is-collapsed');
+        toggleBtn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        if (labelEl) labelEl.textContent = isCollapsed ? labelShow : labelHide;
+        if (iconOpen) iconOpen.classList.toggle('hidden', isCollapsed);
+        if (iconClosed) iconClosed.classList.toggle('hidden', !isCollapsed);
+        syncGridCollapsed(isCollapsed);
+        try { localStorage.setItem('active_admin_filters_collapsed', isCollapsed ? 'true' : 'false'); } catch (e) {}
+      });
+    }
+    document.addEventListener('DOMContentLoaded', initFiltersSidebarToggle);
+    document.addEventListener('turbo:load', initFiltersSidebarToggle);
+    document.addEventListener('turbo:render', initFiltersSidebarToggle);
+
+    // Fix aria-hidden accessibility issue: remove aria-hidden from elements containing focusable buttons
+    function fixAriaHiddenAccessibility() {
+      document.querySelectorAll('[aria-hidden="true"]').forEach(function(element) {
+        // Check if element contains focusable elements (buttons, links, inputs, etc.)
+        const focusableElements = element.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusableElements.length > 0) {
+          // Remove aria-hidden if it contains focusable elements
+          element.removeAttribute('aria-hidden');
+        }
+      });
+    }
+
+    // Run accessibility fix on page load
+    document.addEventListener('DOMContentLoaded', fixAriaHiddenAccessibility);
+    document.addEventListener('turbo:load', fixAriaHiddenAccessibility);
+    document.addEventListener('turbo:render', fixAriaHiddenAccessibility);
+
+    // Observe dark class changes on html element
+    if (typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'class') {
+            updateChartDefaults();
+            // Reload charts if they exist
+            if (typeof Chartkick !== 'undefined') {
+              Chartkick.eachChart(function(chart) {
+                chart.redraw();
+              });
+            }
+          }
+        });
+      });
+
+      observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+  </script>
+  <%# Analytics Scripts %>
+  <%= render "shared/analytics" %>
+  <%# Script de validation pour les items (delivery_category) %>
+  <% if controller_name == "items" %>
+    <script>
+      // Validation pour les items dans Active Admin
+      // S'assure que delivery_category est sélectionnée avant d'approuver un produit
+      document.addEventListener('DOMContentLoaded', function() {
+        const validationStatusSelect = document.querySelector('.validation-status-select');
+        const deliveryCategorySelect = document.querySelector('.delivery-category-select');
+        const form = validationStatusSelect?.closest('form');
+
+        if (!validationStatusSelect || !deliveryCategorySelect || !form) {
+          return; // Pas sur la page d'édition/création d'item
+        }
+
+        // Fonction pour vérifier et afficher l'erreur
+        function validateDeliveryCategory() {
+          const validationStatus = validationStatusSelect.value;
+          const deliveryCategory = deliveryCategorySelect.value;
+
+          // Supprimer les messages d'erreur existants
+          const existingError = form.querySelector('.delivery-category-error');
+          if (existingError) {
+            existingError.remove();
+          }
+
+          // Supprimer les classes d'erreur
+          deliveryCategorySelect.classList.remove('error');
+          validationStatusSelect.classList.remove('error');
+
+          // Si on essaie d'approuver sans catégorie de livraison
+          if (validationStatus === 'approved' && !deliveryCategory) {
+            // Ajouter la classe d'erreur
+            deliveryCategorySelect.classList.add('error');
+            validationStatusSelect.classList.add('error');
+
+            // Créer le message d'erreur
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'delivery-category-error';
+            errorDiv.style.cssText = 'color: #dc2626; font-size: 14px; margin-top: 8px; padding: 8px; background: #fee2e2; border-radius: 4px; border-left: 4px solid #dc2626;';
+            errorDiv.innerHTML = '⚠️ <strong>Erreur:</strong> Vous devez sélectionner une catégorie de livraison pour approuver ce produit.';
+
+            // Insérer après le champ delivery_category
+            const deliveryCategoryField = deliveryCategorySelect.closest('.input');
+            if (deliveryCategoryField) {
+              deliveryCategoryField.appendChild(errorDiv);
+            } else {
+              deliveryCategorySelect.parentElement.appendChild(errorDiv);
+            }
+
+            return false;
+          }
+
+          return true;
+        }
+
+        // Écouter les changements
+        validationStatusSelect.addEventListener('change', validateDeliveryCategory);
+        deliveryCategorySelect.addEventListener('change', function() {
+          // Si on sélectionne une catégorie et que le statut est "approved", valider
+          if (validationStatusSelect.value === 'approved') {
+            validateDeliveryCategory();
+          }
+        });
+
+        // Valider avant la soumission du formulaire
+        form.addEventListener('submit', function(e) {
+          if (!validateDeliveryCategory()) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Scroll vers l'erreur
+            deliveryCategorySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            deliveryCategorySelect.focus();
+
+            return false;
+          }
+        });
+
+        // Valider au chargement si le statut est déjà "approved"
+        if (validationStatusSelect.value === 'approved') {
+          validateDeliveryCategory();
+        }
+      });
+    </script>
+  <% end %>
+  <%= Sentry.get_trace_propagation_meta.html_safe %>
+</head>
+<body class="bg-white dark:bg-gray-950/95 text-gray-950 dark:text-gray-100 antialiased">
+  <%= render "active_admin/site_header", title: site_title %>
+  <div class="xl:ms-60 pt-16">
+    <%= render "active_admin/main_navigation" %>
+    <%= render "active_admin/page_header", title: @page_title || page_title %>
+    <%= render "active_admin/flash_messages" %>
+    <div data-test-page-content class="px-4 lg:px-6 flex flex-col gap-6">
+      <%= render "active_admin/sidebar" %>
+      <div class="min-w-0 w-full">
+        <%= yield %>
+      </div>
+    </div>
+    <%= render "active_admin/site_footer" %>
+  </div>
+</body>
+</html>

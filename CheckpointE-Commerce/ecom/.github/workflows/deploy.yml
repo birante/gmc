@@ -1,0 +1,202 @@
+# name: Deploy
+
+# on:
+#   workflow_run:
+#     workflows: [ "CI" ]
+#     types: [ completed ]
+
+# permissions:
+#   contents: read
+
+# concurrency:
+#   group: deploy-${{ github.ref }}
+#   cancel-in-progress: true
+
+# env:
+#   # Ensure Kamal can access these secrets at runtime
+#   RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+#   SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+#   KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+#   POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+#   ANALYTICS_ENABLED: ${{ secrets.ANALYTICS_ENABLED }}
+#   AHOY_ENABLED: ${{ secrets.AHOY_ENABLED }}
+#   AMPLITUDE_ENABLED: ${{ secrets.AMPLITUDE_ENABLED }}
+#   GA_ENABLED: ${{ secrets.GA_ENABLED }}
+#   # PayDunya configuration (all as secrets)
+#   PAYDUNYA_MASTER_KEY: ${{ secrets.PAYDUNYA_MASTER_KEY }}
+#   PAYDUNYA_PRIVATE_KEY: ${{ secrets.PAYDUNYA_PRIVATE_KEY }}
+#   PAYDUNYA_TOKEN: ${{ secrets.PAYDUNYA_TOKEN }}
+#   PAYDUNYA_PUBLIC_KEY: ${{ secrets.PAYDUNYA_PUBLIC_KEY }}
+#   PAYDUNYA_MODE: ${{ secrets.PAYDUNYA_MODE }}
+#   PAYDUNYA_STORE_NAME: ${{ secrets.PAYDUNYA_STORE_NAME }}
+#   PAYDUNYA_STORE_TAGLINE: ${{ secrets.PAYDUNYA_STORE_TAGLINE }}
+#   PAYDUNYA_STORE_PHONE: ${{ secrets.PAYDUNYA_STORE_PHONE }}
+#   PAYDUNYA_STORE_ADDRESS: ${{ secrets.PAYDUNYA_STORE_ADDRESS }}
+#   PAYDUNYA_STORE_URL: ${{ secrets.PAYDUNYA_STORE_URL }}
+#   PAYDUNYA_STORE_LOGO: ${{ secrets.PAYDUNYA_STORE_LOGO }}
+#   # Lam API configuration (all as secrets)
+#   LAM_API_URL: ${{ secrets.LAM_API_URL }}
+#   LAM_SENDER: ${{ secrets.LAM_SENDER }}
+#   LAM_ACCOUNT_ID: ${{ secrets.LAM_ACCOUNT_ID }}
+#   LAM_PASSWORD: ${{ secrets.LAM_PASSWORD }}
+#   LAM_RET_ID: ${{ secrets.LAM_RET_ID }}
+#   LAM_RET_URL: ${{ secrets.LAM_RET_URL }}
+#   # WhatsApp configuration (all as secrets)
+#   SEND_WHATSAPP_ENABLED: ${{ secrets.SEND_WHATSAPP_ENABLED }}
+#   WHATSAPP_PROVIDER: ${{ secrets.WHATSAPP_PROVIDER }}
+#   WHATSAPP_API_URL: ${{ secrets.WHATSAPP_API_URL }}
+#   WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+#   WHATSAPP_BUSINESS_ACCOUNT_ID: ${{ secrets.WHATSAPP_BUSINESS_ACCOUNT_ID }}
+#   WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+#   WHATSAPP_VERIFY_TOKEN: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
+
+# jobs:
+#   deploy:
+#     name: Deploy with Kamal
+#     runs-on: ubuntu-latest
+#     # Only deploy after CI succeeds on main in the main repo
+#     if: >-
+#       github.event.workflow_run.conclusion == 'success' &&
+#       github.event.workflow_run.head_branch == 'main' &&
+#       github.event.workflow_run.head_repository.full_name == github.repository
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Set up Ruby
+#         uses: ruby/setup-ruby@v1
+#         with:
+#           ruby-version: .ruby-version
+#           bundler: 2.7.2
+#           bundler-cache: true
+
+#       - name: Install Kamal
+#         run: |
+#           gem install kamal --no-document
+
+#       - name: Log in to GitHub Container Registry
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ghcr.io
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
+
+#       - name: Preflight secrets check
+#         env:
+#           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+#           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+#           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+#           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#           ANALYTICS_ENABLED: ${{ secrets.ANALYTICS_ENABLED }}
+#           AHOY_ENABLED: ${{ secrets.AHOY_ENABLED }}
+#           AMPLITUDE_ENABLED: ${{ secrets.AMPLITUDE_ENABLED }}
+#           GA_ENABLED: ${{ secrets.GA_ENABLED }}
+#           PAYDUNYA_MASTER_KEY: ${{ secrets.PAYDUNYA_MASTER_KEY }}
+#           PAYDUNYA_PRIVATE_KEY: ${{ secrets.PAYDUNYA_PRIVATE_KEY }}
+#           PAYDUNYA_TOKEN: ${{ secrets.PAYDUNYA_TOKEN }}
+#           PAYDUNYA_PUBLIC_KEY: ${{ secrets.PAYDUNYA_PUBLIC_KEY }}
+#           PAYDUNYA_MODE: ${{ secrets.PAYDUNYA_MODE }}
+#           PAYDUNYA_STORE_NAME: ${{ secrets.PAYDUNYA_STORE_NAME }}
+#           PAYDUNYA_STORE_TAGLINE: ${{ secrets.PAYDUNYA_STORE_TAGLINE }}
+#           PAYDUNYA_STORE_PHONE: ${{ secrets.PAYDUNYA_STORE_PHONE }}
+#           PAYDUNYA_STORE_ADDRESS: ${{ secrets.PAYDUNYA_STORE_ADDRESS }}
+#           PAYDUNYA_STORE_URL: ${{ secrets.PAYDUNYA_STORE_URL }}
+#           PAYDUNYA_STORE_LOGO: ${{ secrets.PAYDUNYA_STORE_LOGO }}
+#           # Lam API configuration (all as secrets)
+#           LAM_API_URL: ${{ secrets.LAM_API_URL }}
+#           LAM_SENDER: ${{ secrets.LAM_SENDER }}
+#           LAM_ACCOUNT_ID: ${{ secrets.LAM_ACCOUNT_ID }}
+#           LAM_PASSWORD: ${{ secrets.LAM_PASSWORD }}
+#           LAM_RET_ID: ${{ secrets.LAM_RET_ID }}
+#           LAM_RET_URL: ${{ secrets.LAM_RET_URL }}
+#           # WhatsApp configuration (all as secrets)
+#           SEND_WHATSAPP_ENABLED: ${{ secrets.SEND_WHATSAPP_ENABLED }}
+#           WHATSAPP_PROVIDER: ${{ secrets.WHATSAPP_PROVIDER }}
+#           WHATSAPP_API_URL: ${{ secrets.WHATSAPP_API_URL }}
+#           WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+#           WHATSAPP_BUSINESS_ACCOUNT_ID: ${{ secrets.WHATSAPP_BUSINESS_ACCOUNT_ID }}
+#           WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+#           WHATSAPP_VERIFY_TOKEN: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
+#         run: |
+#           set -euo pipefail
+#           for key in RAILS_MASTER_KEY KAMAL_REGISTRY_PASSWORD POSTGRES_PASSWORD SSH_PRIVATE_KEY DOCKERHUB_USERNAME; do
+#             if [ -z "${!key:-}" ]; then
+#               echo "Missing required secret: $key" >&2
+#               exit 1
+#             fi
+#           done
+#           # PayDunya secrets are optional but recommended
+#           for key in PAYDUNYA_MASTER_KEY PAYDUNYA_PRIVATE_KEY PAYDUNYA_TOKEN PAYDUNYA_PUBLIC_KEY PAYDUNYA_MODE PAYDUNYA_STORE_NAME PAYDUNYA_STORE_URL; do
+#             if [ -z "${!key:-}" ]; then
+#               echo "Warning: Missing PayDunya secret: $key (PayDunya integration may not work)" >&2
+#             fi
+#           done
+
+#       - name: Set up SSH for Kamal
+#         run: |
+#           install -m 700 -d ~/.ssh
+#           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+#           chmod 600 ~/.ssh/id_ed25519
+#           # Remove any existing host key to avoid mismatches and add fresh keys
+#           ssh-keygen -R 157.245.162.216 || true
+#           ssh-keyscan -T 15 -t rsa,ecdsa,ed25519 157.245.162.216 >> ~/.ssh/known_hosts
+#           # Relax host key checking in CI to prevent deploy failures on key rotation
+#           {
+#             echo "Host 157.245.162.216";
+#             echo "  StrictHostKeyChecking no";
+#             echo "  UserKnownHostsFile=/dev/null";
+#           } >> ~/.ssh/config
+
+#       - name: Deploy with Kamal
+#         env:
+#           # Kamal relies on these environment variables
+#           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+#           SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+#           KAMAL_REGISTRY_PASSWORD: ${{ secrets.KAMAL_REGISTRY_PASSWORD }}
+#           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+#           # PayDunya configuration (all as secrets)
+#           PAYDUNYA_MASTER_KEY: ${{ secrets.PAYDUNYA_MASTER_KEY }}
+#           PAYDUNYA_PRIVATE_KEY: ${{ secrets.PAYDUNYA_PRIVATE_KEY }}
+#           PAYDUNYA_TOKEN: ${{ secrets.PAYDUNYA_TOKEN }}
+#           PAYDUNYA_PUBLIC_KEY: ${{ secrets.PAYDUNYA_PUBLIC_KEY }}
+#           PAYDUNYA_MODE: ${{ secrets.PAYDUNYA_MODE }}
+#           PAYDUNYA_STORE_NAME: ${{ secrets.PAYDUNYA_STORE_NAME }}
+#           PAYDUNYA_STORE_TAGLINE: ${{ secrets.PAYDUNYA_STORE_TAGLINE }}
+#           PAYDUNYA_STORE_PHONE: ${{ secrets.PAYDUNYA_STORE_PHONE }}
+#           PAYDUNYA_STORE_ADDRESS: ${{ secrets.PAYDUNYA_STORE_ADDRESS }}
+#           PAYDUNYA_STORE_URL: ${{ secrets.PAYDUNYA_STORE_URL }}
+#           PAYDUNYA_STORE_LOGO: ${{ secrets.PAYDUNYA_STORE_LOGO }}
+#           # Lam API configuration (all as secrets)
+#           LAM_API_URL: ${{ secrets.LAM_API_URL }}
+#           LAM_SENDER: ${{ secrets.LAM_SENDER }}
+#           LAM_ACCOUNT_ID: ${{ secrets.LAM_ACCOUNT_ID }}
+#           LAM_PASSWORD: ${{ secrets.LAM_PASSWORD }}
+#           LAM_RET_ID: ${{ secrets.LAM_RET_ID }}
+#           LAM_RET_URL: ${{ secrets.LAM_RET_URL }}
+#           # WhatsApp configuration (all as secrets)
+#           SEND_WHATSAPP_ENABLED: ${{ secrets.SEND_WHATSAPP_ENABLED }}
+#           WHATSAPP_PROVIDER: ${{ secrets.WHATSAPP_PROVIDER }}
+#           WHATSAPP_API_URL: ${{ secrets.WHATSAPP_API_URL }}
+#           WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+#           WHATSAPP_BUSINESS_ACCOUNT_ID: ${{ secrets.WHATSAPP_BUSINESS_ACCOUNT_ID }}
+#           WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+#           WHATSAPP_VERIFY_TOKEN: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
+#         run: |
+#           echo "Releasing any stale Kamal lock..."
+#           bin/kamal lock release || true
+    
+#           # Check if this is the first deployment by trying to get app info
+#           if bin/kamal app details 2>/dev/null; then
+#             echo "App exists, ensuring Postgres accessory is running..."
+#             bin/kamal accessory start postgres || true
+#             echo "Deploying app..."
+#             bin/kamal deploy
+#           else
+#             echo "App doesn't exist, running setup and booting Postgres accessory..."
+#             bin/kamal setup
+#             bin/kamal accessory boot postgres || bin/kamal accessory start postgres || true
+#           fi
+
+

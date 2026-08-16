@@ -1,0 +1,48 @@
+<div class="bg-white rounded-lg shadow p-6 mb-8">
+  <%= form_with url: path, method: :get, local: true, class: "space-y-4" do |f| %>
+    <!-- Période affichée -->
+    <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <h2 class="text-lg font-semibold text-gray-900">Période</h2>
+      </div>
+      <span class="text-sm text-gray-600">
+        <%= start_date.strftime('%d/%m/%Y') %> - <%= end_date.strftime('%d/%m/%Y') %>
+      </span>
+    </div>
+
+    <!-- Filtres -->
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px]">
+        <%= label_tag :start_date, "Date de début", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= date_field_tag :start_date, start_date, 
+            class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-transparent" %>
+      </div>
+
+      <div class="flex-1 min-w-[200px]">
+        <%= label_tag :end_date, "Date de fin", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= date_field_tag :end_date, end_date, 
+            class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-transparent" %>
+      </div>
+
+      <div class="flex gap-2">
+        <%= submit_tag "Filtrer", 
+            class: "px-6 py-2 bg-[#551694] hover:bg-[#451384] text-white font-semibold rounded-lg shadow-sm hover:shadow-md transition" %>
+      </div>
+    </div>
+
+    <!-- Raccourcis -->
+    <div class="flex flex-wrap gap-2 pt-3 border-t border-gray-200">
+      <span class="text-xs font-medium text-gray-500 mr-2 py-2">Raccourcis:</span>
+      <% permitted_params = params.permit(:shop_id, :locale, :tab, :page) %>
+      <%= link_to "Aujourd'hui", url_for(permitted_params.merge(start_date: Date.today, end_date: Date.today)), 
+          class: "px-3 py-1.5 text-xs font-medium bg-[#551694]/10 hover:bg-[#551694]/20 text-[#551694] rounded-md border border-[#551694]/30 transition" %>
+      <%= link_to "7 derniers jours", url_for(permitted_params.merge(start_date: 7.days.ago.to_date, end_date: Date.today)), 
+          class: "px-3 py-1.5 text-xs font-medium bg-[#551694]/10 hover:bg-[#551694]/20 text-[#551694] rounded-md border border-[#551694]/30 transition" %>
+      <%= link_to "30 derniers jours", url_for(permitted_params.merge(start_date: 30.days.ago.to_date, end_date: Date.today)), 
+          class: "px-3 py-1.5 text-xs font-medium bg-[#551694]/10 hover:bg-[#551694]/20 text-[#551694] rounded-md border border-[#551694]/30 transition" %>
+      <%= link_to "Ce mois", url_for(permitted_params.merge(start_date: Date.today.beginning_of_month, end_date: Date.today)), 
+          class: "px-3 py-1.5 text-xs font-medium bg-[#551694]/10 hover:bg-[#551694]/20 text-[#551694] rounded-md border border-[#551694]/30 transition" %>
+    </div>
+  <% end %>
+</div>
+

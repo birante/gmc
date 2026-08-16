@@ -1,0 +1,113 @@
+<%# Shop Spotlight - Section mise en avant d'une boutique officielle %>
+<%
+  # Récupérer le spotlight (configuration de la section)
+  spotlight = local_assigns[:spotlight]
+  shop = spotlight&.shop
+  items = spotlight&.items || []
+%>
+
+<% if spotlight.present? && shop.present? && items.any? %>
+
+<!-- Shop Spotlight Section -->
+<section class="bg-gray-50 py-6 md:py-8 lg:py-10" aria-labelledby="shop-spotlight-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    
+    <!-- En-tête de section -->
+    <div class="mb-6">
+      <h2 id="shop-spotlight-heading" class="text-2xl md:text-3xl font-bold text-gray-900">
+        <%= spotlight.promo_title.presence || "#{shop.name} | #{spotlight.promo_subtitle.presence || 'Offres spéciales'}" %>
+      </h2>
+    </div>
+    
+    <!-- Contenu principal -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-0">
+        
+        <!-- Panneau gauche : Info boutique + Image promo -->
+        <div class="bg-gray-100 p-4 sm:p-6 lg:p-8">
+          <!-- Logo + Rating + Lien boutique -->
+          <div class="flex items-start gap-4 mb-4">
+            <% if shop.logo.attached? %>
+              <div class="flex-shrink-0 w-20 h-20 bg-white rounded-lg p-2 shadow-sm flex items-center justify-center">
+                <%= image_tag shop.logo.variant(resize_to_limit: [80, 80]), 
+                    alt: shop.name, 
+                    class: "w-full h-full object-contain" %>
+              </div>
+            <% end %>
+            
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <h3 class="text-xl font-bold text-gray-900"><%= shop.name %></h3>
+              </div>
+              
+              <p class="text-sm text-gray-600 mb-2"><%= shop.sectors.first&.name || "Électroménager" %></p>
+              
+              <%= link_to "Visiter la boutique", 
+                  shop_path(shop), 
+                  class: "text-purple-600 hover:text-purple-800 text-sm font-semibold inline-flex items-center",
+                  target: "_blank" %>
+            </div>
+          </div>
+          
+          <!-- Slogan -->
+          <% if spotlight.slogan.present? %>
+            <p class="text-gray-700 text-sm mb-6 leading-relaxed">
+              <%= spotlight.slogan %>
+            </p>
+          <% end %>
+          
+          <!-- Image promotionnelle -->
+          <% if spotlight.promo_image.attached? %>
+            <div class="rounded-lg overflow-hidden shadow-md">
+              <%= image_tag spotlight.promo_image.variant(resize_to_limit: [400, 500]), 
+                  alt: "#{shop.name} - #{spotlight.promo_title}", 
+                  class: "w-full h-auto object-cover",
+                  loading: "lazy" %>
+            </div>
+          <% end %>
+        </div>
+        
+        <!-- Panneau droit : Grille de produits avec carousel -->
+        <div class="p-4 sm:p-6 lg:p-8">
+          <!-- Carousel de produits -->
+          <div class="relative" data-controller="horizontal-scroll">
+              <div data-horizontal-scroll-target="scrollable" 
+                class="flex gap-4 overflow-x-auto pb-2 px-2 md:px-8 scrollbar-hide" 
+                 style="scrollbar-width: none; -ms-overflow-style: none;">
+              <% items.each do |item| %>
+                <div class="flex-shrink-0 w-[240px]">
+                  <%= render "shared/product_card", item: item, show_discount_badge: true %>
+                </div>
+              <% end %>
+            </div>
+            
+            <!-- Navigation Buttons (desktop only) -->
+            <button type="button"
+                    data-horizontal-scroll-target="leftButton"
+                    data-action="click->horizontal-scroll#scrollLeft"
+                    aria-label="Défiler vers la gauche"
+                    class="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            <button type="button"
+                    data-horizontal-scroll-target="rightButton"
+                    data-action="click->horizontal-scroll#scrollRight"
+                    aria-label="Défiler vers la droite"
+                    class="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>
+</section>
+  <% else %>
+    <% Rails.logger.debug "ShopSpotlight: Aucun contenu affichable" %>
+  <% end %>

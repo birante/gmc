@@ -1,0 +1,30 @@
+en:
+  client:
+    carts:
+      show:
+        title: "My Cart"
+        item_count:
+          one: "%{count} item"
+          other: "%{count} items"
+        continue_shopping: "Continue shopping"
+        summary: "Order Summary"
+        subtotal: "Subtotal"
+        delivery: "Delivery"
+        to_calculate: "Calculated at checkout"
+        total: "Total"
+        place_order: "Place order"
+        login_to_checkout: "Sign in or create an account to place your order."
+        login: "Sign in"
+        signup: "Create account"
+        clear_cart: "Empty cart"
+        clear_cart_confirm: "Are you sure you want to empty your cart?"
+        empty_cart_title: "Your cart is empty"
+        empty_cart_message: "Start shopping now!"
+        view_catalog: "Browse catalog"
+        remove_item: "Remove"
+        remove_item_confirm: "Are you sure you want to remove this item?"
+        unit_price: "Unit price"
+        quantity: "Qty"
+        item_total: "Total"
+        product: "Product"
+

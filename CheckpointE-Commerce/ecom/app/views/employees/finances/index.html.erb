@@ -1,0 +1,211 @@
+<% content_for :active_tab, 'finances' %>
+<!-- Container principal -->
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <% if @vendor %>
+      <!-- En-tête -->
+      <div class="mb-6">
+        <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+          Finances
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          Gérez votre solde et consultez vos transactions
+        </p>
+      </div>
+      <!-- Cartes de résumé -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
+        <!-- Solde total -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Solde disponible</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900">
+                <%= number_with_delimiter(@total_balance, delimiter: ' ') %> FCFA
+              </p>
+            </div>
+            <div class="h-12 w-12 rounded-full bg-[#551694]/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <!-- En attente de reversement -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">En attente</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900">
+                <%= number_with_delimiter(@pending_payout_amount, delimiter: ' ') %> FCFA
+              </p>
+            </div>
+            <div class="h-12 w-12 rounded-full bg-[#551694]/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <!-- Nombre de boutiques -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Boutiques</p>
+              <p class="text-2xl md:text-3xl font-bold text-gray-900">
+                <%= @shops.count %>
+              </p>
+            </div>
+            <div class="h-12 w-12 rounded-full bg-[#551694]/10 flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Navigation secondaire -->
+      <div class="mb-6 overflow-x-auto">
+        <nav class="flex space-x-4 border-b border-gray-200 min-w-max">
+          <%= link_to "Transactions", url_with_shop(transactions_employees_finances_path, @current_shop),
+              class: "px-4 py-2 text-sm font-medium text-gray-700 hover:text-[#551694] border-b-2 border-transparent hover:border-[#551694]" %>
+          <%= link_to "Reversements", url_with_shop(payouts_employees_finances_path, @current_shop),
+              class: "px-4 py-2 text-sm font-medium text-gray-700 hover:text-[#551694] border-b-2 border-transparent hover:border-[#551694]" %>
+        </nav>
+      </div>
+      <!-- Transactions récentes -->
+      <div class="bg-white rounded-lg shadow mb-6">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Transactions récentes</h2>
+            <%= link_to "Voir tout", url_with_shop(transactions_employees_finances_path, @current_shop),
+                class: "inline-flex items-center px-2 py-1.5 -my-1.5 rounded text-sm font-medium text-[#551694] hover:text-[#451384] hover:bg-[#551694]/5" %>
+          </div>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <% if @recent_transactions.any? %>
+            <% @recent_transactions.each do |transaction| %>
+              <div class="px-4 sm:px-6 py-4 hover:bg-gray-50">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                      <div class="h-10 w-10 rounded-full <%= transaction.transaction_type == 'credit' ? 'bg-[#551694]/10' : 'bg-red-100' %> flex items-center justify-center">
+                        <% if transaction.transaction_type == 'credit' %>
+                          <svg class="w-5 h-5 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                          </svg>
+                        <% else %>
+                          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                          </svg>
+                        <% end %>
+                      </div>
+                      <div>
+                        <p class="font-medium text-gray-900"><%= transaction.description %></p>
+                        <p class="text-sm text-gray-500">
+                          <%= transaction.created_at.strftime("%d/%m/%Y à %H:%M") %>
+                          <% if transaction.order %>
+                            - Commande #<%= transaction.order.id %>
+                          <% end %>
+                        </p>
+                        <% if transaction.transaction_type == 'credit' && transaction.metadata&.dig('order_item_id') %>
+                          <% 
+                            oi = OrderItem.find_by(id: transaction.metadata["order_item_id"])
+                            fr = FinanceManager.commission_fraction_for_shop(oi&.shop)
+                            seller_part = 1.0 - fr
+                            item_total = seller_part.positive? ? (transaction.amount.to_f / seller_part) : transaction.amount.to_f
+                            commission_amount = item_total * fr
+                            pct_comm = (fr * 100).round
+                          %>
+                          <p class="text-xs text-gray-400 mt-1">
+                            Montant total: <span class="font-medium"><%= number_with_delimiter(item_total.round, delimiter: ' ') %> FCFA</span>
+                            • Commission aa (<%= pct_comm %>%): <span class="font-medium text-orange-600"><%= number_with_delimiter(commission_amount.round, delimiter: ' ') %> FCFA</span>
+                          </p>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-left sm:text-right">
+                    <p class="font-semibold <%= transaction.transaction_type == 'credit' ? 'text-[#551694]' : 'text-red-600' %>">
+                      <%= transaction.transaction_type == 'credit' ? '+' : '-' %><%= number_with_delimiter(transaction.amount, delimiter: ' ') %> FCFA
+                    </p>
+                    <% if transaction.transaction_type == 'credit' && transaction.metadata&.dig('order_item_id') %>
+                      <% oi = OrderItem.find_by(id: transaction.metadata["order_item_id"]) %>
+                      <% fr = FinanceManager.commission_fraction_for_shop(oi&.shop) %>
+                      <p class="text-xs text-gray-500 mt-1">(Votre part — <%= ((1.0 - fr) * 100).round %>%)</p>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="px-6 py-12 text-center">
+              <p class="text-gray-500">Aucune transaction pour le moment</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <!-- Reversements récents -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Reversements récents</h2>
+            <%= link_to "Voir tout", url_with_shop(payouts_employees_finances_path, @current_shop),
+                class: "inline-flex items-center px-2 py-1.5 -my-1.5 rounded text-sm font-medium text-[#551694] hover:text-[#451384] hover:bg-[#551694]/5" %>
+          </div>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <% if @recent_payouts.any? %>
+            <% @recent_payouts.each do |payout| %>
+              <div class="px-4 sm:px-6 py-4 hover:bg-gray-50">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                      <div class="h-10 w-10 rounded-full bg-[#551694]/10 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="font-medium text-gray-900">
+                          Reversement <%= payout.payout_month %>/<%= payout.payout_year %>
+                        </p>
+                        <p class="text-sm text-gray-500">
+                          <%= payout.created_at.strftime("%d/%m/%Y à %H:%M") %>
+                          - <%= payout.shop.name %>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-left sm:text-right">
+                    <p class="font-semibold text-gray-900">
+                      <%= number_with_delimiter(payout.amount, delimiter: ' ') %> FCFA
+                    </p>
+                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                      <%= case payout.status
+                          when 'paid' then 'bg-green-100 text-green-800'
+                          when 'pending' then 'bg-yellow-100 text-yellow-800'
+                          when 'processing' then 'bg-blue-100 text-blue-800'
+                          when 'failed' then 'bg-red-100 text-red-800'
+                          else 'bg-gray-100 text-gray-800'
+                          end %>">
+                      <%= payout.status.humanize %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="px-6 py-12 text-center">
+              <p class="text-gray-500">Aucun reversement pour le moment</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">Vendeur non trouvé</p>
+      </div>
+    <% end %>
+  </main>
+  <!-- Footer -->
+</div>

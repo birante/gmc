@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Votre commande est en cours de traitement</h1>
+    <p>Bonjour <%= @user.first_name %>,</p>
+    <p>Votre commande <strong>#{@order.order_number}</strong> est maintenant en cours de traitement par nos équipes.</p>
+    <p>Nous vous tiendrons informé de l'avancement de votre commande.</p>
+    <p>Merci pour votre confiance !</p>
+  </body>
+</html>
+

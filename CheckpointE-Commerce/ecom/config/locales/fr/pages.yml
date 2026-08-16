@@ -1,0 +1,119 @@
+fr:
+  pages:
+    editorial_nav: "Navigation éditoriale"
+    coming_soon:
+      page_title: "Cette page arrive bientôt | aa"
+      meta_description: "Cette section de aa 2.0 est encore en cours de finalisation. Revenez très bientôt."
+      title: "Cette page arrive bientôt."
+      lead_line_1: "Vous explorez aa 2.0 en avant-première."
+      lead_line_2: "Certaines sections sont encore en cours de finalisation."
+      thanks: "Merci de faire partie des premiers utilisateurs."
+      back_home: "Retour à l'accueil"
+      explore_products: "Explorer les produits"
+    about:
+      nav_label: "À Propos"
+      meta:
+        title: "À propos de aa | Marketplace e-commerce du Sénégal"
+        description: "aa simplifie le e-commerce au Sénégal. Découvrez notre mission, notre histoire et nos valeurs."
+      hero:
+        title_part_1: "Acheter en ligne en"
+        highlight_1: "toute"
+        title_part_2: "confiance."
+        title_part_3: "Vendre en ligne"
+        highlight_2: "sans complexité."
+        subtitle: "aa est la marketplace pensée pour les acheteurs et vendeurs au Sénégal. Une plateforme simple, sécurisée et locale."
+        cta_buy: "Explorer les produits"
+        cta_sell: "Devenir vendeur"
+      intro:
+        tag: "Notre raison d'être"
+        title: "À propos de"
+        body_1: "aa est une marketplace 100 %% sénégalaise qui réunit des milliers de boutiques locales et officielles. Notre ambition est de rendre le e-commerce accessible à tous, partout au Sénégal."
+        body_2: "De la mise en ligne d'un produit jusqu'à la livraison du dernier kilomètre, nous simplifions chaque étape pour que vendeurs et acheteurs puissent se concentrer sur l'essentiel."
+      mission:
+        tag: "Notre mission"
+        body: "Parce que vendre en ligne au Sénégal ne devrait pas être compliqué, aa simplifie chaque étape du e-commerce, pour les vendeurs comme pour les acheteurs."
+      stats:
+        shops_value: "+1000"
+        shops_label: "Boutiques actives"
+        products_value: "+50k"
+        products_label: "Produits référencés"
+        cities_value: "14"
+        cities_label: "Régions couvertes"
+        support_value: "24/7"
+        support_label: "Assistance client"
+      history:
+        tag: "Pourquoi aa existe ?"
+        title: "Notre"
+        title_highlight: "Histoire"
+        body_1: "aa est née d'un constat simple : au Sénégal, le commerce est dynamique, mais vendre et acheter en ligne reste compliqué. Entre le manque de visibilité, la gestion des commandes et les difficultés de livraison, beaucoup de vendeurs peinent à développer leur activité, et les acheteurs ne trouvent pas toujours une expérience fiable et simple."
+        body_2: "Grâce à une expérience concrète du terrain, au niveau local et à l'international, aa conçoit une solution plus simple et plus adaptée aux réalités du marché sénégalais."
+      values:
+        tag: "Nos valeurs"
+        title_part_1: "Ce en quoi"
+        title_highlight: "nous croyons"
+        accessibility_title: "Accessibilité"
+        accessibility_body: "Une plateforme simple à utiliser, accessible depuis n'importe quel mobile, dans la langue de chacun."
+        performance_title: "Performance"
+        performance_body: "Des outils efficaces pour vendre vite, livrer mieux, et grandir avec son business."
+        trust_title: "Confiance"
+        trust_body: "Des paiements sécurisés et un service client réactif pour des transactions sereines."
+    contact:
+      nav_label: "Contact"
+      meta:
+        title: "Contact | aa"
+        description: "Une question ? L'équipe aa vous accompagne au quotidien. Contactez-nous par téléphone, mail ou via le formulaire."
+      hero:
+        title_part_1: "Contactez"
+        title_highlight: "nous."
+        subtitle: "Notre équipe vous répond du lundi au samedi, de 9h à 18h."
+      info:
+        title: "Une question ou besoin d'aide ?"
+        subtitle: "Plusieurs canaux pour nous joindre, choisissez celui qui vous arrange."
+        address_label: "Adresse"
+        phone_label: "Numéro de téléphone"
+        email_label: "E-mail"
+        follow_us: "Suivez-nous"
+      form:
+        title: "Envoyez-nous un message"
+        subtitle: "Nous répondons généralement sous 24h."
+        first_name: "Prénom"
+        last_name: "Nom"
+        email: "E-mail"
+        phone: "Téléphone"
+        subject: "Sujet"
+        message: "Message"
+        required_hint: "* Au moins un e-mail ou un téléphone est requis pour que nous puissions vous répondre."
+        submit: "Envoyer"
+      flash:
+        success: "Merci, votre message a bien été envoyé. Nous revenons vers vous rapidement."
+        error: "Veuillez corriger les erreurs ci-dessous."
+      faq:
+        title: "On répond à vos questions"
+        q1: "Comment commander sur aa ?"
+        a1: "Parcourez les produits, ajoutez-les au panier puis passez commande en quelques clics. Vous serez livré directement."
+        q2: "Comment se passe la livraison ?"
+        a2: "Selon votre zone, la livraison se fait sous 24h à 72h en moyenne, partout au Sénégal."
+        q3: "Quels sont les moyens de paiement disponibles ?"
+        a3: "Wave, Orange Money, Free Money, carte bancaire ou paiement à la livraison selon la boutique."
+        q4: "Les vendeurs sont-ils vérifiés ?"
+        a4: "Oui, chaque boutique passe par un processus de vérification avant d'être publiée."
+    blog:
+      nav_label: "Blog"
+      meta:
+        title: "Blog & articles | aa"
+        description: "Conseils, tutos et actualités e-commerce au Sénégal par l'équipe aa."
+      index:
+        title: "Blog et articles"
+        all_tab: "Tous"
+        empty: "Aucun article publié pour le moment. Revenez très bientôt."
+        read_more: "Lire l'article"
+      show:
+        minutes_read: "min de lecture"
+        related_title: "Articles similaires"
+  activerecord:
+    errors:
+      models:
+        contact_message:
+          attributes:
+            base:
+              email_or_phone_required: "Veuillez renseigner un e-mail ou un numéro de téléphone pour que nous puissions vous répondre."

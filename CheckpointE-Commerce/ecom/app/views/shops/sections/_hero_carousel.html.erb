@@ -1,0 +1,65 @@
+<%# Hero Carousel - Produits sélectionnés ou fallback sur les 5 premiers du shop %>
+<% primary_color = local_assigns[:primary_color] || shop_primary_color(shop) %>
+<% secondary_color = local_assigns[:secondary_color] || shop_secondary_color(shop) %>
+<% products = section.shop_page_section_products.active.ordered.map(&:item).compact %>
+<% products = shop.available_items.limit(5).to_a if products.empty? %>
+<% valid_products = products.select { |p| p.default_variant || p.variants.first }.take(5) %>
+
+<% if valid_products.any? %>
+  <section class="relative overflow-hidden bg-gray-900 rounded-2xl shadow-lg mb-4 min-h-[min(70vh,420px)] max-h-[min(85vh,520px)] h-[min(70vh,420px)] sm:h-[380px] md:h-[420px]" aria-label="<%= t('shops.hero_carousel_label', default: 'Produits vedettes') %>">
+    <div class="relative w-full h-full group">
+      <div class="carousel-container relative w-full h-full" data-carousel>
+        <% valid_products.each_with_index do |product, display_index| %>
+          <% variant = product.default_variant || product.variants.first %>
+          <div class="carousel-slide absolute inset-0 transition-opacity duration-1000" data-slide="<%= display_index %>" style="opacity: <%= display_index == 0 ? 1 : 0 %>;">
+            <div class="absolute inset-0">
+              <% if product.images.attached? %>
+                <%= image_tag product.images.first, alt: product.name, class: "w-full h-full max-h-[min(85vh,520px)] object-cover object-center" %>
+              <% else %>
+                <div class="w-full h-full" style="background: linear-gradient(135deg, <%= primary_color %>, <%= secondary_color %>);"></div>
+              <% end %>
+              <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.3) 100%);"></div>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="w-full max-w-7xl mx-auto px-4 lg:px-8 z-10">
+                <div class="max-w-2xl mx-auto text-center">
+                  <div class="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full" style="background-color: <%= primary_color %>CC; color: white;">
+                    <span class="text-sm font-semibold">🌟 Produit vedette</span>
+                  </div>
+                  <h2 class="text-4xl md:text-5xl font-bold text-white mb-3 leading-tight"><%= product.name %></h2>
+                  <p class="text-lg text-white/90 mb-4 leading-relaxed max-w-lg mx-auto"><%= truncate(product.description, length: 150) %></p>
+                  <% currency_symbol = product.currency&.symbol.presence || "F" %>
+                  <div class="flex items-baseline gap-2 mb-5 justify-center">
+                    <span class="text-4xl font-bold text-white"><%= number_to_currency(variant.current_price, unit: currency_symbol, precision: 0, format: "%n %u", separator: ",", delimiter: " ") %></span>
+                    <% if variant.original_price.present? && variant.original_price > variant.current_price %>
+                      <span class="text-xl text-white/60 line-through"><%= number_to_currency(variant.original_price, unit: currency_symbol, precision: 0, format: "%n %u", separator: ",", delimiter: " ") %></span>
+                    <% end %>
+                  </div>
+                  <div class="flex flex-wrap gap-4 justify-center">
+                    <%= link_to "Voir le produit →", item_path(product), class: "px-8 py-4 rounded-lg font-semibold text-white transition-all transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2", style: "background-color: #{primary_color}; box-shadow: 0 10px 30px rgba(0,0,0,0.3);", data: { turbo_frame: "_top" } %>
+                    <%= link_to "Explorer tous les produits", "#products-section", class: "px-8 py-4 rounded-lg font-semibold text-white bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2" %>
+                  </div>
+                  <div class="flex gap-2 mt-6 justify-center">
+                    <% valid_products.each_with_index do |_, i| %>
+                      <button class="carousel-indicator w-3 h-3 rounded-full transition-all duration-300 cursor-pointer" data-slide="<%= i %>" style="background-color: <%= i == 0 ? 'white' : 'rgba(255,255,255,0.5)' %>; width: <%= i == 0 ? '32px' : '12px' %>;" aria-label="Aller à la slide <%= i + 1 %>"></button>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <button type="button" class="carousel-prev absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all backdrop-blur-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2" aria-label="Slide précédente">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button type="button" class="carousel-next absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 bg-white/30 hover:bg-white/50 text-white rounded-full p-3 transition-all backdrop-blur-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2" aria-label="Slide suivante">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <div class="absolute bottom-0 left-0 h-1 bg-white/20" style="width: 100%;">
+          <div class="h-full" style="background: linear-gradient(to right, <%= primary_color %>, <%= secondary_color %>); width: 0%; animation: progress 8s linear infinite;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <%= render "shops/carousel_script" %>
+<% end %>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Un article de votre commande a été retourné</h1>
+    <p>Bonjour <%= @user.first_name %>,</p>
+    <p>Nous vous informons qu'un article de votre commande <strong>#{@order.order_number}</strong> a été retourné :</p>
+    <ul>
+      <li><strong><%= @order_item.item.name %></strong></li>
+      <% if @order_item.item_variant %>
+        <li>Variante : <%= @order_item.item_variant.display_name %></li>
+      <% end %>
+      <li>Quantité : <%= @order_item.quantity %></li>
+    </ul>
+    <p>Si vous avez des questions concernant ce retour, n'hésitez pas à contacter notre service client.</p>
+    <p>Merci pour votre compréhension.</p>
+  </body>
+</html>

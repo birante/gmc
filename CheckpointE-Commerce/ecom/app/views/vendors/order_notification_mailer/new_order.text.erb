@@ -1,0 +1,23 @@
+Nouvelle commande reçue !
+Bonjour <%= @vendor.first_name.presence || @vendor.email %>,
+Vous avez reçu une nouvelle commande pour votre boutique <%= @shop.name %>.
+Détails de la commande :
+- Numéro de commande : #<%= @order.order_number %>
+- Client : <%= @client.first_name %> <%= @client.last_name %>
+- Date : <%= @order.created_at.strftime("%d/%m/%Y à %H:%M") %>
+- Montant total : <%= @order_items.sum(&:total_price) %> <%= @order.currency&.symbol || @order.currency&.code %>
+Articles commandés :
+<% @order_items.each do |item| %>
+  - <%= item.item.name %> (<%= item.quantity %> × <%= item.unit_price %> <%= @order.currency&.symbol || @order.currency&.code %>) = <%= item.total_price %> <%= @order.currency&.symbol || @order.currency&.code %>
+<% end %>
+Adresse de livraison :
+<%= @order.delivery_address %>
+Zone : <%= @order.delivery_zone&.name %>
+Créneau : <%= @order.delivery_slot&.name %>
+<% if @order.notes.present? %>
+  Notes du client :
+  <%= @order.notes %>
+<% end %>
+Voir la commande : <%= url_for([:vendors, @order]) %>
+Merci,
+L'équipe aa

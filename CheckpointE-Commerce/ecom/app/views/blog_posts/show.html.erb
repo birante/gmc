@@ -1,0 +1,87 @@
+<% content_for :title, "#{@post.title} | aa Blog" %>
+<% content_for :meta_description, (@post.excerpt.presence || @post.content.to_plain_text.truncate(160)) %>
+<% if @post.cover_image.attached? %>
+  <% content_for :og_image, url_for(@post.cover_image) %>
+<% end %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "lexxy-content", "data-turbo-track": "reload" %>
+<% end %>
+<% content_for :structured_data do %>
+  <%= combined_json_ld_tag(blog_posting_schema(@post), blog_breadcrumb_schema(@post)) %>
+<% end %>
+<article class="bg-white">
+  <%# ===== HEADER ===== %>
+  <header class="bg-[#F5F3FB] py-10 md:py-14">
+    <div class="container mx-auto px-4 lg:px-[50px]">
+      <nav class="text-xs text-[#6B7280] mb-6 flex items-center gap-2" aria-label="Fil d'Ariane">
+        <%= link_to t("pages.blog.nav_label", default: "Blog"), blog_path, class: "hover:text-[#551694]" %>
+        <% if @post.blog_category %>
+          <span aria-hidden="true">›</span>
+          <%= link_to @post.blog_category.name, blog_category_path(@post.blog_category.slug), class: "hover:text-[#551694]" %>
+        <% end %>
+      </nav>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <%# Image %>
+        <% if @post.cover_image.attached? %>
+          <div class="lg:col-span-7 aspect-[16/10] rounded-2xl overflow-hidden bg-[#EEEAF8]">
+            <%= image_tag @post.cover_image,
+                alt: @post.title,
+                class: "w-full h-full object-cover",
+                loading: "eager" %>
+          </div>
+        <% end %>
+        <%# Méta %>
+        <div class="<%= @post.cover_image.attached? ? 'lg:col-span-5' : 'lg:col-span-12 max-w-4xl' %>">
+          <% if @post.blog_category %>
+            <span class="inline-block bg-[#EEEAF8] text-[#551694] text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
+              <%= @post.blog_category.name %>
+            </span>
+          <% end %>
+          <h1 class="text-3xl md:text-4xl xl:text-5xl font-bold text-[#201A40] leading-tight mb-4">
+            <%= @post.title %>
+          </h1>
+          <% if @post.excerpt.present? %>
+            <p class="text-[#4B5675] text-base md:text-lg leading-7 mb-5">
+              <%= @post.excerpt %>
+            </p>
+          <% end %>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#6B7280]">
+            <% if @post.author_name.present? %>
+              <span class="font-medium text-[#3F4254]"><%= @post.author_name %></span>
+              <span aria-hidden="true">·</span>
+            <% end %>
+            <time>
+              <%= l(@post.published_at || @post.created_at, format: :long) rescue (@post.published_at || @post.created_at).strftime("%-d %B %Y") %>
+            </time>
+            <span aria-hidden="true">·</span>
+            <span><%= @post.reading_time_minutes %> <%= t("pages.blog.show.minutes_read", default: "min de lecture") %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <%# ===== CONTENT ===== %>
+  <section class="py-12 md:py-16">
+    <div class="container mx-auto px-4 lg:px-[50px]">
+      <div class="prose prose-lg max-w-none w-full text-[#3F4254] leading-8">
+        <%= @post.content %>
+      </div>
+    </div>
+  </section>
+  <%# ===== RELATED ===== %>
+  <% if @related_posts.any? %>
+    <section class="bg-[#F5F3FB] py-12 md:py-16">
+      <div class="container mx-auto px-4 lg:px-[50px]">
+        <h2 class="text-2xl md:text-3xl font-bold text-[#201A40] mb-8">
+          <%= t("pages.blog.show.related_title", default: "Articles similaires") %>
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <% @related_posts.each do |related| %>
+            <%= render "blog_posts/card", post: related %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
+</article>

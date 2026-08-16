@@ -1,0 +1,310 @@
+<% page_mode = local_assigns.fetch(:page_mode, false) %>
+
+<div>
+  <!-- Overlay -->
+  <div data-product-sheet-target="overlay" 
+      <% unless page_mode %>data-action="click->product-sheet#close"<% end %>
+  class="<%= page_mode ? 'hidden' : 'hidden fixed inset-0 bg-gray-900/30 z-80 transition-opacity duration-300 backdrop-blur-xs' %>"></div>
+
+  <!-- Sheet Container -->
+  <div data-product-sheet-target="sheet"
+       <% if @categories_json %>data-controller="category-selector"<% end %>
+      class="<%= page_mode ? 'w-full bg-transparent overflow-visible' : 'hidden fixed top-2 right-2 bottom-2 left-2 sm:top-4 sm:right-4 sm:bottom-4 sm:left-auto sm:w-[90vw] md:w-3/4 lg:w-2/3 bg-white rounded-lg shadow-xl z-90 transform translate-x-full transition-transform duration-300 ease-in-out overflow-hidden' %>">
+    <% if @categories_json %>
+      <script type="application/json" data-category-selector-categories>
+        <%= raw json_escape(@categories_json) %>
+      </script>
+    <% end %>
+    
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 sm:p-6 border-b <%= 'bg-white rounded-t-lg' if page_mode %>">
+      <h2 class="text-xl font-bold text-gray-900"><%= t('vendors.items.new.title') %></h2>
+      <% unless page_mode %>
+        <button type="button"
+                data-action="click->product-sheet#close"
+                class="p-2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors cursor-pointer">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      <% end %>
+    </div>
+
+    <!-- Form Content -->
+    <div class="<%= page_mode ? 'p-4 sm:p-6 bg-white rounded-b-lg border border-t-0 border-gray-200' : 'flex-1 overflow-y-auto p-4 sm:p-6' %>">
+      <% if @current_shop && @item %>
+        <%= form_with model: [:vendors, @item], url: url_with_shop(employees_items_path, @current_shop), data: { turbo: true }, class: "space-y-6" do |f| %>
+        <% if @item&.errors&.any? %>
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+            <h3 class="font-bold mb-2"><%= pluralize(@item.errors.count, t('common.errors.one'), t('common.errors.other')) %> :</h3>
+            <ul class="list-disc list-inside">
+              <% @item.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Colonne gauche -->
+          <div class="space-y-6">
+            <!-- Informations générales -->
+            <div class="bg-white border border-gray-200 rounded-lg p-5">
+              <h3 class="text-sm font-semibold text-gray-900 mb-5"><%= t('vendors.items.new.sections.general_info') %></h3>
+              
+              <!-- Titre du produit -->
+              <div class="mb-4">
+                <%= f.label :name, t('vendors.items.new.fields.name'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.text_field :name, 
+                    placeholder: t('vendors.items.new.placeholders.name'),
+                    class: "block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all" %>
+              </div>
+
+              <!-- Catégorie et Sous-catégorie -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div class="relative">
+                  <%= label_tag :product_category_id, t('vendors.items.new.fields.category'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= select_tag :product_category_id,
+                      options_from_collection_for_select(@product_categories || ProductCategory.where(is_active: true), :id, :name, params[:product_category_id]),
+                      {
+                        prompt: t('vendors.items.new.placeholders.select_category'),
+                        class: "block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 pr-10 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all appearance-none cursor-pointer",
+                        data: { category_selector_target: "categorySelect", action: "change->category-selector#updateSubCategories" }
+                      } %>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none top-7">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="relative">
+                  <%= f.label :product_sub_category_id, t('vendors.items.new.fields.sub_category'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= f.collection_select :product_sub_category_id,
+                      [],
+                      :id,
+                      :name,
+                      { prompt: t('vendors.items.new.placeholders.select_sub_category') },
+                      {
+                        class: "block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 pr-10 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all appearance-none cursor-pointer",
+                        data: { 
+                          category_selector_target: "subCategorySelect",
+                          prompt: t('vendors.items.new.placeholders.select_sub_category')
+                        }
+                      } %>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none top-7">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description (optionnel - sera généré par IA si vide) -->
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <%= f.label :description, t('vendors.items.new.fields.description'), class: "block text-sm font-medium text-gray-700" %>
+                  <% if @current_shop&.capabilities&.ai_background_generation_enabled? %>
+                    <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                      </svg>
+                      Généré par IA en arrière-plan si vide
+                    </span>
+                  <% end %>
+                </div>
+                <%= f.text_area :description,
+                    placeholder: @current_shop&.capabilities&.ai_background_generation_enabled? ? "Optionnel - L'IA générera une description optimisée SEO si ce champ est vide" : t('vendors.items.new.placeholders.description'),
+                    rows: 4,
+                    class: "block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all resize-none" %>
+              </div>
+            </div>
+
+            <!-- Prix -->
+            <div class="bg-white border border-gray-200 rounded-lg p-5">
+              <h3 class="text-sm font-semibold text-gray-900 mb-5"><%= t('vendors.items.new.sections.price') %></h3>
+              
+              <!-- Prix du produit -->
+              <div class="mb-4">
+                <%= f.label :price, t('vendors.items.new.fields.price'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <div class="flex gap-0">
+                  <%= f.number_field :price,
+                      step: 0.01,
+                      min: 0,
+                      placeholder: t('vendors.items.new.placeholders.price'),
+                      class: "flex-1 block bg-[#F9F9F9] rounded-l-md border border-[#E9E9E9] border-r-0 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all" %>
+                  <div class="relative">
+                    <%= f.collection_select :currency_id,
+                        (@currencies || Currency.active),
+                        :id,
+                        :symbol,
+                        { selected: Currency.default_currency&.id },
+                        {
+                          class: "bg-gray-100 border border-[#E9E9E9] border-l-0 rounded-r-md px-4 py-2.5 pr-8 text-base font-medium text-gray-700 focus:outline-none cursor-pointer appearance-none min-w-[80px]"
+                        } %>
+                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Promotion (optionnelle) -->
+              <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg" data-controller="promo-toggle">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center">
+                    <%= f.check_box :is_on_sale, 
+                        class: "w-4 h-4 text-[#551694] border-gray-300 rounded focus:ring-[#551694]", 
+                        id: "item_is_on_sale_new",
+                        data: { 
+                          action: "change->promo-toggle#toggle"
+                        } %>
+                    <%= f.label :is_on_sale, "Mettre en promotion", class: "ml-2 text-sm font-medium text-gray-700 cursor-pointer", for: "item_is_on_sale_new" %>
+                  </div>
+                </div>
+                
+                <div data-promo-toggle-target="fields" class="<%= 'hidden' unless @item&.is_on_sale? %> space-y-3 mt-3">
+                  <div>
+                    <%= f.label :sale_discount_percent, "Réduction (%)", class: "block text-xs font-medium text-gray-700 mb-1" %>
+                    <%= f.number_field :sale_discount_percent, step: 1, min: 0, max: 100, placeholder: "Ex: 20", class: "w-full px-3 py-2 text-sm bg-white rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20" %>
+                  </div>
+                  <p class="text-xs text-gray-500">💡 Vous pourrez ajuster les prix promo par variante après la création</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gestion des variantes -->
+            <%= render 'variant_builder', f: f %>
+          </div>
+
+          <!-- Colonne droite -->
+          <div class="space-y-6">
+            <!-- Photos du produit -->
+            <div class="bg-white border border-gray-200 rounded-lg p-5" data-controller="image-preview">
+              <h3 class="text-sm font-semibold text-gray-900 mb-5"><%= t('vendors.items.new.sections.photos') %></h3>
+              
+              <!-- Image principale -->
+              <div class="mb-4">
+                <label class="block text-xs font-medium text-gray-700 mb-2">Image principale</label>
+                <div class="relative">
+                  <div id="main-image-preview" class="hidden mb-2">
+                    <img id="main-image-preview-img" src="" alt="Preview" class="w-full h-32 object-cover rounded-lg border border-gray-200">
+                  </div>
+                  <%= f.file_field :main_image, 
+                      accept: "image/*", 
+                      class: "hidden",
+                      id: "main-image-input",
+                      data: { action: "change->image-preview#previewMain" } %>
+                  <label for="main-image-input" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <svg class="w-8 h-8 mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span class="text-xs text-gray-500">Cliquez pour ajouter</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Images supplémentaires -->
+              <div>
+                <label class="block text-xs font-medium text-gray-700 mb-2">Images supplémentaires (optionnel)</label>
+                <div class="relative">
+                  <div id="additional-images-preview" class="grid grid-cols-3 gap-2 mb-2"></div>
+                  <%= f.file_field :images, 
+                      multiple: true,
+                      accept: "image/*", 
+                      class: "hidden",
+                      id: "additional-images-input",
+                      data: { action: "change->image-preview#previewAdditional" } %>
+                  <label for="additional-images-input" class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                    <svg class="w-6 h-6 mb-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span class="text-xs text-gray-500">Ajouter plusieurs images</span>
+                  </label>
+                </div>
+                <p class="mt-2 text-xs text-gray-500">JPEG, PNG, Maximum 5 MB par image</p>
+              </div>
+            </div>
+
+            <!-- Tags (masqué pour l'instant - fonctionnalité à venir) -->
+            <% if false %>
+            <div class="bg-white border border-gray-200 rounded-lg p-5">
+              <h3 class="text-sm font-semibold text-gray-900 mb-5"><%= t('vendors.items.new.sections.tags') %></h3>
+              <div class="relative mb-3">
+                <%= select_tag :tag_id,
+                    options_for_select([]),
+                    {
+                      prompt: t('vendors.items.new.placeholders.select_tag'),
+                      class: "block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 pr-10 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all appearance-none cursor-pointer"
+                    } %>
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex flex-wrap gap-2" id="tags-container">
+                <!-- Les tags seront ajoutés ici dynamiquement -->
+              </div>
+            </div>
+            <% end %>
+            
+            <!-- Bouton Preview IA (pour vendeurs premium) -->
+            <% if @current_shop&.capabilities&.ai_title_description_enabled? %>
+            <div class="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-5">
+              <h3 class="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                Preview IA
+              </h3>
+              <p class="text-xs text-gray-600 mb-3">
+                Remplissez au moins le <strong>nom</strong> ou la <strong>catégorie</strong> (et optionnellement une image produit), puis cliquez ci-dessous pour générer une proposition de contenu SEO.
+              </p>
+              <button type="button"
+                      id="generate-ai-preview-btn"
+                      data-action="click->product-sheet#generateAiPreview"
+                      class="w-full px-4 py-2.5 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm font-medium flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Générer avec l'IA
+              </button>
+              <div id="ai-preview-result" class="hidden mt-3 p-3 bg-white rounded-md border border-purple-200">
+                <!-- La preview sera injectée ici -->
+              </div>
+            </div>
+            <% end %>
+
+            <!-- Stock -->
+            <div class="bg-white border border-gray-200 rounded-lg p-5">
+              <h3 class="text-sm font-semibold text-gray-900 mb-5"><%= t('vendors.items.new.sections.stock') %></h3>
+              <%= f.label :stock_quantity, t('vendors.items.new.fields.stock'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.number_field :stock_quantity,
+                  min: 0,
+                  value: 0,
+                  placeholder: t('vendors.items.new.placeholders.stock'),
+                  class: "block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 w-full text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer avec boutons -->
+        <div class="flex justify-end gap-3 pt-6 border-t">
+          <%= button_tag type: 'submit', name: 'commit', value: 'publish',
+              class: "w-full sm:w-auto px-6 py-2 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors font-medium" do %>
+            Publié
+          <% end %>
+        </div>
+      <% end %>
+      <% else %>
+        <div class="flex flex-col items-center justify-center h-full text-center py-12">
+          <p class="text-sm text-gray-500"><%= t('vendors.items.new.no_shop') %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+

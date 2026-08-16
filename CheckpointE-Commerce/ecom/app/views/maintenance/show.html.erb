@@ -1,0 +1,181 @@
+<% content_for :title, t('maintenance.title', default: 'aa - Site en maintenance') %>
+<% content_for :meta_description, t('maintenance.meta_description', default: "aa est temporairement en maintenance. Revenez bientôt pour découvrir notre marketplace.") %>
+<% content_for :robots, "noindex, nofollow" %>
+<div class="w-full px-4 sm:px-6 lg:px-12 xl:px-16">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 xl:gap-20 items-center max-w-none">
+    <%# Contenu texte à gauche %>
+    <div class="space-y-6 relative z-10">
+      <%# Badge animé %>
+      <div class="inline-block mb-4">
+        <span class="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm font-semibold shadow-lg animate-pulse">
+          <span class="w-2 h-2 bg-white rounded-full animate-ping"></span>
+          En construction
+        </span>
+      </div>
+      <h1 class="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+        aa fait <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#551694] to-purple-600">peau neuve</span> !
+      </h1>
+      <div class="space-y-4 pt-2">
+        <p class="text-lg text-gray-700 leading-relaxed">
+          Le site est en refonte afin de vous offrir une <strong class="text-[#551694]">expérience plus rapide</strong>, plus fluide et encore plus agréable.
+        </p>
+        <p class="text-lg text-gray-700 leading-relaxed">
+          Renseignez vos informations et soyez parmi les <strong class="text-[#551694]">premiers informés</strong> du lancement du nouveau site.
+        </p>
+      </div>
+      <%# Formulaire d'inscription %>
+      <div class="pt-6">
+        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-purple-100 p-6 lg:p-8">
+          <%= form_with model: @maintenance_notification, url: maintenance_path, method: :post, local: true, class: "space-y-5" do |f| %>
+            <%= render "shared/form_errors", object: @maintenance_notification if @maintenance_notification.errors.any? %>
+            <%# Type d'utilisateur %>
+            <div>
+              <label class="block text-sm font-semibold text-gray-800 mb-3">
+                <%= t('maintenance.user_type', default: 'Je suis un(e)') %>
+              </label>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-[#551694] hover:shadow-lg hover:scale-[1.02] <%= (@maintenance_notification.particulier? || @maintenance_notification.user_type.blank?) ? 'border-[#551694] bg-gradient-to-br from-purple-50 to-pink-50 shadow-md' : 'border-gray-200 bg-white' %>">
+                  <%= f.radio_button :user_type, 'particulier', 
+                      class: "w-5 h-5 text-[#551694] focus:ring-[#551694]",
+                      checked: (@maintenance_notification.particulier? || @maintenance_notification.user_type.blank?) %>
+                  <div class="flex-1">
+                    <div class="font-semibold text-gray-900 flex items-center gap-2">
+                      <span>👤</span>
+                      <%= t('maintenance.user_type_particulier', default: 'Particulier') %>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1">
+                      <%= t('maintenance.user_type_particulier_desc', default: 'Client du site') %>
+                    </div>
+                  </div>
+                </label>
+                <label class="flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all hover:border-[#551694] hover:shadow-lg hover:scale-[1.02] <%= @maintenance_notification.proprietaire_boutique? ? 'border-[#551694] bg-gradient-to-br from-purple-50 to-pink-50 shadow-md' : 'border-gray-200 bg-white' %>">
+                  <%= f.radio_button :user_type, 'proprietaire_boutique', 
+                      class: "w-5 h-5 text-[#551694] focus:ring-[#551694]",
+                      checked: @maintenance_notification.proprietaire_boutique? %>
+                  <div class="flex-1">
+                    <div class="font-semibold text-gray-900 flex items-center gap-2">
+                      <span>🏪</span>
+                      <%= t('maintenance.user_type_proprietaire', default: 'Propriétaire de boutique') %>
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1">
+                      <%= t('maintenance.user_type_proprietaire_desc', default: 'Vendeur sur la plateforme') %>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <%# Nom et Prénom %>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex-1">
+                <%= f.label :first_name, t('maintenance.first_name', default: 'Prénom'), class: "block text-sm font-semibold text-gray-800 mb-2" %>
+                <%= f.text_field :first_name, 
+                    placeholder: t('maintenance.first_name_placeholder', default: 'Votre prénom'),
+                    required: true,
+                    class: "block w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694] text-gray-900 placeholder-gray-400 bg-white transition-all" %>
+              </div>
+              <div class="flex-1">
+                <%= f.label :last_name, t('maintenance.last_name', default: 'Nom'), class: "block text-sm font-semibold text-gray-800 mb-2" %>
+                <%= f.text_field :last_name, 
+                    placeholder: t('maintenance.last_name_placeholder', default: 'Votre nom'),
+                    required: true,
+                    class: "block w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694] text-gray-900 placeholder-gray-400 bg-white transition-all" %>
+              </div>
+            </div>
+            <%# Email %>
+            <div>
+              <%= f.label :email, t('maintenance.email', default: 'Email'), class: "block text-sm font-semibold text-gray-800 mb-2" %>
+              <%= f.email_field :email, 
+                  placeholder: t('maintenance.email_placeholder', default: 'Entrez votre mail'),
+                  required: true,
+                  class: "block w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694] text-gray-900 placeholder-gray-400 bg-white transition-all" %>
+            </div>
+            <%# Téléphone avec sélecteur de pays %>
+            <%= render "shared/phone_field",
+                form: f,
+                error_object: @maintenance_notification,
+                label_text: t('maintenance.phone_number', default: 'Numéro de téléphone'),
+                placeholder: t('maintenance.phone_placeholder', default: '77XXXXXXX'),
+                required: true %>
+            <%# Bouton de soumission %>
+            <div class="pt-4">
+              <%= f.submit t('maintenance.submit_button', default: 'Me notifier au lancement'),
+                  class: "w-full px-6 py-4 bg-gradient-to-r from-[#551694] to-purple-600 text-white font-bold rounded-xl hover:from-[#451584] hover:to-purple-700 transition-all cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-[1.02] text-lg" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <%# Illustration à droite - Design moderne avec SVG %>
+    <div class="hidden lg:block relative">
+      <div class="relative bg-gradient-to-br from-purple-500 via-pink-500 to-blue-500 rounded-3xl p-8 h-[500px] flex items-center justify-center shadow-2xl overflow-hidden">
+        <%# Formes décoratives animées %>
+        <div class="absolute inset-0 opacity-20">
+          <div class="absolute top-10 left-10 w-32 h-32 bg-yellow-300 rounded-full blur-2xl animate-pulse"></div>
+          <div class="absolute bottom-10 right-10 w-40 h-40 bg-green-300 rounded-full blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+          <div class="absolute top-1/2 right-10 w-24 h-24 bg-white rounded-full blur-xl animate-pulse" style="animation-delay: 2s;"></div>
+        </div>
+        <%# Illustration SVG moderne - Construction workers et écran %>
+        <div class="relative z-10 w-full h-full flex items-center justify-center">
+          <svg viewBox="0 0 400 400" class="w-full h-full max-w-md">
+            <%# Écran d'ordinateur %>
+            <g transform="translate(50, 80)">
+              <%# Cadre de l'écran %>
+              <rect x="0" y="0" width="300" height="200" rx="8" fill="#551694" opacity="0.9"/>
+              <%# Écran (fond sombre) %>
+              <rect x="10" y="10" width="280" height="180" rx="4" fill="#1F2937"/>
+              <%# Contrôles de fenêtre (dots) %>
+              <circle cx="30" cy="25" r="6" fill="#FCD34D"/>
+              <circle cx="50" cy="25" r="6" fill="#10B981"/>
+              <circle cx="70" cy="25" r="6" fill="#8B5CF6"/>
+              <%# Éléments sur l'écran (simplifiés) %>
+              <rect x="30" y="50" width="100" height="20" rx="2" fill="#10B981" opacity="0.7"/>
+              <rect x="30" y="80" width="120" height="20" rx="2" fill="#10B981" opacity="0.7"/>
+              <rect x="30" y="110" width="80" height="15" rx="2" fill="#10B981" opacity="0.7"/>
+              <rect x="30" y="135" width="150" height="40" rx="4" fill="#551694" opacity="0.8"/>
+              <rect x="50" y="145" width="30" height="20" rx="2" fill="white" opacity="0.9"/>
+            </g>
+            <%# Travailleur 1 (gauche) %>
+            <g transform="translate(20, 280)">
+              <%# Cône de chantier %>
+              <polygon points="0,40 15,40 7.5,0" fill="#F97316"/>
+              <%# Corps %>
+              <rect x="5" y="40" width="20" height="35" rx="10" fill="#1E3A8A"/>
+              <%# Gilet de sécurité %>
+              <rect x="7" y="42" width="16" height="30" rx="8" fill="#FCD34D"/>
+              <%# Casque %>
+              <ellipse cx="15" cy="40" rx="12" ry="8" fill="#FCD34D"/>
+            </g>
+            <%# Travailleur 2 (milieu sur échelle) %>
+            <g transform="translate(150, 250)">
+              <%# Échelle %>
+              <rect x="5" y="0" width="4" height="50" fill="#1E3A8A"/>
+              <%# Corps sur l'échelle %>
+              <rect x="0" y="20" width="18" height="30" rx="9" fill="#1E3A8A"/>
+              <%# Casque %>
+              <ellipse cx="9" cy="20" rx="10" ry="7" fill="#FCD34D"/>
+              <%# Objet blanc tenu %>
+              <rect x="15" y="25" width="8" height="6" rx="1" fill="white"/>
+            </g>
+            <%# Travailleur 3 (droite) %>
+            <g transform="translate(320, 280)">
+              <%# Corps %>
+              <rect x="0" y="0" width="18" height="35" rx="9" fill="#1E3A8A"/>
+              <%# Gilet de sécurité %>
+              <rect x="2" y="2" width="14" height="30" rx="7" fill="#FCD34D"/>
+              <%# Casque %>
+              <ellipse cx="9" cy="0" rx="10" ry="7" fill="#FCD34D"/>
+              <%# Clé (wrench) %>
+              <g transform="translate(20, 8)">
+                <rect x="0" y="0" width="25" height="4" rx="2" fill="#FCD34D"/>
+                <circle cx="8" cy="2" r="5" fill="none" stroke="#FCD34D" stroke-width="3"/>
+              </g>
+            </g>
+            <%# Éléments flottants %>
+            <circle cx="80" cy="120" r="15" fill="#10B981" opacity="0.6"/>
+            <rect x="20" y="150" width="40" height="25" rx="4" fill="#60A5FA" opacity="0.7"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

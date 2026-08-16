@@ -1,0 +1,232 @@
+<%# SEO Meta Tags %>
+<% content_for :title, @page_title %>
+<% content_for :meta_description, @page_description %>
+<% content_for :canonical_url, items_url %>
+<%# JSON-LD : page de listing produits + breadcrumb %>
+<% content_for :structured_data do %>
+  <% if @items.respond_to?(:any?) && @items.any? %>
+    <%= combined_json_ld_tag(
+          breadcrumb_schema([
+            [ t("breadcrumbs.home", default: "Accueil"), safe_root_url ],
+            [ t("breadcrumbs.items", default: "Produits"), items_url ]
+          ]),
+          item_list_schema(@items.first(20).to_a, t("seo.items.index.title", default: "Tous les produits - aa"))
+        ) %>
+  <% end %>
+<% end %>
+<%# Page de listing général des produits (sans catégorie spécifique) %>
+<div class="container mx-auto px-4 lg:px-[50px] py-6 md:py-8">
+  <!-- Section Top Categories -->
+  <div class="mb-6 md:mb-8">
+    <h2 class="text-xl md:text-2xl font-semibold text-gray-900 mb-2">Top Categories</h2>
+    <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
+      <% if @top_categories.present? %>
+        <% @top_categories.each do |sub_cat| %>
+          <%# @top_categories sont désormais des ProductSubCategory (cf. ItemsController#index)
+              → lien drill-down vers la page sub-category, parent eager-loaded via includes(:product_category) %>
+          <%= link_to category_sub_category_path(sub_cat.product_category.slug, sub_cat.slug),
+              class: "flex-shrink-0 flex flex-col items-center gap-2 w-[120px] text-center group" do %>
+            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-[#551694]/10 transition-colors overflow-hidden">
+              <% if sub_cat.icon.attached? %>
+                <%= storage_image_tag(sub_cat.icon, variant_name: :icon, alt: sub_cat.name, class: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-300", width: 80, height: 80) %>
+              <% else %>
+                <svg class="w-10 h-10 text-gray-400 group-hover:text-[#551694] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+              <% end %>
+            </div>
+            <span class="text-xs font-medium text-gray-700 group-hover:text-[#551694] transition-colors line-clamp-2"><%= sub_cat.name %></span>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  <!-- Promo + Featured row -->
+  <div class="mb-6 md:mb-8">
+    <%# Bannières EnPromo et DÉPÉCHEZ-VOUS temporairement masquées %>
+    <div class="col-span-1">
+      <%= render "shared/featured_items_section", featured_items: @featured_items %>
+    </div>
+  </div>
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Sidebar filters (left column) -->
+    <aside class="lg:w-80 flex-shrink-0">
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 lg:sticky lg:top-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Filtrer les articles</h2>
+        <%= render "shops/filters", locals: {
+          url: items_path,
+          available_categories: @available_categories,
+          available_sub_categories: @available_sub_categories,
+          available_attribute_values: @available_attribute_values,
+          min_price_available: @min_price_available,
+          max_price_available: @max_price_available,
+          shops: @shops
+        } %>
+      </div>
+    </aside>
+    <!-- Contenu principal (droite) -->
+    <div class="flex-1 min-w-0">
+      <!-- En-tête avec titre et tri -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4 sm:mb-0">
+          Tous les produits
+        </h1>
+        <div class="flex items-center gap-3">
+          <label for="sort" class="text-sm text-gray-600">Trier par:</label>
+          <%= form_with url: items_path, method: :get, local: true, class: "inline-block" do |form| %>
+            <% if params[:shop_ids].present? %>
+              <% params[:shop_ids].each do |shop_id| %>
+                <%= hidden_field_tag "shop_ids[]", shop_id %>
+              <% end %>
+            <% end %>
+            <% Array(params[:product_category_ids]).each { |id| concat hidden_field_tag("product_category_ids[]", id) } if params[:product_category_ids].present? %>
+            <% Array(params[:product_sub_category_ids]).each { |id| concat hidden_field_tag("product_sub_category_ids[]", id) } if params[:product_sub_category_ids].present? %>
+            <% Array(params[:attribute_value_ids]).each { |id| concat hidden_field_tag("attribute_value_ids[]", id) } if params[:attribute_value_ids].present? %>
+            <%= form.hidden_field :min_price, value: params[:min_price] if params[:min_price].present? %>
+            <%= form.hidden_field :max_price, value: params[:max_price] if params[:max_price].present? %>
+            <%= form.hidden_field :search, value: params[:search] if params[:search].present? %>
+            <%= form.select :sort, 
+                options_for_select([
+                  ["Les plus pertinents", "relevance"],
+                  ["Prix croissant", "price_asc"],
+                  ["Prix décroissant", "price_desc"],
+                  ["Nouveautés", "newest"],
+                  ["Meilleures ventes", "bestsellers"]
+                ], params[:sort] || "relevance"),
+                {},
+                { 
+                  id: "sort",
+                  class: "rounded-lg border-gray-300 text-sm py-2 px-3 focus:border-[#551694] focus:ring-[#551694]",
+                  onchange: "this.form.submit()"
+                } %>
+          <% end %>
+        </div>
+      </div>
+      <% if @matching_shops.present? %>
+        <section class="mb-6 rounded-xl border border-[#551694]/20 bg-[#551694]/5 p-4" aria-labelledby="search-shops-heading">
+          <h2 id="search-shops-heading" class="text-lg font-semibold text-gray-900 mb-3">Boutiques correspondantes</h2>
+          <ul class="flex flex-wrap gap-2">
+            <% @matching_shops.each do |shop| %>
+              <li>
+                <%= link_to shop.name, shop_path(shop.slug), class: "inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-medium text-[#551694] shadow-sm ring-1 ring-[#551694]/25 hover:bg-[#551694]/10", data: { turbo_frame: "_top" } %>
+              </li>
+            <% end %>
+          </ul>
+        </section>
+      <% end %>
+      <!-- Turbo Frame pour la grille de produits -->
+      <turbo-frame id="products-grid">
+        <% if @items.present? %>
+          <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+            <% @items.each do |item| %>
+              <% variant = item.default_variant || item.variants.first %>
+              <% next unless variant %>
+              <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col group">
+                <%= link_to item_path(item), class: "block flex-1 flex flex-col min-h-0", data: { turbo_frame: "_top" } do %>
+                  <!-- Image produit -->
+                  <div class="relative h-36 sm:h-48 bg-[#e3e3ec] flex items-center justify-center overflow-hidden">
+                    <% if item.has_image? %>
+                      <%= storage_image_tag(item.display_image, variant_name: :card, alt: item.name, class: "w-full h-full object-contain p-1 sm:p-2", width: 400, height: 400) %>
+                    <% else %>
+                      <svg class="w-12 h-12 sm:w-16 sm:h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                    <% end %>
+                    <!-- Badge de réduction -->
+                    <% discount_percent = discount_percentage_for(variant) %>
+                    <% if discount_percent > 0 %>
+                      <div class="absolute top-1.5 left-1.5 bg-red-500 text-white text-[10px] sm:text-xs font-bold px-1.5 py-0.5 sm:px-2 sm:py-1 rounded">
+                        <%= discount_percent %>%
+                      </div>
+                    <% end %>
+                  </div>
+                  <!-- Informations produit -->
+                  <div class="p-2 sm:p-4 flex-1 flex flex-col">
+                    <h3 class="font-medium text-xs sm:text-sm text-gray-900 mb-1 sm:mb-2 line-clamp-2 group-hover:text-[#551694] transition-colors leading-tight">
+                      <%= item.name %>
+                    </h3>
+                    <!-- Note -->
+                    <% if item.average_rating.present? %>
+                      <% rounded_rating = item.average_rating.round %>
+                      <div class="flex items-center gap-0.5 sm:gap-1 mb-1 sm:mb-2" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_rating) %>">
+                        <div class="flex items-center" aria-hidden="true">
+                          <% 5.times do |i| %>
+                            <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 <%= i < rounded_rating ? 'text-yellow-400 fill-current' : 'text-gray-300' %>" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                          <% end %>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-gray-500"><%= item.average_rating.round(1) %></span>
+                      </div>
+                    <% end %>
+                    <!-- Prix -->
+                    <div class="mt-auto">
+                      <div class="flex flex-wrap items-baseline gap-1 sm:gap-2">
+                        <% current_price = current_price_for(variant) %>
+                        <% original_price = original_price_for(variant) %>
+                        <% discount_percent = discount_percentage_for(variant) %>
+                        <span class="text-sm sm:text-base font-bold text-gray-900 leading-none">
+                          <%= number_to_currency(current_price, unit: item.currency.symbol, precision: 0, separator: " ", delimiter: " ") %>
+                        </span>
+                        <% if discount_percent > 0 && original_price > current_price %>
+                          <span class="text-[10px] sm:text-sm text-gray-400 line-through leading-none">
+                            <%= number_to_currency(original_price, unit: item.currency.symbol, precision: 0, separator: " ", delimiter: " ") %>
+                          </span>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+                <div class="px-2 sm:px-4 pb-2 sm:pb-4 pt-0">
+                  <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "primary" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </turbo-frame>
+        <!-- Pagination -->
+        <% if @items.respond_to?(:current_page) && @items.total_pages > 1 %>
+          <% base_pagination_params = {
+          shop_ids: params[:shop_ids],
+          product_category_ids: params[:product_category_ids],
+          product_sub_category_ids: params[:product_sub_category_ids],
+          attribute_value_ids: params[:attribute_value_ids],
+          min_price: params[:min_price],
+          max_price: params[:max_price],
+          sort: params[:sort],
+          search: params[:search]
+        } %>
+          <div class="mt-8 flex justify-center items-center gap-2">
+            <% if @items.current_page > 1 %>
+              <%= link_to items_path(base_pagination_params.merge(page: @items.current_page - 1)), 
+                class: "w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50" do %>
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+              <% end %>
+            <% end %>
+            <% start_page = [@items.current_page - 2, 1].max %>
+            <% end_page = [start_page + 5, @items.total_pages].min %>
+            <% (start_page..end_page).each do |page_num| %>
+              <%= link_to sprintf('%02d', page_num), 
+                items_path(base_pagination_params.merge(page: page_num)),
+                class: "w-10 h-10 flex items-center justify-center rounded-lg border #{@items.current_page == page_num ? 'bg-[#551694] text-white border-[#551694]' : 'border-gray-300 hover:bg-gray-50'}" %>
+            <% end %>
+            <% if @items.current_page < @items.total_pages %>
+              <%= link_to items_path(base_pagination_params.merge(page: @items.current_page + 1)), 
+                class: "w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50" do %>
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-12">
+          <p class="text-gray-500 text-lg">Aucun produit disponible pour le moment.</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

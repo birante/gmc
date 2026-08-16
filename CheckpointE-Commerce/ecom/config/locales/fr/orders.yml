@@ -1,0 +1,35 @@
+fr:
+  client:
+    orders:
+      new:
+        title: "Finaliser la commande"
+        back_to_cart: "Retour au panier"
+        delivery_address: "Adresse de livraison"
+        add_new_address: "Ajouter une nouvelle adresse"
+        no_address: "Vous n'avez pas encore d'adresse enregistrée"
+        add_address: "Ajouter une adresse"
+        delivery_zone: "Zone de livraison"
+        select_zone: "Sélectionnez une zone"
+        delivery_slot: "Créneau de livraison"
+        select_slot: "Sélectionnez un créneau"
+        select_zone_first: "Sélectionnez une zone de livraison pour voir les créneaux disponibles"
+        delivery_notes: "Instructions de livraison (optionnel)"
+        notes_placeholder: "Ex: Livraison le matin de préférence, sonner à l'interphone..."
+        payment: "Paiement"
+        select_payment_method: "Sélectionnez un mode de paiement pour afficher les informations nécessaires."
+        no_payment_methods: "Aucun mode de paiement n'est disponible pour le moment. Veuillez contacter le support."
+        cancel: "Annuler"
+        validate_and_pay: "Valider et payer"
+        summary: "Récapitulatif"
+        subtotal: "Sous-total"
+        delivery_fee: "Frais de livraison"
+        to_calculate: "À calculer"
+        total: "Total"
+        items: "Articles"
+        payment_methods:
+          cash_on_delivery: "Paiement en espèces à la livraison de votre commande."
+          wave: "Paiement sécurisé via Wave. Une notification vous sera envoyée pour validation."
+          orange_money: "Paiement sécurisé via Orange Money. Vous recevrez une notification pour valider le paiement."
+          free_money: "Paiement sécurisé via Free Money. Vous recevrez une notification pour valider le paiement."
+        default_address: "Par défaut"
+

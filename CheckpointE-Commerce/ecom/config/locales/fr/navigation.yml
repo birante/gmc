@@ -1,0 +1,42 @@
+fr:
+  navigation:
+    home: "Accueil"
+    back_home: "Retour à la page d'accueil"
+    login: "Connexion"
+    signup: "Inscription"
+    logout: "Déconnexion"
+    track_order: "Tracker une commande"
+    language: "Langue"
+    assistance_24_7: "Assistance 24/7:"
+    search_placeholder: "Rechercher un article"
+    my_account: "MON COMPTE"
+    my_shops: "MES BOUTIQUES"
+    welcome: "Bienvenue"
+    menu: "Menu"
+    cart: "Panier"
+    my_cart: "Mon panier"
+    empty_cart: "Votre panier est vide"
+    start_shopping: "Commencez vos achats dès maintenant!"
+    continue_shopping: "Continuer mes achats"
+    subtotal: "Sous-total"
+    total: "Total"
+    checkout: "Passer commande"
+    login_required: "Connexion requise"
+    login_to_view_cart: "Connectez-vous pour voir votre panier"
+  
+  assistance:
+    title: "Assistance & Service client"
+    hours: "Lun - Ven, 9:00 - 17:00 (UTC +10:00)"
+    phone: "+123 402 020 024"
+    email: "support@aa.com"
+    chat_title: "Support par chat"
+    chat_desc: "Discutez avec nos équipes 24/7 pour un support instantané."
+    chat_link: "Démarrer le chat en direct"
+    online: "En ligne"
+  
+  footer:
+    copyright: "2025© aa SARL"
+    terms: "Termes & conditions"
+    support: "Support"
+    online: "En ligne"
+

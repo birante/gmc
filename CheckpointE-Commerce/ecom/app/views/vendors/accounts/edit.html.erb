@@ -1,0 +1,131 @@
+<% content_for :active_tab, 'compte' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <nav class="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+        <%= link_to "Dashboard", vendors_dashboard_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mon compte", vendors_account_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-900 font-medium">Modifier</span>
+      </nav>
+    </div>
+
+    <div class="mb-4">
+      <%= link_to vendors_account_path, class: "inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#551694] transition-colors duration-150 group" do %>
+        <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        <span>Retour à mon compte</span>
+      <% end %>
+    </div>
+
+    <div class="mb-6">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Modifier mes informations</h1>
+      <p class="text-sm sm:text-base text-gray-600">Mettez à jour vos informations personnelles</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div class="px-4 sm:px-6 py-6 sm:py-8">
+        <%= form_with model: @vendor, url: vendors_account_path, method: :patch, local: true do |f| %>
+          <% if @vendor.errors.any? %>
+            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <h2 class="font-semibold mb-2">Veuillez corriger les erreurs suivantes :</h2>
+              <ul class="list-disc list-inside text-sm">
+                <% @vendor.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Informations personnelles</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <%= f.label :first_name, "Prénom", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.text_field :first_name, class: "block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors", required: true %>
+              </div>
+
+              <div>
+                <%= f.label :last_name, "Nom", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.text_field :last_name, class: "block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors", required: true %>
+              </div>
+
+              <div>
+                <%= f.label :email, "Email", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.email_field :email, class: "block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors", placeholder: "votre@email.com", required: true %>
+              </div>
+
+              <div>
+                <%= f.label :phone_number, "Téléphone", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <div class="flex gap-2 flex-wrap sm:flex-nowrap">
+                  <%= f.select :country_code,
+                      options_for_select([
+                        ['+221 (SN)', '221'],
+                        ['+225 (CI)', '225'],
+                        ['+33 (FR)', '33'],
+                        ['+226 (BF)', '226']
+                      ], @vendor.country_code),
+                      {},
+                      { class: "min-w-[90px] px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors" } %>
+                  <%= f.telephone_field :phone_number, class: "flex-1 min-w-0 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors", required: true %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-8 border-t border-gray-200 pt-8">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
+            <p class="text-sm text-gray-600 mb-6">Laissez ces champs vides si vous ne souhaitez pas changer votre mot de passe.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div data-controller="password-toggle">
+                <%= f.label :password, "Nouveau mot de passe", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <div class="relative">
+                  <%= f.password_field :password,
+                      class: "block w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors",
+                      autocomplete: "new-password",
+                      placeholder: "Laissez vide pour ne pas changer",
+                      data: { password_toggle_target: "input" } %>
+                  <button type="button"
+                          data-password-toggle-target="toggle"
+                          data-action="click->password-toggle#toggle"
+                          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+                          aria-label="Afficher/Masquer le mot de passe"></button>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Minimum 8 caractères</p>
+              </div>
+
+              <div data-controller="password-toggle">
+                <%= f.label :password_confirmation, "Confirmation", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <div class="relative">
+                  <%= f.password_field :password_confirmation,
+                      class: "block w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#551694] focus:border-[#551694] transition-colors",
+                      autocomplete: "new-password",
+                      placeholder: "Laissez vide pour ne pas changer",
+                      data: { password_toggle_target: "input" } %>
+                  <button type="button"
+                          data-password-toggle-target="toggle"
+                          data-action="click->password-toggle#toggle"
+                          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors"
+                          aria-label="Afficher/Masquer le mot de passe"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-200">
+            <%= link_to "Annuler", vendors_account_path, class: "px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-center" %>
+            <%= f.submit "Enregistrer les modifications", class: "px-6 py-3 bg-[#551694] text-white rounded-lg hover:bg-[#6a1fa8] hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-medium shadow-sm cursor-pointer" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>

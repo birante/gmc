@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%# SEO Meta Tags %>
+    <title><%= content_for(:title) || t('maintenance.title', default: 'aa - Site en maintenance') %></title>
+    <meta name="description" content="<%= content_for(:meta_description) || t('maintenance.description', default: 'aa fait peau neuve ! Le site est en refonte pour vous offrir une expérience améliorée.') %>">
+    <meta name="robots" content="noindex, nofollow">
+    <%# Mobile & Viewport %>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#551694">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%# Analytics Scripts %>
+    <%= render "shared/analytics" %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
+  </head>
+  <body class="bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div class="min-h-screen flex flex-col relative overflow-hidden">
+      <%# Éléments décoratifs en arrière-plan %>
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style="animation-delay: 4s;"></div>
+      </div>
+      <%# Logo en haut à gauche %>
+      <div class="absolute top-6 left-6 z-10">
+        <%= link_to root_path, class: "block hover:opacity-80 transition-opacity" do %>
+          <%= image_tag "logo-2.svg", alt: "aa", class: "h-[30px] w-auto drop-shadow-sm" %>
+        <% end %>
+      </div>
+      <%# Contenu principal %>
+      <main class="flex-1 flex items-center justify-center py-12 relative z-10">
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

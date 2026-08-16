@@ -1,0 +1,112 @@
+<% content_for :active_tab, 'finances' %>
+<!-- Container principal -->
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <% if @vendor %>
+      <!-- En-tête -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <%= link_to url_with_shop(employees_finances_path, @current_shop), class: "inline-flex items-center px-2 py-2 -ml-2 rounded text-sm text-gray-600 hover:text-[#551694] hover:bg-gray-100 mb-3" do %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+              Retour aux finances
+            <% end %>
+            <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+              Transactions
+            </h1>
+            <p class="text-sm text-gray-500 mt-1">
+              Historique complet de vos transactions
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Filtres -->
+      <div class="bg-white rounded-lg shadow p-4 mb-6">
+        <div class="flex flex-wrap gap-4">
+          <%= link_to "Tous", url_with_shop(transactions_employees_finances_path, @current_shop),
+              class: "px-4 py-2 text-sm font-medium rounded-md #{params[:type].blank? ? 'bg-[#551694] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+          <%= link_to "Crédits", url_with_shop(transactions_employees_finances_path(type: 'credit'), @current_shop),
+              class: "px-4 py-2 text-sm font-medium rounded-md #{params[:type] == 'credit' ? 'bg-[#551694] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+          <%= link_to "Débits", url_with_shop(transactions_employees_finances_path(type: 'debit'), @current_shop),
+              class: "px-4 py-2 text-sm font-medium rounded-md #{params[:type] == 'debit' ? 'bg-[#551694] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+        </div>
+      </div>
+      <!-- Liste des transactions -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="divide-y divide-gray-200">
+          <% if @transactions.any? %>
+            <% @transactions.each do |transaction| %>
+              <div class="px-4 sm:px-6 py-4 hover:bg-gray-50">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                      <div class="h-10 w-10 rounded-full <%= transaction.transaction_type == 'credit' ? 'bg-[#551694]/10' : 'bg-red-100' %> flex items-center justify-center">
+                        <% if transaction.transaction_type == 'credit' %>
+                          <svg class="w-5 h-5 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                          </svg>
+                        <% else %>
+                          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+                          </svg>
+                        <% end %>
+                      </div>
+                      <div>
+                        <p class="font-medium text-gray-900"><%= transaction.description %></p>
+                        <p class="text-sm text-gray-500">
+                          <%= transaction.created_at.strftime("%d/%m/%Y à %H:%M") %>
+                          <% if transaction.order %>
+                            - Commande #<%= transaction.order.id %>
+                          <% end %>
+                          <% if transaction.shop %>
+                            - <%= transaction.shop.name %>
+                          <% end %>
+                        </p>
+                        <% if transaction.transaction_type == 'credit' && transaction.metadata&.dig('order_item_id') %>
+                          <% 
+                            oi = OrderItem.find_by(id: transaction.metadata["order_item_id"])
+                            fr = FinanceManager.commission_fraction_for_shop(oi&.shop)
+                            seller_part = 1.0 - fr
+                            item_total = seller_part.positive? ? (transaction.amount.to_f / seller_part) : transaction.amount.to_f
+                            commission_amount = item_total * fr
+                            pct_comm = (fr * 100).round
+                            pct_seller = (seller_part * 100).round
+                          %>
+                          <p class="text-xs text-gray-400 mt-1">
+                            Montant total: <span class="font-medium"><%= number_with_delimiter(item_total.round, delimiter: ' ') %> FCFA</span>
+                            • Commission aa (<%= pct_comm %>%): <span class="font-medium text-orange-600"><%= number_with_delimiter(commission_amount.round, delimiter: ' ') %> FCFA</span>
+                          </p>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-left sm:text-right">
+                    <p class="font-semibold text-lg <%= transaction.transaction_type == 'credit' ? 'text-[#551694]' : 'text-red-600' %>">
+                      <%= transaction.transaction_type == 'credit' ? '+' : '-' %><%= number_with_delimiter(transaction.amount, delimiter: ' ') %> FCFA
+                    </p>
+                    <% if transaction.transaction_type == 'credit' && transaction.metadata&.dig('order_item_id') %>
+                      <% oi = OrderItem.find_by(id: transaction.metadata["order_item_id"]) %>
+                      <% fr = FinanceManager.commission_fraction_for_shop(oi&.shop) %>
+                      <p class="text-xs text-gray-500 mt-1">(Votre part — <%= ((1.0 - fr) * 100).round %>%)</p>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="px-6 py-12 text-center">
+              <p class="text-gray-500">Aucune transaction trouvée</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4">Vendeur non trouvé</p>
+      </div>
+    <% end %>
+  </main>
+  <!-- Footer -->
+</div>

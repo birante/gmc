@@ -1,0 +1,84 @@
+<%# Composant: Mega Menu des Catégories %>
+<div class="relative flex-shrink-0" data-controller="categories-dropdown">
+  <div class="flex items-center gap-2 px-4 py-3 text-gray-700 hover:text-[#551694] font-medium text-sm whitespace-nowrap cursor-pointer transition-colors"
+       data-action="mouseenter->categories-dropdown#open mouseleave->categories-dropdown#handleMouseLeave">
+    <span>Toutes les catégories</span>
+    <svg data-categories-dropdown-target="icon" class="w-3 h-3 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </div>
+  
+  <!-- Mega menu pour toutes les catégories -->
+  <div data-categories-dropdown-target="menu"
+       class="hidden fixed left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-[100] overflow-hidden"
+       data-action="mouseenter->categories-dropdown#keepMenuOpen mouseleave->categories-dropdown#handleMouseLeave">
+    <div class="container mx-auto px-4 lg:px-[50px]">
+      <div class="flex h-[500px]">
+        <!-- Sidebar gauche : Liste des catégories -->
+        <div class="w-64 border-r border-gray-200 bg-gray-50 overflow-y-auto">
+          <% categories.each_with_index do |category, index| %>
+            <% sub_count = category.sub_categories.size %>
+            <%= link_to category_path(category.slug), 
+                data: { 
+                  "categories-dropdown-target": "categoryItem",
+                  "category-id": category.id,
+                  action: "mouseenter->categories-dropdown#selectCategory"
+                },
+                class: "#{'bg-gray-100 text-[#551694]' if index == 0} #{'text-gray-700' if index > 0} block px-4 py-3 cursor-pointer transition-colors hover:bg-gray-100 hover:text-[#551694]" do %>
+              <div class="font-medium text-sm"><%= category.name %></div>
+              <% if sub_count > 0 %>
+                <div class="text-xs text-gray-500 mt-0.5">
+                  <%= sub_count %> sous-catégorie<%= 's' if sub_count > 1 %>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+
+        <!-- Contenu principal : Détails de la catégorie sélectionnée -->
+        <div class="flex-1 bg-white overflow-y-auto p-6">
+          <% categories.each_with_index do |category, index| %>
+            <div data-categories-dropdown-target="contentArea"
+                 data-category-id="<%= category.id %>"
+                 <%= 'class="hidden"'.html_safe if index > 0 %>>
+              
+              <!-- Explorer par catégorie -->
+              <% if category.sub_categories.any? %>
+                <div class="mb-8">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-900">EXPLORER PAR SOUS CATÉGORIE</h3>
+                    <%= link_to category_path(category.slug), class: "text-sm text-[#551694] hover:underline flex items-center gap-1" do %>
+                      Voir tout
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    <% end %>
+                  </div>
+                  <div class="grid grid-cols-4 gap-4">
+                    <% category.sub_categories.first(8).each do |sub_category| %>
+                      <%= link_to category_sub_category_path(category.slug, sub_category.slug), 
+                          class: "flex flex-col items-center text-center group hover:opacity-80 transition-opacity" do %>
+                        <div class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mb-2 group-hover:from-purple-200 group-hover:to-purple-300 transition-colors overflow-hidden">
+                          <% if sub_category.icon.attached? %>
+                            <%= storage_image_tag(sub_category.icon, variant_name: :icon, alt: sub_category.name, class: "w-full h-full object-cover", width: 80, height: 80) %>
+                          <% else %>
+                            <svg class="w-10 h-10 text-[#551694] opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                          <% end %>
+                        </div>
+                        <span class="text-xs text-gray-700 font-medium line-clamp-2"><%= sub_category.name %></span>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
+              <% else %>
+                <div class="text-sm text-gray-500">Sous-catégories indisponibles pour le moment.</div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<% content_for :active_tab, 'clients' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/clients/index",
+        client_path_for: ->(client) { employees_client_path(client, shop_id: @current_shop&.id) } %>
+  </main>
+</div>

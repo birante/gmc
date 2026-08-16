@@ -1,0 +1,123 @@
+en:
+  clients:
+    registration:
+      title: "Create your client account"
+      subtitle: "Join us in a few clicks"
+      first_name: "First Name"
+      last_name: "Last Name"
+      phone_number: "Phone Number"
+      email_address: "Email (optional)"
+      password: "Password"
+      password_confirmation: "Confirm Password"
+      submit: "Sign Up"
+      already_account: "Already have an account?"
+      login: "Sign In"
+      placeholders:
+        first_name: "Your first name"
+        last_name: "Your last name"
+        phone: "77XXXXXXX"
+        email: "example@email.com"
+        password: "Minimum 4 characters"
+        password_confirmation: "Repeat your password"
+    
+    session:
+      title: "Sign in to your account"
+      subtitle: "Access your client space"
+      phone_number: "Phone Number"
+      password: "Password"
+      submit: "Sign In"
+      forgot_password: "Forgot password?"
+      no_account: "Don't have an account yet?"
+      signup: "Sign up"
+      placeholders:
+        phone: "77XXXXXXX"
+        password: "Your password"
+    
+    sessions:
+      new:
+        title: "Sign in to your account"
+        subtitle: "Access your client space"
+        phone_number: "Phone Number"
+        password: "Password"
+        submit: "Sign In"
+        forgot_password: "Forgot password?"
+        no_account: "Don't have an account yet?"
+        signup: "Sign up"
+        placeholders:
+          phone: "77XXXXXXX"
+          password: "Your password"
+  
+  client:
+    sessions:
+      new:
+        title: "Sign in to your account"
+        subtitle: "Access your client space"
+        phone_number: "Phone Number"
+        password: "Password"
+        submit: "Sign In"
+        forgot_password: "Forgot password?"
+        no_account: "Don't have an account yet?"
+        signup: "Sign up"
+        vendor_space_prompt: "Are you a vendor?"
+        vendor_space_link: "Access your vendor space"
+        employee_space_prompt: "Are you a collaborator?"
+        employee_space_link: "Access your collaborator space"
+        placeholders:
+          phone: "77XXXXXXX"
+          password: "Your password"
+    
+    registrations:
+      new:
+        title: "Create your client account"
+        subtitle: "Join us in a few clicks"
+        first_name: "First Name"
+        last_name: "Last Name"
+        phone_number: "Phone Number"
+        email_address: "Email (optional)"
+        email: "Email (optional)"
+        password: "Password"
+        password_confirmation: "Confirm Password"
+        password_hint: "Minimum 8 characters"
+        submit: "Sign Up"
+        already_account: "Already have an account?"
+        login: "Sign In"
+        vendor_space_prompt: "Want to sell on aa?"
+        vendor_space_link: "Create a vendor account"
+        placeholders:
+          first_name: "Your first name"
+          last_name: "Your last name"
+          phone: "77XXXXXXX"
+          email: "example@email.com"
+          password: "Minimum 8 characters"
+          password_confirmation: "Minimum 8 characters"
+      create:
+        success: "Account created. Check your SMS for the code."
+        success_with_errors: "Account created, code sending failed"
+        failure: "Error creating account"
+    
+    verification:
+      title: "Verify your account"
+      subtitle: "Enter the verification code sent by SMS"
+      code_label: "Verification code"
+      resend: "Resend"
+      no_code: "Didn't receive the code?"
+      submit: "Verify"
+    
+    verifications:
+      new:
+        title: "Verify your account"
+        subtitle: "Enter the verification code sent by SMS"
+        code_label: "Verification code"
+        resend: "Resend"
+        no_code: "Didn't receive the code?"
+        submit: "Verify"
+      create:
+        success: "Verification successful. Welcome!"
+        invalid_code: "Invalid or expired code. Please request a new code."
+        user_not_found: "User not found"
+        error: "Error during verification. Please try again."
+      resend:
+        success: "Verification code resent via %{channel}"
+        error: "Error resending code: %{error}"
+        user_not_found: "User not found"
+

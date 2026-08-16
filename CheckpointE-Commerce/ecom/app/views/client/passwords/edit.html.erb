@@ -1,0 +1,38 @@
+<%= render "shared/auth/auth_header", title: t('client.passwords.edit.title'), subtitle: t('client.passwords.edit.subtitle') %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with model: @user, url: client_passwords_path, method: :patch, local: true do |f| %>
+    <%= render "shared/auth/auth_alert", type: :alert, message: flash[:alert] %>
+    <%= render "shared/auth/auth_alert", type: :notice, message: flash[:notice] %>
+    <%= render "shared/auth/auth_errors", error_object: f.object %>
+
+    <div class="space-y-5">
+      <%= render "shared/password_field",
+                 form: f,
+                 field_name: :password,
+                 label_text: t('client.passwords.edit.new_password'),
+                 placeholder: t('client.passwords.edit.new_password_placeholder'),
+                 autocomplete_value: "new-password",
+                 required: true,
+                 minlength: 8 %>
+      <%= render "shared/password_field",
+                 form: f,
+                 field_name: :password_confirmation,
+                 label_text: t('client.passwords.edit.password_confirmation'),
+                 placeholder: t('client.passwords.edit.password_confirmation_placeholder'),
+                 autocomplete_value: "new-password",
+                 required: true,
+                 minlength: 8 %>
+    </div>
+
+    <div class="mt-6">
+      <%= f.submit t('client.passwords.edit.submit'), class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-gray-200 text-center">
+      <p class="text-sm text-gray-600">
+        <%= link_to t('client.passwords.edit.back_to_login'), new_client_session_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+      </p>
+    </div>
+  <% end %>
+</div>

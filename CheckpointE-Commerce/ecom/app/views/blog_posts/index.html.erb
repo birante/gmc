@@ -1,0 +1,108 @@
+<% content_for :title, t("pages.blog.meta.title", default: "Blog & articles | aa") %>
+<% content_for :meta_description, t("pages.blog.meta.description", default: "Conseils, tutos et actualités e-commerce au Sénégal par l'équipe aa.") %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<% content_for :structured_data do %>
+  <%= combined_json_ld_tag(
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": t("pages.blog.meta.title", default: "Blog aa"),
+      "description": t("pages.blog.meta.description", default: "Conseils, tutos et actualités e-commerce au Sénégal."),
+      "url": blog_url,
+      "inLanguage": I18n.locale.to_s,
+      "publisher": {
+        "@type": "Organization",
+        "name": "aa",
+        "logo": { "@type": "ImageObject", "url": asset_url("logo.svg") }
+      },
+      "blogPost": (@posts || []).first(10).map do |post|
+        {
+          "@type": "BlogPosting",
+          "headline": post.title,
+          "url": blog_post_url(post),
+          "datePublished": (post.published_at || post.created_at).iso8601,
+          "author": { "@type": "Person", "name": post.author_name.presence || "Équipe aa" }
+        }
+      end
+    },
+    breadcrumb_schema([
+      [ t("breadcrumbs.home", default: "Accueil"), root_url ],
+      [ t("pages.blog.nav_label", default: "Blog"), blog_url ]
+    ])
+  ) %>
+<% end %>
+<section class="bg-white py-10 md:py-14">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <%# ===== TITRE + FILTRES ===== %>
+    <header class="mb-10">
+      <h1 class="text-3xl md:text-4xl font-bold text-[#551694] mb-6">
+        <%= t("pages.blog.index.title", default: "Blog et articles") %>
+      </h1>
+      <div class="flex flex-wrap gap-2">
+        <%= link_to t("pages.blog.index.all_tab", default: "Tous"),
+            blog_path,
+            class: "inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-colors #{@active_category.nil? ? 'bg-[#551694] text-white' : 'bg-[#F1F1F4] text-[#3F4254] hover:bg-[#EEEAF8]'}" %>
+        <% @blog_categories.each do |cat| %>
+          <%= link_to cat.name,
+              blog_category_path(cat.slug),
+              class: "inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-colors #{@active_category&.id == cat.id ? 'bg-[#551694] text-white' : 'bg-[#F1F1F4] text-[#3F4254] hover:bg-[#EEEAF8]'}" %>
+        <% end %>
+      </div>
+    </header>
+    <% if @posts.empty? %>
+      <div class="bg-[#F5F3FB] border border-[#EBEEF6] rounded-2xl p-10 text-center">
+        <p class="text-[#4B5675] text-sm">
+          <%= t("pages.blog.index.empty", default: "Aucun article publié pour le moment. Revenez très bientôt.") %>
+        </p>
+      </div>
+    <% else %>
+      <%# ===== ARTICLE VEDETTE ===== %>
+      <% if @featured.present? %>
+        <%= link_to blog_post_path(@featured.slug), class: "group block mb-14" do %>
+          <article class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <div class="lg:col-span-7 aspect-[16/10] rounded-2xl overflow-hidden bg-[#EEEAF8]">
+              <% if @featured.cover_image.attached? %>
+                <%= image_tag @featured.cover_image,
+                    alt: @featured.title,
+                    class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
+                    loading: "eager" %>
+              <% end %>
+            </div>
+            <div class="lg:col-span-5">
+              <% if @featured.blog_category %>
+                <span class="inline-block bg-[#EEEAF8] text-[#551694] text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full mb-3">
+                  <%= @featured.blog_category.name %>
+                </span>
+              <% end %>
+              <time class="block text-xs text-[#6B7280] mb-2"><%= l(@featured.published_at || @featured.created_at, format: :long) rescue (@featured.published_at || @featured.created_at).strftime("%-d %B %Y") %></time>
+              <h2 class="text-2xl md:text-3xl font-bold text-[#201A40] mb-3 group-hover:text-[#551694] transition-colors">
+                <%= @featured.title %>
+              </h2>
+              <% if @featured.excerpt.present? %>
+                <p class="text-[#4B5675] text-base leading-7 mb-4"><%= @featured.excerpt %></p>
+              <% end %>
+              <span class="inline-flex items-center gap-2 text-[#551694] font-semibold text-sm">
+                <%= t("pages.blog.index.read_more", default: "Lire l'article") %>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+                </svg>
+              </span>
+            </div>
+          </article>
+        <% end %>
+      <% end %>
+      <%# ===== GRILLE ARTICLES ===== %>
+      <% if @other_posts.any? %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <% @other_posts.each do |post| %>
+            <%= render "blog_posts/card", post: post %>
+          <% end %>
+        </div>
+      <% end %>
+      <%# ===== PAGINATION ===== %>
+      <div class="mt-12 flex justify-center">
+        <%= paginate @posts %>
+      </div>
+    <% end %>
+  </div>
+</section>

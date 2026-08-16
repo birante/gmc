@@ -1,0 +1,70 @@
+fr:
+  analytics:
+    pagination:
+      displaying: "Affichage de %{first} à %{last} sur %{total} produits"
+      displaying_pages: "Affichage de %{first} à %{last} sur %{total} pages"
+    
+    page_names:
+      # Pages publiques
+      home: "🏠 Accueil"
+      about: "ℹ️ À propos"
+      contact: "📧 Contact"
+      terms: "📄 Conditions d'utilisation"
+      privacy: "🔒 Politique de confidentialité"
+      
+      # Boutiques
+      shops_index: "🏪 Liste des boutiques"
+      shops_show: "🏪 Détail boutique"
+      shops_search: "🔍 Recherche de boutiques"
+      
+      # Produits
+      items_index: "🏷️ Liste des produits"
+      items_show: "🏷️ Détail produit"
+      items_search: "🔍 Recherche de produits"
+      
+      # Panier & Checkout
+      cart: "🛒 Panier"
+      checkout: "💳 Paiement"
+      checkout_delivery: "🚚 Choix de la livraison"
+      checkout_payment: "💰 Mode de paiement"
+      checkout_confirmation: "✅ Confirmation de commande"
+      order_success: "🎉 Commande réussie"
+      
+      # Compte utilisateur
+      user_profile: "👤 Mon profil"
+      user_orders: "📦 Mes commandes"
+      user_addresses: "📍 Mes adresses"
+      user_favorites: "❤️ Mes favoris"
+      
+      # Compte vendeur
+      vendor_dashboard: "📊 Tableau de bord vendeur"
+      vendor_products: "🏷️ Mes produits"
+      vendor_product_new: "➕ Nouveau produit"
+      vendor_product_edit: "✏️ Édition produit"
+      vendor_orders: "📦 Mes commandes"
+      vendor_order_show: "📦 Détail de commande"
+      vendor_settings: "⚙️ Paramètres"
+      vendor_shop_edit: "🏪 Édition boutique"
+      vendor_analytics: "📊 Analytics"
+      
+      # Compte employé
+      employee_dashboard: "📊 Tableau de bord employé"
+      employee_products: "🏷️ Produits"
+      employee_product_new: "➕ Nouveau produit"
+      employee_product_edit: "✏️ Édition produit"
+      employee_orders: "📦 Commandes"
+      employee_order_show: "📦 Détail de commande"
+      employee_analytics: "📊 Analytics"
+      
+      # Authentification
+      sign_in: "🔑 Connexion"
+      sign_up: "📝 Inscription"
+      password_reset: "🔐 Réinitialisation du mot de passe"
+      
+      # Maintenance
+      maintenance: "🚧 Page de maintenance"
+      maintenance_confirmation: "✅ Confirmation inscription maintenance"
+      
+      # Fallback
+      unknown: "Page sans nom"
+

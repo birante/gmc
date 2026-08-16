@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%# SEO Meta Tags %>
+    <title><%= content_for(:title) || t('seo.default_title', default: 'aa - Mon Compte') %></title>
+    <meta name="description" content="<%= content_for(:meta_description) || t('seo.default_description', default: 'aa, votre marketplace sénégalaise. Gérer vos commandes et votre compte.') %>">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#551694">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%# Analytics Scripts %>
+    <%= render "shared/analytics" %>
+    <%= render "shared/recaptcha" %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
+  </head>
+  <body class="bg-gray-50">
+    <%# Navbar publique (header avec recherche) %>
+    <%= render "shared/public_navbar" %>
+    <%= render "shared/cart_sheet" %>
+    <div id="flash-notifications" class="fixed top-4 right-4 z-50 space-y-3 max-w-md w-full sm:w-auto" role="alert" aria-live="polite">
+      <%= render "shared/flash_notifications" %>
+    </div>
+    <main id="main-content" class="min-h-screen" role="main">
+      <%= yield %>
+    </main>
+    <%= render "shared/footer" %>
+    <%# Schema.org JSON-LD pour SEO %>
+    <%= yield :structured_data %>
+  </body>
+</html>

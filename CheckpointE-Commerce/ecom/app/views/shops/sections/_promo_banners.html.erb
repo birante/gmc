@@ -1,0 +1,7 @@
+<%# Bannières promo - utilise ShopBanner de la boutique %>
+<% if shop.shop_banners.any? %>
+  <section class="py-6" aria-labelledby="shop-banners-heading">
+    <h2 id="shop-banners-heading" class="sr-only"><%= t('shops.banners.title', default: 'Bannières promotionnelles') %></h2>
+    <%= render "shared/shops/shop_banners", shop: shop %>
+  </section>
+<% end %>

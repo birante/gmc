@@ -1,0 +1,320 @@
+<% content_for :active_tab, 'catalogue' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <nav class="mb-4 text-sm" aria-label="Fil d'Ariane">
+      <ol class="flex flex-wrap items-center gap-2 text-gray-500">
+        <li>
+          <%= link_to t('vendors.items.index.title'), url_with_shop(employees_items_path, @current_shop), class: "hover:text-gray-900 transition-colors" %>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <%= link_to @item.name, url_with_shop(employees_item_path(@item), @current_shop), class: "hover:text-gray-900 transition-colors truncate max-w-xs" %>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li class="text-gray-700 font-medium">Gestion des variantes</li>
+      </ol>
+    </nav>
+
+    <!-- Header avec bouton retour -->
+    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex items-center gap-2 min-w-0">
+        <%= link_to url_with_shop(employees_item_path(@item), @current_shop),
+            class: "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          <%= t('common.back') %>
+        <% end %>
+        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Gestion des variantes</h1>
+      </div>
+      <%= link_to "+ Ajouter une variante", 
+          url_with_shop(new_employees_item_variant_path(@item), @current_shop),
+          class: "self-start sm:self-auto px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium" %>
+    </div>
+
+    <!-- Informations du produit -->
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+      <div class="flex items-start justify-between mb-4">
+        <div class="flex-1">
+          <h2 class="text-2xl font-bold text-gray-900 mb-2"><%= @item.name %></h2>
+          <% if @item.description.present? %>
+            <p class="text-gray-600 mb-3"><%= @item.description %></p>
+          <% end %>
+          <div class="flex flex-wrap gap-3 mt-3">
+            <% if @item.product_sub_category %>
+              <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm bg-gray-100 text-gray-700">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <%= @item.product_sub_category.name %>
+              </span>
+            <% end %>
+            <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm bg-gray-100 text-gray-700">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <%= @item.currency.code %>
+            </span>
+            <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm <%= @item.validation_status == 'approved' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' %>">
+              <%= @item.validation_status == 'approved' ? '✓ Approuvé' : '⏳ En attente de validation' %>
+            </span>
+          </div>
+        </div>
+        <div>
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <%= 
+            case @item.validation_status
+            when 'approved' then 'bg-green-100 text-green-800'
+            when 'pending' then 'bg-yellow-100 text-yellow-800'
+            else 'bg-red-100 text-red-800'
+            end
+          %>">
+            <%= t("enums.item.validation_status.#{@item.validation_status}") %>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques principales -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Total variantes</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1"><%= @variants.size %></p>
+          </div>
+          <div class="p-3 bg-purple-100 rounded-lg">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Stock total</p>
+            <p class="text-2xl font-bold text-green-600 mt-1"><%= @variants.sum(:stock_quantity) %></p>
+          </div>
+          <div class="p-3 bg-green-100 rounded-lg">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Prix min</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1"><%= number_to_currency(@variants.minimum(:price) || 0, unit: @item.currency.symbol, precision: 0) %></p>
+          </div>
+          <div class="p-3 bg-blue-100 rounded-lg">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Prix max</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1"><%= number_to_currency(@variants.maximum(:price) || 0, unit: @item.currency.symbol, precision: 0) %></p>
+          </div>
+          <div class="p-3 bg-orange-100 rounded-lg">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques de ventes et visites -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Total ventes</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1"><%= @total_sales %></p>
+            <p class="text-xs text-gray-500 mt-1">Unités vendues</p>
+          </div>
+          <div class="p-3 bg-indigo-100 rounded-lg">
+            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Revenu total</p>
+            <p class="text-2xl font-bold text-green-600 mt-1"><%= number_to_currency(@total_revenue || 0, unit: @item.currency.symbol, precision: 0) %></p>
+            <p class="text-xs text-gray-500 mt-1">Ventes confirmées</p>
+          </div>
+          <div class="p-3 bg-emerald-100 rounded-lg">
+            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600">Visites</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1"><%= @total_views %></p>
+            <p class="text-xs text-gray-500 mt-1">Vues totales</p>
+          </div>
+          <div class="p-3 bg-pink-100 rounded-lg">
+            <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations sur les attributs -->
+    <% if @item_attributes.any? %>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h3 class="font-medium text-blue-900 mb-2">📋 Attributs disponibles</h3>
+        <div class="flex flex-wrap gap-2">
+          <% @item_attributes.each do |attr| %>
+            <div class="bg-white px-3 py-1 rounded-lg border border-blue-200">
+              <span class="font-medium text-gray-900"><%= attr.name %>:</span>
+              <span class="text-gray-600"><%= attr.attribute_values.map(&:value).join(', ') %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Tableau des variantes -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-900">Liste des variantes</h2>
+      </div>
+      
+      <% if @variants.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">SKU</th>
+                <% @item_attributes.each do |attr| %>
+                  <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider"><%= attr.name %></th>
+                <% end %>
+                <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Prix</th>
+                <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Stock</th>
+                <th class="hidden md:table-cell px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Ventes</th>
+                <th class="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Statut</th>
+                <th class="px-3 md:px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @variants.each do |variant| %>
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-3 md:px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm font-mono text-gray-900"><%= variant.sku %></span>
+                  </td>
+                  <% @item_attributes.each do |attr| %>
+                    <td class="px-3 md:px-6 py-4 whitespace-nowrap">
+                      <% value = variant.attribute_values.find { |av| av.item_attribute_id == attr.id }&.value %>
+                      <span class="text-sm text-gray-900"><%= value || '—' %></span>
+                    </td>
+                  <% end %>
+                  <td class="px-3 md:px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm font-medium text-gray-900">
+                      <%= number_to_currency(variant.price, unit: @item.currency.symbol, precision: 0) %>
+                    </span>
+                  </td>
+                  <td class="px-3 md:px-6 py-4 whitespace-nowrap">
+                    <span class="text-sm font-medium <%= variant.stock_quantity > 0 ? 'text-green-600' : 'text-red-600' %>">
+                      <%= variant.stock_quantity %>
+                    </span>
+                  </td>
+                  <td class="hidden md:table-cell px-3 md:px-6 py-4 whitespace-nowrap">
+                    <% variant_sales = OrderItem.joins(:order).where(item_variant_id: variant.id, orders: { status: ['completed', 'delivered'] }).sum(:quantity) %>
+                    <span class="text-sm font-medium <%= variant_sales > 0 ? 'text-indigo-600' : 'text-gray-400' %>">
+                      <%= variant_sales %>
+                    </span>
+                  </td>
+                  <td class="px-3 md:px-6 py-4 whitespace-nowrap">
+                    <% if variant.is_default? %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Défaut
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Standard
+                      </span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex justify-end gap-2">
+                      <%= link_to "Modifier", 
+                          url_with_shop(edit_employees_item_variant_path(@item, variant), @current_shop),
+                          class: "text-[#551694] hover:text-[#451384] font-medium transition-colors" %>
+                      <% unless variant.is_default? %>
+                        <%= button_to "Supprimer", 
+                            url_with_shop(employees_item_variant_path(@item, variant), @current_shop),
+                            method: :delete,
+                            data: { confirm: "Êtes-vous sûr de vouloir supprimer cette variante ?" },
+                            class: "text-red-600 hover:text-red-800 font-medium transition-colors" %>
+                      <% end %>
+                    </div>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="px-6 py-12 text-center">
+          <div class="text-gray-400 mb-4">
+            <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Aucune variante</h3>
+          <p class="text-gray-600 mb-4">Ce produit n'a pas encore de variantes.</p>
+          <%= link_to "Créer une variante", 
+              url_with_shop(new_employees_item_variant_path(@item), @current_shop),
+              class: "inline-flex items-center px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="mt-6 flex flex-wrap gap-4">
+      <%= link_to url_with_shop(employees_item_path(@item), @current_shop),
+          class: "inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors font-medium" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Retour au produit
+      <% end %>
+      
+      <%= link_to "Modifier le produit", 
+          url_with_shop(edit_employees_item_path(@item), @current_shop),
+          class: "px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium" %>
+      
+      <% if @item_attributes.any? && @variants.select { |v| !v.is_default }.size < @item.variant_combinations_count %>
+        <%= button_to "🎯 Générer toutes les variantes possibles", 
+            url_with_shop(generate_variants_employees_item_path(@item), @current_shop),
+            method: :post,
+            class: "px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium" %>
+      <% end %>
+    </div>
+  </main>
+
+</div>

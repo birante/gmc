@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <%# SEO Meta Tags %>
+    <title><%= content_for(:title) || t('seo.default_title', default: 'aa - Marketplace E-commerce Sénégal | Boutiques & Produits Locaux') %></title>
+    <meta name="description" content="<%= content_for(:meta_description) || t('seo.default_description', default: 'aa, votre marketplace sénégalaise. Découvrez des milliers de produits de boutiques locales et officielles. Livraison rapide à Dakar et partout au Sénégal.') %>">
+    <meta name="keywords" content="<%= content_for(:meta_keywords) || t('seo.default_keywords', default: 'e-commerce sénégal, boutiques dakar, produits locaux, made in senegal, livraison dakar') %>">
+    <meta name="robots" content="<%= content_for(:robots) || 'index, follow' %>">
+    <%# Open Graph %>
+    <meta property="og:title" content="<%= content_for(:og_title) || content_for(:title) || t('seo.default_title') %>">
+    <meta property="og:description" content="<%= content_for(:og_description) || content_for(:meta_description) || t('seo.default_description') %>">
+    <meta property="og:image" content="<%= content_for(:og_image) || asset_url('og-default.jpg') rescue '/icon.png' %>">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <meta property="og:type" content="<%= content_for(:og_type) || 'website' %>">
+    <meta property="og:locale" content="<%= I18n.locale == :fr ? 'fr_SN' : 'en_US' %>">
+    <meta property="og:site_name" content="aa">
+    <%# Twitter Card %>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for(:title) || t('seo.default_title') %>">
+    <meta name="twitter:description" content="<%= content_for(:meta_description) || t('seo.default_description') %>">
+    <meta name="twitter:image" content="<%= content_for(:og_image) || asset_url('og-default.jpg') rescue '/icon.png' %>">
+    <%# Canonical URL %>
+    <link rel="canonical" href="<%= content_for(:canonical_url) || request.original_url.split('?').first %>">
+    <%# Hreflang pour multilingue %>
+    <link rel="alternate" hreflang="fr" href="<%= url_for(locale: :fr, only_path: false) rescue root_url(locale: :fr) %>">
+    <link rel="alternate" hreflang="en" href="<%= url_for(locale: :en, only_path: false) rescue root_url(locale: :en) %>">
+    <link rel="alternate" hreflang="x-default" href="<%= url_for(locale: :fr, only_path: false) rescue root_url(locale: :fr) %>">
+    <%# Geo Tags pour le Sénégal %>
+    <meta name="geo.region" content="SN">
+    <meta name="geo.placename" content="Dakar">
+    <%# Mobile & PWA %>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#551694">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%# Preconnect pour les ressources externes %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <%# Preload des ressources critiques %>
+    <%= yield :preload %>
+    <%= yield :head %>
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%# Analytics Scripts %>
+    <%= render "shared/analytics" %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
+  </head>
+  <body class="bg-gray-50">
+    <%# Skip Link pour l'accessibilité %>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-[#551694] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:outline-none focus:ring-2 focus:ring-white">
+      <%= t('accessibility.skip_to_content', default: 'Aller au contenu principal') %>
+    </a>
+    <%= render "shared/public_navbar" %>
+    <% unless content_for?(:hide_nav_search) %>
+      <div class="md:hidden border-b border-[#EBEEF6]/95 bg-white px-4 py-2 relative"
+           data-controller="search"
+           data-search-url-value="<%= search_suggestions_path %>"
+           data-search-see-all-url-value="<%= items_path %>">
+        <div class="relative border border-[#EBEEF6] rounded-full overflow-hidden bg-[#F1F1F4]">
+          <%= form_with url: items_path, method: :get, local: true, class: "flex items-center", html: { role: "search", "aria-label": t('navigation.search_label_products_shops', default: 'Rechercher des produits ou des boutiques') } do |f| %>
+            <%= f.search_field :search,
+                placeholder: t('navigation.search_placeholder_products_shops', default: 'Produit ou boutique…'),
+                value: params[:search],
+                autocomplete: "off",
+                data: {
+                  search_target: "input",
+                  action: "input->search#onInput focus->search#onFocus keydown->search#onKeydown"
+                },
+                class: "flex-1 h-[44px] bg-transparent px-4 py-2 focus:outline-none text-sm" %>
+            <%= f.button type: :submit, class: "bg-[#551694] text-white w-10 h-9 rounded-full mr-1 flex items-center justify-center shrink-0", "aria-label": t('navigation.search_button', default: 'Rechercher') do %>
+              <svg class="w-4 h-4" fill="white" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+            <% end %>
+          <% end %>
+        </div>
+        <!-- Dropdown suggestions (mobile) -->
+        <div data-search-target="dropdown"
+             class="hidden absolute top-full left-2 right-2 mt-1 bg-white shadow-xl rounded-2xl border border-gray-100 max-h-[70vh] overflow-y-auto z-50"
+             role="listbox">
+          <div data-search-target="loading" class="hidden px-4 py-3 text-xs text-gray-400 flex items-center gap-2">
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"></circle>
+              <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"></path>
+            </svg>
+            Recherche en cours…
+          </div>
+          <div data-search-target="productsSection" class="hidden">
+            <div class="px-4 pt-3 pb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Produits</div>
+            <div data-search-target="productsList"></div>
+          </div>
+          <div data-search-target="shopsSection" class="hidden border-t border-gray-100">
+            <div class="px-4 pt-3 pb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Boutiques</div>
+            <div data-search-target="shopsList"></div>
+          </div>
+          <div data-search-target="categoriesSection" class="hidden border-t border-gray-100">
+            <div class="px-4 pt-3 pb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Catégories</div>
+            <div data-search-target="categoriesList"></div>
+          </div>
+          <div data-search-target="empty" class="hidden px-4 py-6 text-center text-sm text-gray-500">
+            Aucun résultat trouvé.
+          </div>
+          <div data-search-target="footer" class="hidden border-t border-gray-100 px-4 py-2.5 bg-gray-50">
+            <a href="#" data-search-target="footerLink" class="text-sm text-[#551694] font-medium hover:underline">Voir tous les résultats</a>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    <div id="cart-sheet">
+      <turbo-frame id="cart-sheet_frame" src="<%= client_cart_path(frame: :sheet) %>"></turbo-frame>
+    </div>
+    <div id="flash-notifications" class="fixed top-4 right-4 z-50 space-y-3 max-w-md w-full sm:w-auto" role="alert" aria-live="polite">
+      <%= render "shared/flash_notifications" %>
+    </div>
+    <main id="main-content" class="min-h-screen" role="main">
+      <%= yield %>
+    </main>
+    <%= render "shared/footer" %>
+    <%# Schema.org JSON-LD pour SEO %>
+    <%= yield :structured_data %>
+  </body>
+</html>

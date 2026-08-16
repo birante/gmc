@@ -1,0 +1,20 @@
+<% content_for :active_tab, 'catalogue' %>
+
+<%# Catalogue (lecture) côté collaborateur. La création/édition de produits reste
+    sur le portail vendor (cross-portail, accessible aux collaborateurs autorisés
+    via Vendors::BaseController#authenticate_vendor_or_employee). Les boutons
+    « Ajouter un produit » / « Importer en masse » ne s'affichent qu'aux managers
+    (can_manage_items?). Pas d'alerte de limite de plan ici (concept vendor). %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/items/index",
+        items_index_path:         employees_items_path(shop_id: @current_shop&.id),
+        item_path_for:            ->(item) { url_with_shop(employees_item_path(item), @current_shop) },
+        new_item_path:            (current_employee.can_manage_items? ? new_employees_item_path(shop_slug: @current_shop&.slug) : nil),
+        dashboard_path:           url_with_shop(employees_dashboard_path, @current_shop),
+        can_manage_items_buttons: current_employee.can_manage_items?,
+        show_bulk_upload_panel:   false,
+        show_limit_alert:         false %>
+  </main>
+</div>

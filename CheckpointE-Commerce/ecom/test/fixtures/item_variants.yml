@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one_default:
+  item: one
+  size: M
+  color: Blue
+  sku: ITEM-ONE-DEFAULT
+  price: 9.99
+  stock_quantity: 10
+  is_default: true
+
+two_default:
+  item: two
+  size: L
+  color: Red
+  sku: ITEM-TWO-DEFAULT
+  price: 19.99
+  stock_quantity: 5
+  is_default: true

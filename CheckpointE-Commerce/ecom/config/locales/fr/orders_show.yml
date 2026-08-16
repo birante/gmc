@@ -1,0 +1,44 @@
+fr:
+  client:
+    orders:
+      show:
+        title: "Commande #%{slug}"
+        placed_on: "Passée le %{date}"
+        ordered_items: "Articles commandés"
+        status: "Statut"
+        quantity: "Quantité"
+        unit_price: "Prix unitaire"
+        total_price: "Total"
+        delivery_info: "Informations de livraison"
+        delivery_address: "Adresse de livraison"
+        delivery_zone: "Zone de livraison"
+        delivery_slot: "Créneau de livraison"
+        delivery_notes: "Notes de livraison"
+        payment_info: "Informations de paiement"
+        payment_method: "Mode de paiement"
+        payment_status: "Statut du paiement"
+        summary: "Récapitulatif"
+        subtotal: "Sous-total"
+        delivery_fee: "Frais de livraison"
+        total: "Total"
+        back_to_orders: "Retour aux commandes"
+        default_variant: "Variante par défaut"
+        payment_not_completed: "Cette commande n'a pas encore été payée. Merci de contacter le support pour finaliser le paiement."
+        delivery_time: "Délai: %{min}-%{max} minutes"
+        amount: "Montant"
+  orders:
+    status:
+      pending: "En attente"
+      processing: "En traitement"
+      shipped: "Expédié"
+      partially_delivered: "Partiellement livré"
+      delivered: "Livré"
+      canceled: "Annulé"
+    status_history:
+      pending: "Votre commande a été effectuée avec succès"
+      processing: "Votre commande est en cours de traitement par le vendeur"
+      shipped: "Votre commande est en route"
+      partially_delivered: "Une partie de votre commande a été livrée"
+      delivered: "Votre commande a été livrée avec succès"
+      canceled: "Votre commande a été annulée"
+

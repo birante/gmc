@@ -1,0 +1,9 @@
+one:
+  start_time: <%= Time.parse('09:00:00') %>
+  end_time: <%= Time.parse('12:00:00') %>
+  is_active: true
+
+two:
+  start_time: <%= Time.parse('14:00:00') %>
+  end_time: <%= Time.parse('18:00:00') %>
+  is_active: true

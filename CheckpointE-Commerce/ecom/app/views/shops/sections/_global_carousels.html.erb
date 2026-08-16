@@ -1,0 +1,6 @@
+<%# Carrousels globaux - Meilleures offres, etc. Produits sélectionnés ou auto %>
+<% primary_color = local_assigns[:primary_color] || shop_primary_color(shop) %>
+<% secondary_color = local_assigns[:secondary_color] || shop_secondary_color(shop) %>
+<% products = section.shop_page_section_products.active.ordered.map(&:item).compact %>
+<% meilleures_offres = products.any? ? products : shop.available_items.on_sale.where.not(sale_discount_percent: nil).order(Arel.sql("sale_discount_percent DESC NULLS LAST")).limit(12).to_a %>
+<%= render "shops/global_carousels", shop: shop, meilleures_offres: meilleures_offres, nouveautes: [], destockage: [], primary_color: primary_color, secondary_color: secondary_color, force_show: meilleures_offres.any? %>

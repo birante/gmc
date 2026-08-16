@@ -1,0 +1,30 @@
+fr:
+  client:
+    orders:
+      payment_provider_fields:
+        payment_info: "Informations de paiement"
+        phone_number_label: "Numéro de téléphone"
+        phone_number_placeholder: "77XXXXXXX"
+        phone_number_help: "Entrez le numéro %{name} qui recevra la demande de paiement."
+        how_it_works: "Comment ça marche ?"
+        how_it_works_step1: "Entrez votre numéro %{name}."
+        how_it_works_step2: "Cliquez sur \"Valider le paiement\"."
+        how_it_works_step3: "Vous recevrez une notification sur votre téléphone."
+        how_it_works_step4: "Confirmez le paiement en suivant les instructions."
+        card_info: "Informations de carte bancaire"
+        card_number_label: "Numéro de carte"
+        card_number_placeholder: "1234 5678 9012 3456"
+        card_expiry_label: "Date d'expiration"
+        card_expiry_placeholder: "MM/AA"
+        card_cvv_label: "CVV"
+        card_cvv_placeholder: "123"
+        card_name_label: "Nom sur la carte"
+        card_name_placeholder: "PRENOM NOM"
+        card_security_note: "Vos informations sont sécurisées et cryptées. Nous ne stockons pas vos données bancaires."
+        cash_on_delivery_title: "Paiement à la livraison"
+        cash_on_delivery_description: "Vous paierez en espèces lors de la réception de votre commande."
+        cash_on_delivery_step1: "Préparez le montant exact si possible."
+        cash_on_delivery_step2: "Vérifiez votre commande avant de payer."
+        cash_on_delivery_step3: "Le livreur vous remettra un reçu."
+        no_additional_info: "Aucune information supplémentaire n'est requise pour ce mode de paiement."
+

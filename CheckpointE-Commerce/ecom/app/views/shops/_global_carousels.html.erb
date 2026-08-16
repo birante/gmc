@@ -1,0 +1,49 @@
+<%# Carrousels globaux style Jumia : Meilleures offres, Nouveautés, Déstockage %>
+<% show_carousels = local_assigns[:force_show] || (shop.official? && (meilleures_offres.present? || nouveautes.present? || destockage.present?)) %>
+<% if show_carousels %>
+  <% primary_color = shop_primary_color(shop) %>
+  <% secondary_color = shop_secondary_color(shop) %>
+
+  <style>
+    .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    .scrollbar-hide::-webkit-scrollbar { display: none; }
+    .shop-carousel-nav { color: var(--primary-color); border: 1px solid var(--primary-color); }
+    .shop-carousel-nav:hover { background-color: var(--primary-color); color: #fff; }
+    .shop-carousel-price { color: var(--primary-color); }
+  </style>
+
+  <div class="space-y-4" style="--primary-color: <%= primary_color %>; --secondary-color: <%= secondary_color %>;">
+    <% [
+      ["Meilleures offres", meilleures_offres, "meilleures-offres"],
+      ["Nouveautés", nouveautes, "nouveautes"],
+      ["Déstockage", destockage, "destockage"]
+    ].each do |title, products, section_id| %>
+      <% next if products.blank? %>
+      <section class="rounded-xl overflow-hidden" style="border: 2px solid <%= primary_color %>20;" data-carousel-index="global-<%= section_id %>" id="carousel-<%= section_id %>">
+        <div class="text-white px-3 sm:px-4 py-1.5" style="background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));">
+          <h3 class="text-sm sm:text-base md:text-lg font-bold"><%= title %></h3>
+        </div>
+
+        <div class="bg-gray-50 px-2 sm:px-4 py-2">
+          <div class="relative flex items-center gap-0 md:gap-2">
+            <button type="button" class="shop-carousel-nav flex absolute md:relative left-1 md:left-auto top-1/2 -translate-y-1/2 md:translate-y-0 md:top-auto z-10 md:z-auto flex-shrink-0 w-8 h-8 md:w-auto md:h-auto p-1.5 md:p-2 rounded-full bg-white/90 md:bg-white backdrop-blur-sm md:backdrop-blur-none transition-colors shadow-md md:shadow-sm hover:shadow-lg items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" style="--tw-ring-color: var(--primary-color);" data-carousel-prev aria-label="Produit précédent">
+              <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+
+            <div class="flex-1 overflow-hidden" data-carousel-container>
+              <div class="flex gap-2.5 sm:gap-3 transition-transform duration-300 ease-out overflow-x-auto scrollbar-hide pb-1 snap-x snap-mandatory sm:snap-none" style="min-width: min-content;" data-carousel-track>
+                <% products.each do |item| %>
+                  <%= render "shops/carousel_product_card", item: item %>
+                <% end %>
+              </div>
+            </div>
+
+            <button type="button" class="shop-carousel-nav flex absolute md:relative right-1 md:right-auto top-1/2 -translate-y-1/2 md:translate-y-0 md:top-auto z-10 md:z-auto flex-shrink-0 w-8 h-8 md:w-auto md:h-auto p-1.5 md:p-2 rounded-full bg-white/90 md:bg-white backdrop-blur-sm md:backdrop-blur-none transition-colors shadow-md md:shadow-sm hover:shadow-lg items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" style="--tw-ring-color: var(--primary-color);" data-carousel-next aria-label="Produit suivant">
+              <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    <% end %>
+  </div>
+<% end %>

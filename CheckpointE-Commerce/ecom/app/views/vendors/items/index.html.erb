@@ -1,0 +1,18 @@
+<% content_for :active_tab, 'catalogue' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/items/index",
+        items_index_path:         url_with_shop(vendors_items_path, @current_shop),
+        item_path_for:            ->(item) { url_with_shop(vendors_item_path(item), @current_shop) },
+        new_item_path:            new_vendors_item_path(shop_slug: @current_shop&.slug),
+        dashboard_path:           url_with_shop(vendors_dashboard_path, @current_shop),
+        signup_path:              new_vendors_registration_path,
+        signup_label:             t('vendors.items.index.signup'),
+        can_manage_items_buttons: true,
+        show_bulk_upload_panel:   true,
+        show_limit_alert:         true %>
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>

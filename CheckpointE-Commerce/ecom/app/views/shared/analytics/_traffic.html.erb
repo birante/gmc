@@ -1,0 +1,76 @@
+<%# Partial partagé : Analytics trafic (vendor + employees) %>
+<%# Variables d'instance attendues : @traffic_sources, @devices, @browsers %>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Sources de trafic -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Sources de Trafic</h3>
+    <% if @traffic_sources.any? %>
+      <div class="space-y-3">
+        <% @traffic_sources.each do |source, count| %>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-gray-700 truncate flex-1 mr-2"><%= source %></span>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <div class="w-32 bg-gray-200 rounded-full h-2">
+                <% max_count = @traffic_sources.first[1] %>
+                <% width = max_count > 0 ? (count.to_f / max_count * 100).to_i : 0 %>
+                <div class="bg-[#551694] h-2 rounded-full" style="width: <%= width %>%"></div>
+              </div>
+              <span class="text-sm font-semibold text-gray-900 w-12 text-right"><%= count %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-8">
+        <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucune source UTM trackée</p>
+        <p class="text-xs text-gray-500 text-center px-4">
+          Ajoutez des paramètres UTM à vos liens pour suivre l'origine de votre trafic.<br>
+          Exemple : <code class="text-[#551694]">?utm_source=facebook&utm_medium=social</code>
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Appareils -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Appareils</h3>
+    <% if @devices.any? && @devices.values.sum > 0 %>
+      <%= pie_chart @devices, donut: true, colors: ["#551694", "#7c1fc4", "#9d4edd", "#c77dff", "#e0aaff"], height: "250px" %>
+    <% else %>
+      <div class="h-[250px] flex flex-col items-center justify-center bg-gray-50 rounded">
+        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucune donnée d'appareil</p>
+        <p class="text-xs text-gray-500 text-center px-4">Les types d'appareils utilisés par vos visiteurs apparaîtront ici.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Navigateurs -->
+  <div class="bg-white rounded-lg shadow p-6 lg:col-span-2">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigateurs</h3>
+    <% if @browsers.any? && @browsers.sum { |(_, count)| count.to_i } > 0 %>
+      <%= column_chart @browsers, thousands: ",", colors: ["#551694"], height: "250px",
+          library: {
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+              x: { grid: { display: false } }
+            },
+            borderRadius: 4
+          } %>
+    <% else %>
+      <div class="h-[250px] flex flex-col items-center justify-center bg-gray-50 rounded">
+        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucune donnée de navigateur</p>
+        <p class="text-xs text-gray-500 text-center px-4">Les navigateurs utilisés par vos visiteurs apparaîtront ici.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

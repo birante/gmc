@@ -1,0 +1,11 @@
+<% content_for :active_tab, 'clients' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/clients/show",
+        back_to_clients_path: vendors_clients_path,
+        order_path_for:       ->(order) { vendors_order_path(order, shop_slug: @current_shop&.slug || params[:shop_slug]) } %>
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>

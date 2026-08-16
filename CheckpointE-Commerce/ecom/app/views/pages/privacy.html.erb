@@ -1,0 +1,131 @@
+<% content_for :title, "aa | Politique de Confidentialité" %>
+<% content_for :meta_description, "Politique de confidentialité de aa : données personnelles collectées, finalités, droits des utilisateurs et contacts." %>
+<% content_for :meta_keywords, "aa, politique confidentialité, données personnelles, RGPD, Loi 2008-12, Sénégal" %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<% content_for :structured_data do %>
+  <%= combined_json_ld_tag(
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Politique de Confidentialité",
+      "url": request.original_url.split("?").first,
+      "inLanguage": I18n.locale.to_s,
+      "isPartOf": { "@type": "WebSite", "name": "aa", "url": safe_root_url },
+      "publisher": organization_schema.except(:@context)
+    },
+    breadcrumb_schema([
+      [ t("breadcrumbs.home", default: "Accueil"), root_url ],
+      [ "Politique de Confidentialité", request.original_url.split("?").first ]
+    ])
+  ) %>
+<% end %>
+<section class="bg-[#ECEAF5] border-b border-[#DDD6F0] py-10 md:py-12">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="max-w-5xl mx-auto text-center">
+      <p class="text-xs uppercase tracking-[0.18em] text-[#551694] font-semibold mb-3">aa</p>
+      <h1 class="text-xl md:text-3xl font-semibold text-[#201A40] leading-snug">
+        Politique de Confidentialité
+      </h1>
+      <p class="mt-3 text-sm text-[#4B5675]">
+        Dernière mise à jour : <%= l(Date.new(2026, 5, 29), format: :long) rescue "29 mai 2026" %>
+      </p>
+    </div>
+  </div>
+</section>
+<section class="bg-white py-10 md:py-14">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="max-w-4xl mx-auto prose prose-lg text-[#3F4254] leading-7">
+      <h2>1. Préambule</h2>
+      <p>
+        aa West Africa SASU (ci-après « aa »), exploitant de la plateforme accessible via
+        <a href="https://sn.aa.com">sn.aa.com</a>, attache une importance particulière à la
+        protection des données à caractère personnel collectées dans le cadre de son activité de
+        marketplace au Sénégal. La présente politique décrit les traitements effectués, conformément
+        à la <strong>Loi n° 2008-12 du 25 janvier 2008</strong> sur la protection des données à
+        caractère personnel et aux standards internationaux (RGPD pour les utilisateurs européens).
+      </p>
+      <h2>2. Données collectées</h2>
+      <p>Nous collectons les catégories de données suivantes lorsque vous utilisez aa :</p>
+      <ul>
+        <li><strong>Identification</strong> : nom, prénom, adresse e-mail, numéro de téléphone.</li>
+        <li><strong>Compte vendeur / boutique</strong> : raison sociale, NINEA, RCCM, IBAN, coordonnées professionnelles.</li>
+        <li><strong>Commandes</strong> : produits commandés, adresses de livraison, modes de paiement (numéro masqué).</li>
+        <li><strong>Navigation</strong> : pages consultées, durée de session, appareil, adresse IP — via cookies et outils d'analyse (Ahoy, Sentry).</li>
+        <li><strong>Communications</strong> : messages envoyés via le formulaire de contact ou le support.</li>
+      </ul>
+      <h2>3. Finalités du traitement</h2>
+      <ul>
+        <li>Permettre l'inscription, la connexion et la gestion du compte utilisateur / vendeur.</li>
+        <li>Exécuter les commandes (paiement, livraison, facturation, service après-vente).</li>
+        <li>Améliorer la plateforme (mesure d'audience, détection des bugs, sécurité).</li>
+        <li>Envoyer des informations de service (confirmations, suivi de commande, alertes sécurité).</li>
+        <li>Adresser, avec votre consentement, des communications marketing (newsletter, promotions).</li>
+        <li>Respecter nos obligations légales et comptables.</li>
+      </ul>
+      <h2>4. Base légale</h2>
+      <p>
+        Le traitement repose principalement sur l'<strong>exécution du contrat</strong> qui vous lie à
+        aa (compte, commande), sur votre <strong>consentement</strong> (newsletter, cookies non
+        essentiels), sur notre <strong>intérêt légitime</strong> (sécurité, lutte contre la fraude,
+        amélioration du service) et sur le respect de nos <strong>obligations légales</strong>
+        (comptabilité, lutte contre le blanchiment).
+      </p>
+      <h2>5. Destinataires & sous-traitants</h2>
+      <p>Vos données sont accessibles aux équipes internes habilitées de aa ainsi qu'à nos sous-traitants techniques :</p>
+      <ul>
+        <li>Hébergement & infrastructure (fournisseur cloud sécurisé).</li>
+        <li>Prestataires de paiement (PayDunya, Wave, Orange Money) — uniquement les données nécessaires.</li>
+        <li>Transporteurs / livreurs partenaires (adresse de livraison uniquement).</li>
+        <li>Outils d'analyse anonymisée et de monitoring (Sentry, Amplitude).</li>
+      </ul>
+      <p>
+        Aucune donnée n'est vendue à des tiers à des fins commerciales.
+      </p>
+      <h2>6. Durée de conservation</h2>
+      <ul>
+        <li>Données de compte : tant que le compte est actif, puis 3 ans après la dernière connexion.</li>
+        <li>Données de commande / facturation : 10 ans (obligation comptable sénégalaise).</li>
+        <li>Cookies analytics : 13 mois maximum.</li>
+      </ul>
+      <h2>7. Vos droits</h2>
+      <p>
+        Conformément à la loi, vous disposez d'un droit d'accès, de rectification, d'effacement,
+        d'opposition, de limitation et de portabilité de vos données. Vous pouvez exercer ces droits
+        à tout moment en nous écrivant à
+        <a href="mailto:contact@aa.com">contact@aa.com</a> ou via la page
+        <%= link_to "Contact", contact_path %>. Une copie de pièce d'identité pourra être demandée
+        pour vérifier votre identité.
+      </p>
+      <p>
+        Vous pouvez également introduire une réclamation auprès de la <strong>Commission de
+          Protection des Données Personnelles (CDP)</strong> au Sénégal.
+      </p>
+      <h2>8. Cookies</h2>
+      <p>
+        aa utilise des cookies strictement nécessaires (session, panier, sécurité) ainsi que
+        des cookies de mesure d'audience anonymisés. Vous pouvez configurer leur usage depuis les
+        paramètres de votre navigateur.
+      </p>
+      <h2>9. Sécurité</h2>
+      <p>
+        Nous mettons en œuvre des mesures techniques et organisationnelles raisonnables pour
+        protéger vos données : chiffrement TLS, sauvegardes régulières, contrôle des accès, audit
+        de sécurité. Aucun système n'étant infaillible, en cas d'incident affectant vos données,
+        aa s'engage à vous en informer dans les délais prévus par la loi.
+      </p>
+      <h2>10. Modifications</h2>
+      <p>
+        La présente politique peut être amendée à tout moment. La date de dernière mise à jour
+        figure en tête de page. En cas de modification substantielle, nous vous en informerons par
+        e-mail ou via un bandeau sur la plateforme.
+      </p>
+      <h2>11. Contact</h2>
+      <p>
+        aa West Africa SASU — Quartier Ouakam, Mamelles, Lot numéro 752, Cité El Hadj Malick SY,
+        Dakar, Sénégal.<br>
+        E-mail : <a href="mailto:contact@aa.com">contact@aa.com</a><br>
+        Téléphone : +221 77 881 83 83
+      </p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,19 @@
+Un article de votre commande a été livré
+
+Bonjour <%= @user.first_name %>,
+
+Nous vous informons qu'un article de votre commande #{@order.order_number} a été livré avec succès :
+
+- <%= @order_item.item.name %>
+<% if @order_item.item_variant %>
+- Variante : <%= @order_item.item_variant.display_name %>
+<% end %>
+- Quantité : <%= @order_item.quantity %>
+
+<% delivered_count = @order.order_items.where(delivery_status: "delivered").count %>
+<% total_count = @order.order_items.count %>
+<% unless delivered_count == total_count %>
+Les autres articles de votre commande sont encore en cours de livraison. Nous vous tiendrons informé de leur arrivée.
+<% end %>
+
+Merci d'avoir fait vos achats chez nous !

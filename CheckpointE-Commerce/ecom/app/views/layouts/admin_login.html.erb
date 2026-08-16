@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title) || "aa Admin — Connexion" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    <%# Dark mode (aligné avec le reste de l’admin) %>
+    <%= javascript_tag nonce: true do %>
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+      } else {
+      document.documentElement.classList.remove('dark');
+      }
+    <% end %>
+    <%= render "shared/analytics" %>
+    <%= Sentry.get_trace_propagation_meta.html_safe %>
+  </head>
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-950 dark:text-gray-100 antialiased">
+    <div class="mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-8">
+      <% if flash[:alert] %>
+        <div class="mb-4 px-4 py-3 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 text-sm w-full max-w-md">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+      <% if flash[:notice] %>
+        <div class="mb-4 px-4 py-3 rounded-md bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 text-sm w-full max-w-md">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+<% content_for :active_tab, "couleurs" %>
+
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+  <div class="mb-6">
+    <%= link_to url_with_shop(vendors_colors_path, @current_shop), class: "text-sm text-gray-600 hover:text-[#551694] inline-flex items-center gap-1" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Retour à la palette
+    <% end %>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Modifier <span style="color: <%= @shop_color.hex_code %>">« <%= @shop_color.name %> »</span></h1>
+
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <%= render "form" %>
+  </div>
+</div>

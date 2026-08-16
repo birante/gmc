@@ -1,0 +1,7 @@
+Bonjour <%= @vendor.first_name %>,
+Vous avez demandé à réinitialiser votre mot de passe.
+Vous pouvez réinitialiser votre mot de passe dans les 15 prochaines minutes en cliquant sur le lien ci-dessous :
+<%= edit_vendors_password_url(token: @token) %>
+Si vous n'avez pas demandé cette réinitialisation, ignorez cet email.
+Cordialement,
+L'équipe aa

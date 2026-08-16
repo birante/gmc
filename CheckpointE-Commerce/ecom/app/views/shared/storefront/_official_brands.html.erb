@@ -1,0 +1,84 @@
+<%# Official Brands - Boutiques officielles avec accessibilité %>
+<%
+  # Charger les bannières de marques officielles depuis la base de données
+  # Elles doivent être passées via @official_shops depuis le contrôleur
+  official_brands = local_assigns[:official_shops] || []
+  
+  # Si aucune bannière, ne pas afficher la section
+  return if official_brands.empty?
+%>
+
+<section class="bg-white py-6 md:py-8" aria-labelledby="official-brands-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]" data-controller="horizontal-scroll">
+    
+    <!-- Section Header -->
+    <header class="flex items-center justify-between mb-6">
+      <h2 id="official-brands-heading" class="text-xl md:text-2xl font-semibold text-[#362526]">
+        <%= link_to t('storefront.official_brands.title', default: 'Boutiques officielles'),
+                    official_client_shops_path,
+                    class: "hover:text-[#551694] hover:underline underline-offset-4",
+                    data: { turbo_frame: "_top" } %>
+      </h2>
+      
+      <!-- Navigation Buttons -->
+      <div class="flex gap-2">
+        <button type="button"
+                data-horizontal-scroll-target="leftButton"
+                data-action="click->horizontal-scroll#scrollLeft"
+                aria-label="<%= t('storefront.carousel.scroll_left', default: 'Faire défiler vers la gauche') %>"
+                class="w-10 h-10 rounded-full bg-[#f1f1f4] border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button type="button"
+                data-horizontal-scroll-target="rightButton"
+                data-action="click->horizontal-scroll#scrollRight"
+                aria-label="<%= t('storefront.carousel.scroll_right', default: 'Faire défiler vers la droite') %>"
+                class="w-10 h-10 rounded-full bg-[#f1f1f4] border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+    
+    <!-- Brands Carousel -->
+    <nav data-horizontal-scroll-target="scrollable" 
+         class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide" 
+         style="scrollbar-width: none; -ms-overflow-style: none;"
+         role="list"
+         aria-label="<%= t('storefront.official_brands.nav_label', default: 'Liste des marques officielles') %>">
+      <% official_brands.each do |brand| %>
+        <%= link_to(brand.link.presence || '#', 
+            class: "flex-shrink-0 group focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 rounded-lg",
+            role: "listitem",
+            "aria-label": t('storefront.official_brands.visit_brand', brand: brand.name, default: "Visiter la marque #{brand.name}")) do %>
+          <article class="w-[160px] md:w-[204px] border border-[#ebebee] rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+            <!-- Logo Container -->
+            <div class="bg-[#f9f9f9] h-[120px] md:h-[153px] flex items-center justify-center">
+              <% if brand.image.attached? %>
+                <%= image_tag(brand.image,
+                    alt: "Logo #{brand.name}",
+                    class: "w-full h-full object-cover",
+                    width: 150,
+                    height: 120) %>
+              <% else %>
+                <!-- Fallback text si pas d'image attachée -->
+                <span class="text-gray-400 font-semibold text-sm text-center"><%= brand.name %></span>
+              <% end %>
+            </div>
+            
+            <!-- Brand Info -->
+            <div class="p-3 md:p-[14px] flex flex-col items-center gap-2">
+              <h3 class="text-[14px] md:text-[16px] font-semibold text-black text-center group-hover:text-[#551694] transition-colors">
+                <%= brand.name %>
+              </h3>
+            </div>
+          </article>
+        <% end %>
+      <% end %>
+    </nav>
+    
+  </div>
+</section>

@@ -1,0 +1,10 @@
+<%# Bloc alerte auth (erreur / succès) — style et typo normalisés %>
+<% if type == :alert && local_assigns[:message].present? %>
+  <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 mb-5 text-sm text-red-700" role="alert">
+    <%= message %>
+  </div>
+<% elsif type == :notice && local_assigns[:message].present? %>
+  <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 mb-5 text-sm text-green-700" role="status">
+    <%= message %>
+  </div>
+<% end %>

@@ -1,0 +1,623 @@
+<%# SEO Meta Tags %>
+<% content_for :title, @page_title %>
+<% content_for :meta_description, @page_description %>
+<% content_for :meta_keywords, @page_keywords if defined?(@page_keywords) %>
+<% content_for :canonical_url, item_url(@item) %>
+<%# Structured Data JSON-LD %>
+<% content_for :structured_data do %>
+  <%= json_ld_tag(product_schema_enhanced(@item)) %>
+<% end %>
+<%# Variables pour le produit %>
+<% @variant = @selected_variant || @item.default_variant || @item.variants.first %>
+<% if @variant %>
+  <% current_price = current_price_for(@variant) %>
+  <% original_price = original_price_for(@variant) %>
+  <% discount_percent = discount_percentage_for(@variant) %>
+  <% is_on_sale = on_sale?(@variant) %>
+<% end %>
+<%# Variables pour les autres produits de la boutique (chargés par le contrôleur ou chargés ici si non défini) %>
+<% @shop_items ||= @item.shop.items.available_for_sale.where.not(id: @item.id).includes(:variants, :currency, main_image_attachment: :blob).limit(5).to_a %>
+<div class="bg-white min-h-screen"
+     data-controller="variant-selector"
+     data-variant-selector-variants-value="<%= @variant_payload&.to_json %>"
+     data-variant-selector-initial-value="<%= @variant&.id %>">
+  <div class="container mx-auto px-4 sm:px-4 md:px-6 lg:px-[50px] py-4 md:py-6">
+    <%# Breadcrumb %>
+    <% breadcrumb_crumbs = [
+      [t('breadcrumbs.home', default: 'Accueil'), root_path],
+      [t('breadcrumbs.products', default: 'Produits'), items_path]
+    ] %>
+    <% if @item.product_sub_category %>
+      <% category = @item.product_sub_category.product_category %>
+      <% breadcrumb_crumbs << [category.name, category_path(category.slug)] %>
+      <% breadcrumb_crumbs << [@item.product_sub_category.name, category_sub_category_path(category.slug, @item.product_sub_category.slug)] %>
+    <% end %>
+    <% breadcrumb_crumbs << [@item.name, item_path(@item)] %>
+    <%= render "shared/breadcrumbs", crumbs: breadcrumb_crumbs %>
+    <%# Hero Section - Produit avec galerie d'images et détails %>
+    <div class="bg-white py-4 md:py-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12">
+        <%# Colonne gauche - Galerie d'images %>
+        <div class="space-y-4">
+          <%# Image principale %>
+          <div class="relative bg-gray-50 rounded-lg overflow-hidden border border-gray-200"
+               style="aspect-ratio: 1/1; max-height: 600px;"
+               data-controller="product-image-actions"
+               data-product-image-actions-title-value="<%= @item.name %>"
+               data-product-image-actions-url-value="<%= item_url(@item) %>">
+            <% if @item.main_image.attached? %>
+              <%= storage_image_tag(@item.main_image,
+                  variant_name: :detail,
+                  alt: @item.name,
+                  id: "main-product-image",
+                  data: { "variant-selector-target": "mainImage" },
+                  class: "w-full h-full object-contain p-4",
+                  eager: true,
+                  priority: true,
+                  width: 800,
+                  height: 800,
+                  data: { action: "click->product-image-actions#zoom" }) %>
+              <%# Badge de réduction sur l'image principale %>
+              <% if is_on_sale && discount_percent > 0 %>
+                <div class="absolute top-4 left-4 bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  -<%= discount_percent %>%
+                </div>
+              <% end %>
+              <%# Bouton Zoom %>
+              <div class="absolute top-4 right-4 flex gap-2">
+                <button type="button"
+                        data-action="click->product-image-actions#zoom"
+                  class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-50 transition-colors"
+                  aria-label="Zoom">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/>
+                  </svg>
+                </button>
+              </div>
+            <% else %>
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+            <% end %>
+          </div>
+          <%# Miniatures d'images %>
+          <% all_images = [] %>
+          <% if @item.main_image.attached? %>
+            <% begin %>
+              <% all_images << @item.main_image.blob %>
+              <% rescue => e %>
+              <% Rails.logger.warn("Erreur lors de la récupération de main_image: #{e.message}") %>
+            <% end %>
+          <% end %>
+          <% if @item.images.attached? %>
+            <% begin %>
+              <% @item.images.each do |img| %>
+                <% all_images << (img.respond_to?(:blob) ? img.blob : img) if img.present? %>
+              <% end %>
+              <% rescue => e %>
+              <% Rails.logger.warn("Erreur lors de la récupération des images: #{e.message}") %>
+            <% end %>
+          <% end %>
+          <% if all_images.any? %>
+            <div class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width: thin;">
+              <% all_images.each_with_index do |image, index| %>
+                <% begin %>
+                  <button type="button"
+                      onclick="changeMainImage('<%= url_for(image.variant(resize_to_limit: [ 800, 800 ], format: :webp)) %>', <%= index %>)"
+                          class="flex-shrink-0 w-20 h-20 rounded-lg border-2 <%= index == 0 ? 'border-[#551694]' : 'border-gray-200 hover:border-gray-300' %> overflow-hidden bg-gray-50 transition-colors"
+                          id="thumbnail-<%= index %>">
+                    <%= storage_image_tag(image,
+                        variant_name: :thumbnail,
+                        alt: "#{@item.name} - Image #{index + 1}",
+                        class: "w-full h-full object-cover",
+                        width: 80,
+                        height: 80) %>
+                  </button>
+                  <% rescue => e %>
+                  <% Rails.logger.warn("Erreur lors de l'affichage de l'image #{index}: #{e.message}") %>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <%# Colonne droite - Détails du produit %>
+        <div class="flex flex-col">
+          <%# Titre du produit %>
+          <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 md:mb-3 leading-tight">
+            <%= @item.name %>
+          </h1>
+          <%# Vendu par — lien rapide vers la boutique %>
+          <%= link_to shop_path(@item.shop),
+              class: "inline-flex items-center gap-2 mb-3 md:mb-4 group",
+              aria: { label: "Voir la boutique #{@item.shop.name}" } do %>
+            <span class="text-xs md:text-sm text-gray-500">Vendu par</span>
+            <span class="w-6 h-6 md:w-7 md:h-7 bg-gray-100 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 flex items-center justify-center">
+              <% if @item.shop.logo.attached? %>
+                <%= storage_image_tag(@item.shop.logo, variant_name: :logo_small, alt: @item.shop.name, class: "w-full h-full object-cover", width: 28, height: 28) %>
+              <% else %>
+                <span class="text-xs font-bold text-[#551694]"><%= @item.shop.name.first.upcase %></span>
+              <% end %>
+            </span>
+            <span class="text-xs md:text-sm font-semibold text-gray-900 group-hover:text-[#551694] group-hover:underline transition-colors truncate max-w-[200px]"><%= @item.shop.name %></span>
+          <% end %>
+          <%# Rating et nombre d'avis %>
+          <div class="flex items-center gap-2 mb-3 md:mb-4">
+            <% if @item.average_rating.present? && @item.reviews.approved.any? %>
+              <div class="flex items-center">
+                <% @item.average_rating.round.times do %>
+                  <svg class="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                <% end %>
+                <% (5 - @item.average_rating.round).times do %>
+                  <svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                <% end %>
+              </div>
+              <span class="text-sm font-semibold text-gray-900"><%= @item.average_rating.round(1) %></span>
+              <span class="text-sm text-gray-600">(<%= pluralize(@item.reviews.approved.size, 'avis') %>)</span>
+            <% else %>
+              <div class="flex items-center">
+                <% 5.times do %>
+                  <svg class="w-5 h-5 text-gray-300 fill-current" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                  </svg>
+                <% end %>
+              </div>
+              <span class="text-sm text-gray-600">(Aucun avis)</span>
+            <% end %>
+          </div>
+          <%# Prix avec promotion %>
+          <% if @variant %>
+            <div class="mb-4 md:mb-6">
+              <div class="flex items-baseline gap-2 md:gap-3 mb-2 flex-wrap">
+                <span class="text-2xl sm:text-3xl md:text-4xl font-bold text-[#dc2626]"
+                      id="selectedPrice"
+                      data-variant-selector-target="price">
+                  <%= number_to_currency(current_price, unit: "", precision: 0, delimiter: ".", separator: ",") %> <%= @item.currency.symbol %>
+                </span>
+                <span class="text-lg md:text-xl text-gray-500 line-through <%= (is_on_sale && original_price > current_price) ? '' : 'hidden' %>"
+                      id="originalPrice"
+                      data-variant-selector-target="originalPrice">
+                  <%= number_to_currency(original_price, unit: "", precision: 0, delimiter: ".", separator: ",") %> <%= @item.currency.symbol %>
+                </span>
+              </div>
+              <%# Stock info — Phase 1 : on n'expose plus le compte brut, juste un badge sémantique %>
+              <p id="selectedStock" data-variant-selector-target="stockBadge"
+                 class="<%= @variant.stock_quantity <= 0 ? 'text-sm text-red-600 font-medium' : (@variant.stock_quantity <= 3 ? 'text-sm text-amber-600 font-medium' : 'text-sm text-green-600 font-medium') %>">
+                <% if @variant.stock_quantity <= 0 %>
+                  ✗ Rupture de stock
+                <% elsif @variant.stock_quantity <= 3 %>
+                  ⚠ Plus que <%= @variant.stock_quantity %> — commandez vite
+                <% else %>
+                  ✓ En stock
+                <% end %>
+              </p>
+            </div>
+          <% end %>
+          <%# ====================================================== %>
+          <%# Sélecteurs de variantes (cross-attribut, piloté par Stimulus) %>
+          <%# ====================================================== %>
+          <% if @item.variants.any? && @item.item_attributes.any? %>
+            <div class="space-y-5 md:space-y-6 mb-4 md:mb-6">
+              <% @item.item_attributes.ordered.each do |attribute| %>
+                <% attr_payload = @variant_payload[:attributes].find { |a| a[:id] == attribute.id } %>
+                <% next unless attr_payload && attr_payload[:values].any? %>
+                <div>
+                  <div class="flex items-center justify-between mb-2 md:mb-3">
+                    <label class="block text-sm font-semibold text-gray-900">
+                      <%= attribute.name %><% if color_attribute?(attribute.name) %> :
+                        <span class="font-normal text-gray-700"
+                              data-variant-selector-target="selectedValue"
+                              data-attr-name="<%= attribute.name %>"></span>
+                      <% end %>
+                    </label>
+                  </div>
+                  <% if color_attribute?(attribute.name) %>
+                    <%# Pastilles couleur %>
+                    <div class="flex flex-wrap gap-2 md:gap-3">
+                      <% attr_payload[:values].each do |val| %>
+                        <% hex = color_hex_for(val) %>
+                        <button type="button"
+                                data-variant-selector-target="option"
+                                data-action="click->variant-selector#select"
+                          data-attr-name="<%= attribute.name %>"
+                          data-attr-value="<%= val[:value] %>"
+                          data-option-style="swatch"
+                          class="relative w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all <%= swatch_needs_dark_border?(hex) ? 'border-gray-400' : 'border-gray-300' %>"
+                          style="background-color: <%= hex %>;"
+                          title="<%= val[:value] %>"
+                          aria-label="<%= attribute.name %> <%= val[:value] %>">
+                          <span data-swatch-check class="hidden absolute inset-0 m-auto w-6 h-6 flex items-center justify-center">
+                            <svg class="w-5 h-5 <%= swatch_needs_dark_border?(hex) ? 'text-gray-900' : 'text-white' %> drop-shadow" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                          </span>
+                        </button>
+                      <% end %>
+                    </div>
+                  <% else %>
+                    <%# Boutons rectangulaires (tailles, stockage, autres) %>
+                    <div class="flex flex-wrap gap-2 md:gap-3">
+                      <% attr_payload[:values].each do |val| %>
+                        <button type="button"
+                                data-variant-selector-target="option"
+                                data-action="click->variant-selector#select"
+                          data-attr-name="<%= attribute.name %>"
+                          data-attr-value="<%= val[:value] %>"
+                          data-option-style="chip"
+                          class="px-4 md:px-5 py-2 md:py-2.5 rounded-lg border-2 text-sm font-medium text-gray-900 transition-all hover:border-gray-400 disabled:hover:border-gray-300">
+                          <%= val[:value] %>
+                        </button>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+              <%# ----------- Quantité + Ajouter au panier -------- %>
+              <div data-variant-selector-target="addToCartWrapper" class="space-y-3 md:space-y-4 pt-2">
+                <div class="flex items-center gap-2 border border-gray-300 rounded-lg w-fit">
+                  <button type="button"
+                          onclick="decreaseQuantity()"
+                          id="decreaseBtn"
+                          class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                  </button>
+                  <input type="number"
+                         id="quantityInput"
+                         data-variant-selector-target="quantityInput"
+                         value="1"
+                         min="1"
+                         max="<%= @variant&.stock_quantity || 1 %>"
+                         class="w-14 md:w-16 text-center text-base md:text-lg font-semibold border-0 focus:outline-none focus:ring-0"
+                         onchange="validateQuantity()" />
+                  <button type="button"
+                          onclick="increaseQuantity()"
+                          id="increaseBtn"
+                          class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </button>
+                </div>
+                <%= form_with url: client_cart_items_path, method: :post, class: "w-full", data: { turbo: true } do |form| %>
+                  <%= form.hidden_field :item_id, value: @item.id %>
+                  <%= form.hidden_field :item_variant_id, value: @variant&.id, id: "variantInput", data: { "variant-selector-target": "variantInput" } %>
+                  <%= form.hidden_field :quantity, value: 1, id: "quantityHidden", data: { "variant-selector-target": "quantityHidden" } %>
+                  <%= form.button type: "submit",
+                      formaction: client_cart_items_path,
+                      class: "w-full bg-[#551694] text-white font-semibold px-4 md:px-6 py-3 md:py-4 rounded-lg hover:bg-[#451384] transition-all shadow-lg hover:shadow-xl text-sm md:text-base add-to-cart-btn flex items-center justify-center gap-2",
+                      id: "addToCartBtn",
+                      data: { "variant-selector-target": "addToCart" } do %>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Ajouter au panier
+                  <% end %>
+                <% end %>
+              </div>
+              <%# Bouton alternatif quand la combinaison est en rupture %>
+              <div data-variant-selector-target="outOfStock" class="hidden pt-2">
+                <button type="button"
+                        class="w-full border-2 border-[#551694] text-[#551694] font-semibold px-4 md:px-6 py-3 md:py-4 rounded-lg hover:bg-[#551694]/5 transition-all text-sm md:text-base flex items-center justify-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                  </svg>
+                  M'avertir quand disponible
+                </button>
+              </div>
+            </div>
+          <% elsif @variant && @variant.stock_quantity > 0 %>
+            <%# Cas legacy : produit sans attributs définis — un seul prix, un seul stock, un seul bouton %>
+            <div class="space-y-3 md:space-y-4 mb-4 md:mb-6">
+              <div class="flex items-center gap-2 border border-gray-300 rounded-lg w-fit">
+                <button type="button" onclick="decreaseQuantity()" id="decreaseBtn"
+                        class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                </button>
+                <input type="number" id="quantityInput" value="1" min="1" max="<%= @variant.stock_quantity %>"
+                       class="w-14 md:w-16 text-center text-base md:text-lg font-semibold border-0 focus:outline-none focus:ring-0"
+                       onchange="validateQuantity()" />
+                <button type="button" onclick="increaseQuantity()" id="increaseBtn"
+                        class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
+              </div>
+              <%= form_with url: client_cart_items_path, method: :post, class: "w-full", data: { turbo: true } do |form| %>
+                <%= form.hidden_field :item_id, value: @item.id %>
+                <%= form.hidden_field :item_variant_id, value: @variant.id, id: "variantInput" %>
+                <%= form.hidden_field :quantity, value: 1, id: "quantityHidden" %>
+                <%= form.button type: "submit",
+                    class: "w-full bg-[#551694] text-white font-semibold px-4 md:px-6 py-3 md:py-4 rounded-lg hover:bg-[#451384] transition-all shadow-lg hover:shadow-xl text-sm md:text-base add-to-cart-btn flex items-center justify-center gap-2",
+                    id: "addToCartBtn" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                  Ajouter au panier
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
+            <button disabled class="w-full bg-gray-300 text-gray-500 font-semibold px-6 py-4 rounded-lg cursor-not-allowed mb-6">
+              Rupture de stock
+            </button>
+          <% end %>
+          <%# Bandeau de réassurance %>
+          <div class="grid grid-cols-3 gap-2 md:gap-3 mt-4 md:mt-5 pt-4 border-t border-gray-200 text-center">
+            <div class="flex flex-col items-center gap-1">
+              <svg class="w-6 h-6 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-[11px] md:text-xs font-medium text-gray-700 leading-tight">Livraison rapide</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <svg class="w-6 h-6 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+              </svg>
+              <span class="text-[11px] md:text-xs font-medium text-gray-700 leading-tight">Paiement sécurisé</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <svg class="w-6 h-6 text-[#551694]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+              <span class="text-[11px] md:text-xs font-medium text-gray-700 leading-tight">Retour 7 jours</span>
+            </div>
+          </div>
+          <%# Partage du produit %>
+          <% share_url = item_url(@item) %>
+          <% share_text = "Découvrez « #{@item.name} » sur aa : #{share_url}" %>
+          <div class="mt-4 md:mt-5 pt-4 border-t border-gray-200"
+               data-controller="share-link"
+               data-share-link-url-value="<%= share_url %>">
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Partager ce produit</p>
+            <div class="flex items-center gap-2">
+              <%= link_to "https://wa.me/?text=#{CGI.escape(share_text)}",
+                  target: "_blank", rel: "noopener noreferrer",
+                  aria: { label: "Partager sur WhatsApp" },
+                  class: "inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg bg-[#25D366] text-white text-sm font-semibold hover:bg-[#1ebe57] transition-colors shadow-sm" do %>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span class="hidden sm:inline">WhatsApp</span>
+              <% end %>
+              <button type="button"
+                      data-action="click->share-link#copy"
+                aria-label="Copier le lien"
+                class="inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 010 5.656l-3 3a4 4 0 01-5.656-5.656l1.5-1.5m4-4l1.5-1.5a4 4 0 015.656 5.656l-3 3a4 4 0 01-5.656 0"></path>
+                </svg>
+                <span data-share-link-target="label">Copier le lien</span>
+              </button>
+            </div>
+          </div>
+          <%# Section "À propos de la boutique" — cliquable vers la page boutique %>
+          <div class="border-t border-gray-200 pt-4 md:pt-6 mt-4 md:mt-6">
+            <%= link_to shop_path(@item.shop),
+                class: "flex items-center gap-3 md:gap-4 mb-3 md:mb-4 p-2 -m-2 rounded-lg hover:bg-gray-50 transition-colors group",
+                aria: { label: "Voir la boutique #{@item.shop.name}" } do %>
+              <%# Logo boutique %>
+              <div class="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-gray-200 flex-shrink-0">
+                <% if @item.shop.logo.attached? %>
+                  <%= storage_image_tag(@item.shop.logo, variant_name: :logo_small, alt: @item.shop.name, class: "w-full h-full object-cover", width: 64, height: 64) %>
+                <% else %>
+                  <span class="text-2xl font-bold text-[#551694]"><%= @item.shop.name.first.upcase %></span>
+                <% end %>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1 group-hover:text-[#551694] transition-colors truncate"><%= @item.shop.name %></h3>
+                <%# Rating boutique %>
+                <% if @item.shop.average_rating.present? %>
+                  <% shop_rounded_rating = @item.shop.average_rating.round %>
+                  <div class="flex items-center gap-1" role="img" aria-label="<%= t('storefront.products.rating', rating: shop_rounded_rating) %>">
+                    <% 5.times do |i| %>
+                      <svg class="w-4 h-4 <%= i < shop_rounded_rating ? 'text-yellow-400 fill-current' : 'text-gray-300' %>" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                    <% end %>
+                    <span class="text-sm text-gray-600 ml-1">(<%= @item.shop.reviews_count %>)</span>
+                  </div>
+                <% end %>
+              </div>
+              <svg class="w-5 h-5 text-gray-400 group-hover:text-[#551694] transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <%# Onglets Description / Avis %>
+    <div class="border-t border-gray-200 mt-6 md:mt-8 pt-6 md:pt-8 px-4 md:px-0">
+      <div class="flex gap-4 md:gap-6 border-b border-gray-200 mb-4 md:mb-6 overflow-x-auto" data-controller="tabs" style="scrollbar-width: thin;">
+        <button type="button"
+                onclick="switchTab('description')"
+                id="tab-description"
+                class="px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-[#551694] text-[#551694] transition-colors whitespace-nowrap flex-shrink-0">
+          Description
+        </button>
+        <button type="button"
+                onclick="switchTab('reviews')"
+                id="tab-reviews"
+                class="px-3 md:px-4 py-2 text-xs md:text-sm font-medium text-gray-600 hover:text-gray-900 border-b-2 border-transparent transition-colors whitespace-nowrap flex-shrink-0">
+          Avis (<%= @item.reviews.approved.size %>)
+        </button>
+      </div>
+      <%# Contenu Description %>
+      <div id="tab-content-description" class="prose max-w-none">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">Caractéristiques complémentaires</h3>
+        <% if @item.description.present? %>
+          <div class="text-gray-700 leading-relaxed mb-6">
+            <%= simple_format(@item.description) %>
+          </div>
+        <% end %>
+        <%# Spécifications techniques si disponibles %>
+        <% if @item.variants.any? && @variant %>
+          <div class="bg-gray-50 rounded-lg p-6">
+            <h4 class="font-semibold text-gray-900 mb-4">Spécifications</h4>
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <% if @item.product_sub_category %>
+                <div>
+                  <dt class="text-sm text-gray-600 mb-1">Catégorie</dt>
+                  <dd class="text-sm font-medium text-gray-900"><%= @item.product_sub_category.name %></dd>
+                </div>
+              <% end %>
+              <% if @variant.sku.present? %>
+                <div>
+                  <dt class="text-sm text-gray-600 mb-1">Référence</dt>
+                  <dd class="text-sm font-medium text-gray-900"><%= @variant.sku %></dd>
+                </div>
+              <% end %>
+              <div>
+                <dt class="text-sm text-gray-600 mb-1">Prix</dt>
+                <dd class="text-sm font-medium text-gray-900">
+                  <%= number_to_currency(current_price, unit: @item.currency.symbol, precision: 0) %>
+                  <% if is_on_sale && original_price > current_price %>
+                    <span class="text-xs text-gray-500 line-through ml-2"><%= number_to_currency(original_price, unit: @item.currency.symbol, precision: 0) %></span>
+                  <% end %>
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm text-gray-600 mb-1">Stock disponible</dt>
+                <dd class="text-sm font-medium <%= @variant.stock_quantity > 0 ? 'text-green-600' : 'text-red-600' %>">
+                  <%= @variant.stock_quantity > 0 ? "#{@variant.stock_quantity} unités" : "Rupture de stock" %>
+                </dd>
+              </div>
+            </dl>
+          </div>
+        <% end %>
+      </div>
+      <%# Contenu Avis - Prend tout l'espace disponible %>
+      <div id="tab-content-reviews" class="hidden w-full">
+        <div class="w-full">
+          <%= render "shared/reviews/reviews_section", item: @item, current_user: current_user %>
+        </div>
+      </div>
+    </div>
+    <%# Sticky CTA mobile — visible uniquement < md, sous le pli %>
+    <% if @variant %>
+      <div class="fixed bottom-0 inset-x-0 z-40 md:hidden bg-white border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3">
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-gray-500 truncate"><%= @item.name %></p>
+          <p class="text-base font-bold text-[#dc2626]">
+            <span data-variant-selector-target="price" data-price-with-symbol="false"><%= number_to_currency(current_price, unit: "", precision: 0, delimiter: ".", separator: ",") %></span>
+            <%= @item.currency.symbol %>
+          </p>
+        </div>
+        <button type="button"
+                class="flex-shrink-0 bg-[#551694] text-white font-semibold px-5 py-3 rounded-lg active:bg-[#451384] flex items-center gap-2 text-sm"
+                onclick="document.getElementById('addToCartBtn')?.click()">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          Ajouter
+        </button>
+      </div>
+      <%# Espace pour ne pas masquer le contenu sous le sticky %>
+      <div class="md:hidden h-20"></div>
+    <% end %>
+    <%# Section "Autres produits de la boutique" %>
+    <% if @shop_items.any? %>
+      <div class="border-t border-gray-200 mt-8 md:mt-12 pt-6 md:pt-8">
+        <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-4 md:mb-6 px-4 md:px-0">Autres produits de la boutique</h2>
+        <%# Grid responsive: mobile (scroll horizontal), tablette (2 colonnes), desktop (4-5 colonnes) %>
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 px-4 md:px-0">
+          <% @shop_items.each do |item| %>
+            <% variant = item.default_variant || item.variants.first %>
+            <% next unless variant %>
+            <div class="w-full">
+              <%= render "shared/storefront/recommendation_item_card", item: item %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+<script>
+  let currentVariantId = <%= @variant&.id || 'null' %>;
+  let maxQuantity = <%= @variant ? @variant.stock_quantity : 0 %>;
+
+  // Changer l'image principale
+  function changeMainImage(imageUrl, index) {
+    document.getElementById('main-product-image').src = imageUrl;
+    // Mettre à jour les thumbnails actifs
+    document.querySelectorAll('[id^="thumbnail-"]').forEach((thumb, i) => {
+      if (i === index) {
+        thumb.classList.remove('border-gray-200');
+        thumb.classList.add('border-[#551694]');
+      } else {
+        thumb.classList.remove('border-[#551694]');
+        thumb.classList.add('border-gray-200');
+      }
+    });
+  }
+
+  // Gestion de la quantité
+  function increaseQuantity() {
+    const input = document.getElementById('quantityInput');
+    const currentValue = parseInt(input.value) || 1;
+    if (currentValue < maxQuantity) {
+      input.value = currentValue + 1;
+      document.getElementById('quantityHidden').value = input.value;
+      validateQuantity();
+    }
+  }
+
+  function decreaseQuantity() {
+    const input = document.getElementById('quantityInput');
+    const currentValue = parseInt(input.value) || 1;
+    if (currentValue > 1) {
+      input.value = currentValue - 1;
+      document.getElementById('quantityHidden').value = input.value;
+      validateQuantity();
+    }
+  }
+
+  function validateQuantity() {
+    const input = document.getElementById('quantityInput');
+    let value = parseInt(input.value) || 1;
+
+    if (value < 1) value = 1;
+    if (value > maxQuantity) value = maxQuantity;
+
+    input.value = value;
+    document.getElementById('quantityHidden').value = value;
+
+    // Désactiver/activer les boutons
+    document.getElementById('decreaseBtn').disabled = value <= 1;
+    document.getElementById('increaseBtn').disabled = value >= maxQuantity;
+  }
+
+  // Changer d'onglet
+  function switchTab(tabName) {
+    // Masquer tous les contenus
+    document.getElementById('tab-content-description').classList.add('hidden');
+    document.getElementById('tab-content-reviews').classList.add('hidden');
+
+    // Retirer l'état actif de tous les onglets
+    document.getElementById('tab-description').classList.remove('border-[#551694]', 'text-[#551694]', 'font-semibold');
+    document.getElementById('tab-description').classList.add('border-transparent', 'text-gray-600', 'font-medium');
+    document.getElementById('tab-reviews').classList.remove('border-[#551694]', 'text-[#551694]', 'font-semibold');
+    document.getElementById('tab-reviews').classList.add('border-transparent', 'text-gray-600', 'font-medium');
+
+    // Afficher le contenu sélectionné
+    if (tabName === 'description') {
+      document.getElementById('tab-content-description').classList.remove('hidden');
+      document.getElementById('tab-description').classList.remove('border-transparent', 'text-gray-600', 'font-medium');
+      document.getElementById('tab-description').classList.add('border-[#551694]', 'text-[#551694]', 'font-semibold');
+    } else if (tabName === 'reviews') {
+      document.getElementById('tab-content-reviews').classList.remove('hidden');
+      document.getElementById('tab-reviews').classList.remove('border-transparent', 'text-gray-600', 'font-medium');
+      document.getElementById('tab-reviews').classList.add('border-[#551694]', 'text-[#551694]', 'font-semibold');
+    }
+  }
+
+  // Initialiser au chargement
+  document.addEventListener('DOMContentLoaded', function() {
+    validateQuantity();
+  });
+</script>

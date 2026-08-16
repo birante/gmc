@@ -1,0 +1,519 @@
+<% content_for :page_title, "Tableau de bord" %>
+<% v = "#6C3FD6" %>
+
+<%# ── Helpers de vue ──────────────────────────────────────────────────── %>
+<% def pct_change(curr, prev)
+     return nil if prev.nil? || prev.zero?
+     ((curr.to_f - prev.to_f) / prev.to_f * 100).round(1)
+   end %>
+
+<%# ────────────────────────────────────────────────────────────────────
+    BARRE DE FILTRE DATE — compacte, collée au top
+──────────────────────────────────────────────────────────────────── %>
+<div class="mb-5 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3"
+     style="box-shadow: 0 1px 4px rgba(0,0,0,0.05);">
+  <%= form_with url: admin_hub_path, method: :get, data: { turbo: false },
+      html: { class: "flex flex-wrap items-center gap-2" } do |f| %>
+    <%= hidden_field_tag :locale, params[:locale] if params[:locale].present? %>
+
+    <%# Icône calendrier %>
+    <span class="text-gray-400 mr-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    </span>
+
+    <%= date_field_tag :date_start, d_start,
+        class: "text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none w-[140px]",
+        style: "outline-color: #{v}" %>
+    <span class="text-gray-300 text-sm">→</span>
+    <%= date_field_tag :date_end, d_end,
+        class: "text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none w-[140px]",
+        style: "outline-color: #{v}" %>
+
+    <div class="flex items-center gap-1.5 ml-1">
+      <%= select_tag :etablissement,
+          options_for_select([["Tous", ""], ["Principal", "principal"]], params[:etablissement].presence || ""),
+          class: "text-sm text-gray-600 border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none" %>
+      <%= submit_tag "Filtrer",
+          class: "px-4 py-1.5 text-white text-sm font-semibold rounded-lg cursor-pointer",
+          style: "background: #{v};" %>
+      <%= link_to "✕", admin_hub_path,
+          class: "px-3 py-1.5 text-sm text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors",
+          data: { turbo: false } %>
+    </div>
+
+    <%# Raccourcis rapides %>
+    <div class="flex items-center gap-1 pl-3 ml-1 border-l border-gray-100">
+      <% last_m_s = 1.month.ago.beginning_of_month.to_date; last_m_e = 1.month.ago.end_of_month.to_date %>
+      <% [["Auj.", Date.current, Date.current], ["7j", 7.days.ago.to_date, Date.current], ["30j", 30.days.ago.to_date, Date.current], ["Mois", Date.current.beginning_of_month, Date.current], ["M-1", last_m_s, last_m_e]].each do |label, ds, de| %>
+        <% active = d_start == ds && d_end == de %>
+        <%= link_to label,
+            admin_hub_path(date_start: ds.to_s, date_end: de.to_s, locale: params[:locale]),
+            class: "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all whitespace-nowrap #{active ? "text-white" : "text-gray-500 hover:bg-gray-100"}",
+            style: active ? "background: #{v};" : "",
+            data: { turbo: false } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    ALERTES
+──────────────────────────────────────────────────────────────────── %>
+<% total_alerts = (@alert_pending_orders || 0) + (@alert_pending_products || 0) %>
+<% if total_alerts > 0 %>
+  <div class="mb-5 flex items-center gap-3 px-4 py-3 bg-amber-50 border border-amber-200/60 rounded-2xl">
+    <div class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+    </div>
+    <div class="flex flex-wrap gap-4 flex-1">
+      <% if (@alert_pending_orders || 0) > 0 %>
+        <%= link_to admin_orders_path(q: { status_in: [ "pending" ] }, locale: params[:locale]),
+            class: "text-sm text-amber-700 hover:text-amber-900 font-semibold flex items-center gap-1" do %>
+          <span class="font-black text-amber-800"><%= @alert_pending_orders %></span> commandes à traiter
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <% end %>
+      <% end %>
+      <% if (@alert_pending_products || 0) > 0 %>
+        <%= link_to admin_items_path(q: { validation_status_eq: "pending" }, locale: params[:locale]),
+            class: "text-sm text-amber-700 hover:text-amber-900 font-semibold flex items-center gap-1" do %>
+          <span class="font-black text-amber-800"><%= @alert_pending_products %></span> produits en attente
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%# ────────────────────────────────────────────────────────────────────
+    KPI CARDS — 4 colonnes, gradient top-border
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+
+  <%# Définition des 4 KPIs %>
+  <% kpis = [
+    {
+      label: "Chiffre d'affaires", sub: "Livraisons payées",
+      val: number_with_delimiter((@revenue || 0).to_i),
+      unit: "FCFA",
+      pct: pct_change(@revenue || 0, @rev_prev || 0),
+      icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+      gradient: "linear-gradient(135deg, #10b981, #059669)",
+      bg: "#F0FDF4", accent: "#10b981"
+    },
+    {
+      label: "Commandes", sub: "#{@orders_delivered || 0} livrées",
+      val: number_with_delimiter(@orders_count || 0), unit: nil,
+      pct: pct_change(@orders_count || 0, @ord_prev || 0),
+      icon: "M16 11V7a4 4 0 00-8 0v4M5 9h14l1 7H4l1-7z",
+      gradient: "linear-gradient(135deg, #6C3FD6, #9b6dff)",
+      bg: "#F5F0FF", accent: v
+    },
+    {
+      label: "Visites", sub: "Sessions uniques",
+      val: (@traffic || 0) >= 1000 ? "#{((@traffic || 0)/1000.0).round(1)}k" : number_with_delimiter(@traffic || 0),
+      unit: nil,
+      pct: pct_change(@traffic || 0, @traf_prev || 0),
+      icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
+      gradient: "linear-gradient(135deg, #3b82f6, #2563eb)",
+      bg: "#EFF6FF", accent: "#3b82f6"
+    },
+    {
+      label: "Conversion", sub: "Visites → livraisons",
+      val: @conversion || 0, unit: "%",
+      pct: pct_change(@conversion || 0, @conv_prev || 0),
+      icon: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
+      gradient: "linear-gradient(135deg, #06b6d4, #0891b2)",
+      bg: "#ECFEFF", accent: "#06b6d4"
+    }
+  ] %>
+
+  <% kpis.each do |kpi| %>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col gap-4 relative overflow-hidden"
+         style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+      <%# Accent bar top %>
+      <div class="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style="background: <%= kpi[:accent] %>;"></div>
+
+      <%# Icône + badge tendance %>
+      <div class="flex items-center justify-between">
+        <div class="w-11 h-11 rounded-2xl flex items-center justify-center"
+             style="background: <%= kpi[:gradient] %>;">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="<%= kpi[:icon] %>"/>
+          </svg>
+        </div>
+        <% p = kpi[:pct] %>
+        <% if p %>
+          <span class="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full
+                       <%= p >= 0 ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600" %>">
+            <%= p >= 0 ? "↑" : "↓" %> <%= p.abs %>%
+          </span>
+        <% end %>
+      </div>
+
+      <%# Valeur %>
+      <div>
+        <p class="text-[26px] font-black leading-none text-gray-900 tracking-tight">
+          <%= kpi[:val] %><% if kpi[:unit] %><span class="text-base font-semibold text-gray-400 ml-1"><%= kpi[:unit] %></span><% end %>
+        </p>
+        <p class="text-sm font-semibold text-gray-700 mt-1.5"><%= kpi[:label] %></p>
+        <p class="text-xs text-gray-400 mt-0.5"><%= kpi[:sub] %></p>
+      </div>
+
+      <%# Sparkline mini (CA seulement) %>
+      <% if kpi[:label] == "Chiffre d'affaires" && @revenue_by_day.present? %>
+        <div class="-mx-1 -mb-1">
+          <%= line_chart @revenue_by_day.sort.to_h.transform_keys { |d| d.strftime("%d/%m") },
+              height: "36px", colors: ["#10b981"],
+              library: { plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                         elements: { point: { radius: 0 } },
+                         scales: { x: { display: false }, y: { display: false } } } %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    GRAPHIQUE CA + STATUTS
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-5">
+
+  <%# Graphique CA ── large %>
+  <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5"
+       style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between mb-5">
+      <div>
+        <h3 class="text-sm font-bold text-gray-900">Évolution du CA</h3>
+        <p class="text-xs text-gray-400 mt-0.5">Commandes livrées · <%= d_start.strftime("%d/%m") %> – <%= d_end.strftime("%d/%m/%Y") %></p>
+      </div>
+      <span class="text-xs font-bold px-3 py-1 rounded-full text-white"
+            style="background: #{v};">
+        <%= number_with_delimiter((@revenue || 0).to_i) %> FCFA
+      </span>
+    </div>
+    <% chart_data = (@revenue_by_day || {}).sort.to_h.transform_keys { |d| d.strftime("%d/%m") } %>
+    <%= area_chart chart_data.presence || { "—" => 0 },
+        suffix: " FCFA", thousands: ",", colors: [v], height: "200px",
+        library: {
+          elements: { line: { fill: true, tension: 0.4, borderWidth: 2 }, point: { radius: 0, hoverRadius: 4 } },
+          plugins: { legend: { display: false } },
+          scales: { x: { grid: { display: false }, ticks: { color: "#9ca3af", font: { size: 11 } } },
+                    y: { grid: { color: "#f3f4f6" }, ticks: { color: "#9ca3af", font: { size: 11 } } } }
+        } %>
+  </div>
+
+  <%# Donut statuts ── compact %>
+  <div class="bg-white rounded-2xl border border-gray-100 p-5"
+       style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <h3 class="text-sm font-bold text-gray-900 mb-4">Statut des commandes</h3>
+    <% if @logistics.present? && @logistics.values.sum > 0 %>
+      <% log_labeled = (@logistics || {}).transform_keys { |k| hub_status_labels[k.to_s] || k.to_s.humanize } %>
+      <%= pie_chart log_labeled, donut: true, height: "150px",
+          colors: ["#10b981","#3b82f6","#8b5cf6","#ef4444","#eab308","#6b7280"],
+          library: { plugins: { legend: { display: false } } } %>
+      <div class="mt-4 space-y-2">
+        <% (@logistics || {}).sort_by { |_, c| -c }.first(5).each do |k, cnt| %>
+          <% total = @logistics.values.sum.to_f; total = 1 if total.zero? %>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 min-w-0">
+              <% status_colors = { "delivered" => "#10b981", "processing" => "#3b82f6", "pending" => "#eab308", "shipped" => "#8b5cf6", "canceled" => "#ef4444" } %>
+              <span class="w-2 h-2 rounded-full flex-shrink-0" style="background: <%= status_colors[k.to_s] || "#6b7280" %>;"></span>
+              <span class="text-xs text-gray-600 truncate"><%= hub_status_labels[k.to_s] || k.humanize %></span>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <span class="text-xs text-gray-400"><%= (cnt.to_f / total * 100).round %>%</span>
+              <span class="text-xs font-bold text-gray-800"><%= cnt %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="py-10 text-center text-gray-300 text-sm">Aucune commande</div>
+    <% end %>
+  </div>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    MINI STATS — 8 cartes compactes
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-4 lg:grid-cols-8 gap-3 mb-5">
+  <% [
+    [@orders_delivered,          "Livrées",          "#10b981", "#F0FDF4"],
+    [@alert_pending_orders || 0, "À traiter",        "#f59e0b", "#FFFBEB"],
+    [@stats_canceled,            "Annulées",         "#ef4444", "#FEF2F2"],
+    [@users_new,                 "Nv. clients",      v,         "#F5F0FF"],
+    [@stats_approved,            "Prod. validés",    "#14b8a6", "#F0FDFA"],
+    [@stats_pending,             "Prod. en attente", "#f97316", "#FFF7ED"],
+    [@pay_ok,                    "Paiements OK",     "#3b82f6", "#EFF6FF"],
+    [@pay_wait,                  "Pmt. attente",     "#a855f7", "#FAF5FF"]
+  ].each do |val, label, color, bg| %>
+    <div class="rounded-2xl border p-3 text-center" style="background: <%= bg %>; border-color: <%= color %>22;">
+      <span class="text-xl font-black block leading-tight" style="color: <%= color %>;"><%= number_with_delimiter(val || 0) %></span>
+      <p class="text-[10px] font-semibold leading-tight mt-1" style="color: <%= color %>CC;"><%= label %></p>
+    </div>
+  <% end %>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    TABLE COMMANDES
+──────────────────────────────────────────────────────────────────── %>
+<div class="bg-white rounded-2xl border border-gray-100 mb-5 overflow-hidden"
+     style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+
+  <%# Titre + filtres inline %>
+  <div class="flex flex-wrap items-center gap-3 px-5 py-4 border-b border-gray-50">
+    <div class="flex items-center gap-2 flex-1 min-w-0">
+      <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: #F5F0FF;">
+        <svg class="w-4 h-4" style="color: #{v};" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <h3 class="text-sm font-bold text-gray-900">Commandes récentes</h3>
+      <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500"><%= @orders_total_count || 0 %></span>
+    </div>
+
+    <%= form_with url: admin_hub_path, method: :get, data: { turbo: false }, html: { class: "flex items-center gap-2 flex-wrap" } do |f| %>
+      <%= hidden_field_tag :date_start, d_start %>
+      <%= hidden_field_tag :date_end, d_end %>
+      <%= hidden_field_tag :locale, params[:locale] if params[:locale].present? %>
+      <%= select_tag :order_status,
+          options_for_select([["Tous statuts",""],["En attente","pending"],["En traitement","processing"],["Expédié","shipped"],["Livré","delivered"],["Annulé","canceled"]], params[:order_status]),
+          class: "text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 bg-white focus:outline-none" %>
+      <%= select_tag :order_direction,
+          options_for_select([["Récent ↓","desc"],["Ancien ↑","asc"]], params[:order_direction] || "desc"),
+          class: "text-xs border border-gray-200 rounded-lg px-2 py-1.5 text-gray-600 bg-white focus:outline-none" %>
+      <%= text_field_tag :search_orders, params[:search_orders], placeholder: "N° commande…",
+          class: "text-xs border border-gray-200 rounded-lg px-3 py-1.5 w-[110px] focus:outline-none" %>
+      <%= submit_tag "→", class: "px-3 py-1.5 text-white text-xs font-bold rounded-lg cursor-pointer",
+          style: "background: #{v};" %>
+    <% end %>
+  </div>
+
+  <%# Table %>
+  <% rows = @orders_filtered.respond_to?(:to_a) ? @orders_filtered.to_a.compact : [] %>
+  <% if rows.any? %>
+    <div class="overflow-x-auto">
+      <table class="min-w-full">
+        <thead>
+          <tr style="background: #FAFAFA;">
+            <% ["ID", "Date", "Client", "Montant", "Statut", ""].each do |h| %>
+              <th class="px-5 py-2.5 text-left text-[10px] font-bold text-gray-400 uppercase tracking-wider"><%= h %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          <% rows.each do |o| %>
+            <tr class="hover:bg-[#FDFCFF] transition-colors">
+              <td class="px-5 py-3.5">
+                <span class="text-xs font-black" style="color: <%= v %>;">#<%= o.id %></span>
+              </td>
+              <td class="px-5 py-3.5">
+                <span class="text-sm text-gray-800 block font-medium"><%= o.created_at.strftime("%d/%m/%y") rescue "—" %></span>
+                <span class="text-[11px] text-gray-400"><%= time_ago_in_words(o.created_at) rescue "" %></span>
+              </td>
+              <td class="px-5 py-3.5">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl flex items-center justify-center text-white text-xs font-black flex-shrink-0"
+                       style="background: linear-gradient(135deg, #8B5CF6, #6C3FD6);">
+                    <%= (o.user&.full_name || o.user&.email_address || "?")[0]&.upcase %>
+                  </div>
+                  <span class="text-sm text-gray-800 font-medium truncate max-w-[130px]">
+                    <%= o.user&.full_name.presence || o.user&.email_address&.split("@")&.first || "Invité" %>
+                  </span>
+                </div>
+              </td>
+              <td class="px-5 py-3.5">
+                <span class="text-sm font-black text-gray-900"><%= number_with_delimiter(o.final_amount.to_i) %></span>
+                <span class="text-xs text-gray-400"> <%= o.currency&.symbol %></span>
+              </td>
+              <td class="px-5 py-3.5"><%= hub_status_badge(o.status) %></td>
+              <td class="px-5 py-3.5">
+                <%= link_to "Voir →", admin_order_path(o, locale: params[:locale]),
+                    class: "text-xs font-semibold hover:underline whitespace-nowrap",
+                    style: "color: #{v};" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="py-16 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      </div>
+      <p class="text-sm font-semibold text-gray-400">Aucune commande pour cette période</p>
+      <p class="text-xs text-gray-300 mt-1">Modifiez les filtres ci-dessus</p>
+    </div>
+  <% end %>
+
+  <%# Pagination %>
+  <% pag = @orders_filtered %>
+  <% if pag.respond_to?(:total_pages) && pag.total_pages > 1 %>
+    <div class="flex items-center justify-between px-5 py-3.5 border-t border-gray-50 bg-gray-50/50">
+      <span class="text-xs text-gray-400">Page <strong><%= pag.current_page %></strong> / <%= pag.total_pages %> &nbsp;·&nbsp; <%= number_with_delimiter(@orders_total_count) %> commandes</span>
+      <div class="flex gap-1.5">
+        <% if pag.prev_page %>
+          <%= link_to "←", admin_hub_path(filter_params.merge(page: pag.prev_page)),
+              class: "px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:bg-white transition-colors text-gray-600",
+              data: { turbo: false } %>
+        <% end %>
+        <% if pag.next_page %>
+          <%= link_to "→", admin_hub_path(filter_params.merge(page: pag.next_page)),
+              class: "px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:bg-white transition-colors text-gray-600",
+              data: { turbo: false } %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    LOGISTIQUE + PAIEMENTS
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+  <div class="bg-white rounded-2xl border border-gray-100 p-5" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-bold text-gray-900">Logistique</h3>
+      <span class="text-xs text-gray-400">Par statut</span>
+    </div>
+    <% log2 = (@logistics || {}).transform_keys { |k| hub_status_labels[k.to_s] || k.humanize } %>
+    <%= pie_chart log2.presence || { "Aucune donnée" => 0 }, donut: true, height: "160px",
+        colors: ["#10b981","#3b82f6","#8b5cf6","#ef4444","#eab308","#6b7280"],
+        library: { plugins: { legend: { position: "right", labels: { font: { size: 11 }, boxWidth: 10 } } } } %>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-5" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-bold text-gray-900">Paiements</h3>
+      <div class="flex gap-3 text-xs">
+        <span class="text-green-600 font-bold"><%= @pay_ok || 0 %> validés</span>
+        <span class="text-amber-500 font-bold"><%= @pay_wait || 0 %> en attente</span>
+      </div>
+    </div>
+    <% pay_d = @pay_by_method.presence || { "Complétés" => (@pay_ok || 0), "En attente" => (@pay_wait || 0) } %>
+    <%= bar_chart pay_d.presence || { "—" => 0 }, colors: [v, "#a78bfa"], height: "160px", horizontal: true,
+        library: { plugins: { legend: { display: false } },
+                   scales: { x: { grid: { display: false } }, y: { grid: { display: false } } } } %>
+  </div>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    TOP PRODUITS + TOP BOUTIQUES
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+
+  <%# Top produits %>
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+      <h3 class="text-sm font-bold text-gray-900">🏆 Top Produits</h3>
+      <%= link_to "Tout voir →", admin_items_path(locale: params[:locale]), class: "text-xs font-semibold hover:underline", style: "color: #{v};" %>
+    </div>
+    <% items = @top_items.presence || [] %>
+    <% if items.any? %>
+      <div class="divide-y divide-gray-50 px-2">
+        <% items.each_with_index do |it, idx| %>
+          <div class="flex items-center gap-3 px-3 py-3">
+            <span class="w-6 h-6 flex items-center justify-center rounded-lg text-white text-[11px] font-black flex-shrink-0"
+                  style="background: <%= idx.zero? ? "#f59e0b" : idx == 1 ? "#94a3b8" : idx == 2 ? "#cd7c2c" : v %>;">
+              <%= idx + 1 %>
+            </span>
+            <% img_url = (it.main_image.attached? ? url_for(it.main_image.variant(resize_to_fill: [40, 40])) : nil) rescue nil %>
+            <% if img_url %>
+              <%= image_tag img_url, class: "w-10 h-10 rounded-xl object-cover flex-shrink-0 border border-gray-100" %>
+            <% else %>
+              <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-lg flex-shrink-0 border border-gray-100">📦</div>
+            <% end %>
+            <div class="flex-1 min-w-0">
+              <%= link_to it.name, admin_item_path(it, locale: params[:locale]),
+                  class: "text-sm font-semibold text-gray-900 hover:underline block truncate leading-tight" %>
+              <% v2 = it.default_variant %>
+              <span class="text-xs text-gray-400">
+                <%= it.currency && v2 ? "#{number_with_delimiter(v2.price.to_i)} #{it.currency.symbol}" : "—" %>
+              </span>
+            </div>
+            <div class="text-right flex-shrink-0">
+              <span class="text-sm font-black block" style="color: #{v};">+<%= (@top_sold || {})[it.id].to_i %></span>
+              <span class="text-[10px] text-gray-400">ventes</span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="py-10 text-center text-gray-300 text-sm">Aucune vente sur la période</div>
+    <% end %>
+  </div>
+
+  <%# Top boutiques %>
+  <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+      <h3 class="text-sm font-bold text-gray-900">🏪 Top Boutiques (CA)</h3>
+      <%= link_to "Tout voir →", admin_shops_path(locale: params[:locale]), class: "text-xs font-semibold hover:underline", style: "color: #{v};" %>
+    </div>
+    <% if @top_shops.present? && @top_shops.any? %>
+      <% max_ca = (@top_shops_ca || {}).values.map(&:to_i).max.to_f; max_ca = 1 if max_ca.zero? %>
+      <div class="px-5 py-2 divide-y divide-gray-50">
+        <% @top_shops.each_with_index do |shop, idx| %>
+          <div class="py-3">
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="text-[11px] font-bold text-gray-300 w-4 flex-shrink-0"><%= idx + 1 %></span>
+                <%= link_to shop.name, admin_shop_path(shop, locale: params[:locale]),
+                    class: "text-sm font-semibold text-gray-900 hover:underline truncate" %>
+              </div>
+              <span class="text-sm font-black text-green-600 flex-shrink-0 ml-2">
+                <%= number_with_delimiter((@top_shops_ca || {})[shop.id].to_i) %> FCFA
+              </span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+              <div class="h-1.5 rounded-full transition-all"
+                   style="width: <%= ((@top_shops_ca || {})[shop.id].to_f / max_ca * 100).to_i %>%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="py-10 text-center text-gray-300 text-sm">Aucune vente sur la période</div>
+    <% end %>
+  </div>
+</div>
+
+<%# ────────────────────────────────────────────────────────────────────
+    VENTES PAR CATÉGORIE + ACTIVITÉ CLIENTS
+──────────────────────────────────────────────────────────────────── %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+  <div class="bg-white rounded-2xl border border-gray-100 p-5" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-bold text-gray-900">Ventes par catégorie</h3>
+      <span class="text-xs text-gray-400">Quantités vendues</span>
+    </div>
+    <%= column_chart @sales_by_cat.presence || { "—" => 0 }, colors: [v], height: "200px",
+        library: { plugins: { legend: { display: false } },
+                   scales: { x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                             y: { grid: { color: "#f3f4f6" }, ticks: { font: { size: 11 } } } } } %>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-5" style="box-shadow: 0 1px 6px rgba(0,0,0,0.05);">
+    <h3 class="text-sm font-bold text-gray-900 mb-5">Résumé d'activité</h3>
+    <% rate = @orders_count.to_i > 0 ? ((@orders_delivered.to_i.to_f / @orders_count) * 100).round(1) : 0 %>
+    <% activity = [
+      { label: "Nouveaux clients",      val: @users_new || 0,         color: v,         bg: "#F5F0FF", icon: "👤" },
+      { label: "Commandes livrées",     val: @orders_delivered || 0,  color: "#10b981",  bg: "#F0FDF4", icon: "✅" },
+      { label: "Commandes annulées",    val: @stats_canceled || 0,    color: "#ef4444",  bg: "#FEF2F2", icon: "✗"  },
+      { label: "Produits validés",      val: @stats_approved || 0,    color: "#14b8a6",  bg: "#F0FDFA", icon: "📦" },
+      { label: "Taux de livraison",     val: "#{rate}%",              color: "#3b82f6",  bg: "#EFF6FF", icon: "📈" },
+      { label: "Paiements validés",     val: @pay_ok || 0,            color: "#8b5cf6",  bg: "#FAF5FF", icon: "💳" },
+    ] %>
+    <div class="space-y-2.5">
+      <% activity.each do |a| %>
+        <div class="flex items-center justify-between py-2 px-3 rounded-xl" style="background: <%= a[:bg] %>;">
+          <div class="flex items-center gap-2">
+            <span class="text-base leading-none"><%= a[:icon] %></span>
+            <span class="text-sm text-gray-700"><%= a[:label] %></span>
+          </div>
+          <span class="text-sm font-black" style="color: <%= a[:color] %>;"><%= a[:val] %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

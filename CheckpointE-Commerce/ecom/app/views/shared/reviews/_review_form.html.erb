@@ -1,0 +1,178 @@
+<%# Formulaire de création d'avis %>
+<% item = local_assigns[:item] || @item %>
+<% user = local_assigns[:current_user] || current_user %>
+
+<%= form_with url: client_reviews_path, method: :post, local: true, html: { class: "space-y-6", multipart: true }, data: { turbo: true } do |form| %>
+  <%= form.hidden_field :item_id, value: item.id %>
+
+  <%# Structurer les paramètres manuellement pour éviter le problème de fields_for avec form_with url: %>
+  <!-- Note (étoiles) - Design amélioré -->
+  <div class="bg-white rounded-lg p-4 border border-gray-200">
+    <label class="block text-base font-semibold text-gray-900 mb-3">Votre note *</label>
+    <div class="flex items-center gap-3" data-controller="star-rating">
+      <% (1..5).each do |rating| %>
+        <button
+          type="button"
+          data-star-rating-target="star"
+          data-rating="<%= rating %>"
+          data-action="click->star-rating#selectRating mouseenter->star-rating#hoverStar mouseleave->star-rating#resetStars"
+          class="transition-all transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 rounded"
+          aria-label="<%= rating %> étoile<%= 's' if rating > 1 %>">
+          <svg class="w-10 h-10 text-gray-300 fill-current hover:text-yellow-400 transition-colors" viewBox="0 0 20 20">
+            <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
+          </svg>
+        </button>
+      <% end %>
+      <%= hidden_field_tag "review[rating]", nil, data: { "star-rating-target": "ratingInput" }, required: true %>
+    </div>
+    <p class="text-sm text-gray-600 mt-2 font-medium" data-star-rating-target="ratingText">Cliquez sur les étoiles pour noter</p>
+  </div>
+
+  <!-- Commentaire - Design amélioré -->
+  <div class="bg-white rounded-lg p-4 border border-gray-200" data-controller="char-counter" data-char-counter-max-value="2000">
+    <%= label_tag "review[comment]", "Votre avis *", class: "block text-base font-semibold text-gray-900 mb-3" %>
+    <%= text_area_tag "review[comment]", 
+      nil,
+      rows: 6,
+      placeholder: "Partagez votre expérience avec ce produit... Décrivez ce que vous avez aimé ou ce qui pourrait être amélioré.",
+      class: "w-full rounded-lg border-2 border-gray-300 focus:border-[#551694] focus:ring-2 focus:ring-[#551694] focus:ring-offset-1 px-4 py-3 text-sm text-gray-900 placeholder-gray-400 resize-none transition-all",
+      maxlength: 2000,
+      required: true,
+      data: { 
+        action: "input->char-counter#updateCounter",
+        char_counter_target: "textarea"
+      } %>
+    <div class="flex items-center justify-between mt-2">
+      <p class="text-xs text-gray-500">Minimum 10 caractères, maximum 2000 caractères</p>
+      <span class="text-xs text-gray-400" data-char-counter-target="counter">0 / 2000</span>
+    </div>
+  </div>
+
+  <!-- Photos (optionnel) - Design amélioré avec preview -->
+  <div class="bg-white rounded-lg p-4 border border-gray-200">
+    <label class="block text-base font-semibold text-gray-900 mb-3">Photos (optionnel)</label>
+    <div data-controller="image-preview">
+      <!-- Zone d'upload -->
+      <div class="relative">
+        <%= file_field_tag "review[images][]", 
+          multiple: true,
+          accept: "image/*",
+          class: "hidden",
+          id: "review-images-input",
+          data: { 
+            "image-preview-target": "input",
+            action: "change->image-preview#handleFiles"
+          } %>
+        <label for="review-images-input" class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-[#551694] transition-all group">
+          <svg class="w-10 h-10 text-gray-400 group-hover:text-[#551694] mb-2 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <p class="text-sm font-medium text-gray-700 group-hover:text-[#551694] transition-colors">
+            Cliquez pour ajouter des photos
+          </p>
+          <p class="text-xs text-gray-500 mt-1">JPG, PNG (max 5 photos, 5 MB chacune)</p>
+        </label>
+      </div>
+
+      <!-- Preview des images -->
+      <div class="mt-4 grid grid-cols-3 sm:grid-cols-4 gap-3 hidden" data-image-preview-target="previewContainer">
+        <template data-image-preview-target="previewTemplate">
+          <div class="relative group" data-index="">
+            <img src="" alt="Preview" class="w-full h-24 object-cover rounded-lg border-2 border-gray-200" data-index="">
+            <button type="button" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" data-action="click->image-preview#removeImage" data-index="">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bouton de soumission - Design amélioré -->
+  <div class="pt-4 border-t border-gray-200">
+    <%= form.submit "Publier mon avis", 
+        class: "w-full sm:w-auto px-8 py-3 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-all font-semibold text-base shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
+        data: { disable_with: "Publication en cours..." } %>
+  </div>
+<% end %>
+
+<script>
+  // Controller Stimulus pour la sélection d'étoiles (à créer dans app/javascript/controllers/star_rating_controller.js)
+  // Pour l'instant, implémentation simple avec vanilla JS
+  document.addEventListener('DOMContentLoaded', function() {
+    const starRating = document.querySelector('[data-controller="star-rating"]');
+    if (starRating) {
+      const stars = starRating.querySelectorAll('[data-star-rating-target="star"]');
+      const ratingInput = starRating.querySelector('[data-star-rating-target="ratingInput"]');
+      const ratingText = starRating.querySelector('[data-star-rating-target="ratingText"]');
+      let selectedRating = 0;
+
+      stars.forEach((star, index) => {
+        star.addEventListener('click', function() {
+          selectedRating = index + 1;
+          ratingInput.value = selectedRating;
+          updateStars();
+          updateText();
+        });
+
+        star.addEventListener('mouseenter', function() {
+          if (selectedRating === 0) {
+            highlightStars(index + 1);
+          }
+        });
+      });
+
+      starRating.addEventListener('mouseleave', function() {
+        if (selectedRating === 0) {
+          resetStars();
+        } else {
+          updateStars();
+        }
+      });
+
+      function updateStars() {
+        stars.forEach((star, index) => {
+          if (index < selectedRating) {
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-400');
+          } else {
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+          }
+        });
+      }
+
+      function highlightStars(count) {
+        stars.forEach((star, index) => {
+          if (index < count) {
+            star.classList.remove('text-gray-300');
+            star.classList.add('text-yellow-400');
+          } else {
+            star.classList.remove('text-yellow-400');
+            star.classList.add('text-gray-300');
+          }
+        });
+      }
+
+      function resetStars() {
+        stars.forEach(star => {
+          star.classList.remove('text-yellow-400');
+          star.classList.add('text-gray-300');
+        });
+      }
+
+      function updateText() {
+        const texts = {
+          1: "Très mauvais",
+          2: "Mauvais",
+          3: "Moyen",
+          4: "Bien",
+          5: "Excellent"
+        };
+        ratingText.textContent = selectedRating > 0 ? texts[selectedRating] : "Cliquez sur les étoiles pour noter";
+      }
+    }
+  });
+</script>

@@ -1,0 +1,6 @@
+<%# Google reCAPTCHA v3 (site key publique uniquement – secret key côté serveur).
+    Chargé uniquement sur les layouts qui contiennent des formulaires publics
+    (client, storefront, onboarding). Exclu des layouts authentifiés (vendor,
+    employee, admin) où il pollue l'UI mobile sans être utilisé. %>
+<% recaptcha_key = ENV["RECAPTCHA_SITE_KEY"].presence || "6Lc6q5osAAAAAFq8HI692z9stadc575BJfMaieWm" %>
+<script src="https://www.google.com/recaptcha/api.js?render=<%= recaptcha_key %>"></script>

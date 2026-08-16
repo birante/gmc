@@ -1,0 +1,28 @@
+<%# Liste des produits pour la section recommandations %>
+<% if items.any? %>
+  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4" 
+       data-recommendation-tabs-target="itemsGrid">
+    <% items.each do |item| %>
+      <%= render "shared/storefront/recommendation_item_card", item: item %>
+    <% end %>
+  </div>
+
+  <%# Bouton Load More %>
+  <% if items.current_page < items.total_pages %>
+    <div class="mt-8 sm:text-center" data-recommendation-tabs-target="loadMoreContainer">
+      <button type="button"
+              data-action="click->recommendation-tabs#loadMore"
+              data-recommendation-tabs-target="loadMoreButton"
+              class="block w-full sm:inline-block sm:w-auto bg-[#551694] text-white px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base font-medium hover:bg-[#4a1468] transition-colors focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+        <%= t('storefront.recommendation.load_more', default: 'Charger plus') %>
+      </button>
+    </div>
+  <% end %>
+<% else %>
+  <div class="text-center py-12">
+    <p class="text-gray-500">
+      <%= t('storefront.recommendation.no_products', default: 'Aucun produit trouvé') %>
+    </p>
+  </div>
+<% end %>
+

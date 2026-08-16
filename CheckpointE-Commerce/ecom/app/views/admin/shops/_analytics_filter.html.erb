@@ -1,0 +1,32 @@
+<div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+  <%= form_with url: admin_shop_path(shop), method: :get, local: true, html: { class: "space-y-3" } do |f| %>
+    <div class="flex flex-wrap gap-3 items-end">
+      <div class="flex-1 min-w-[180px]">
+        <%= label_tag :analytics_start_date, "Date de début", class: "block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5" %>
+        <%= date_field_tag :analytics_start_date, start_date, 
+            class: "w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-colors" %>
+      </div>
+
+      <div class="flex-1 min-width: 180px;">
+        <%= label_tag :analytics_end_date, "Date de fin", class: "block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5" %>
+        <%= date_field_tag :analytics_end_date, end_date, 
+            class: "w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:border-transparent transition-colors" %>
+      </div>
+
+      <div>
+        <%= submit_tag "Filtrer", 
+            class: "px-5 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white text-sm font-semibold rounded-md shadow-sm hover:shadow transition-all" %>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "7j", admin_shop_path(shop, analytics_start_date: 7.days.ago.to_date, analytics_end_date: Date.today), 
+          class: "px-3 py-1 text-xs font-medium bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded border border-green-200 dark:border-green-800 transition-colors" %>
+      <%= link_to "30j", admin_shop_path(shop, analytics_start_date: 30.days.ago.to_date, analytics_end_date: Date.today), 
+          class: "px-3 py-1 text-xs font-medium bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded border border-green-200 dark:border-green-800 transition-colors" %>
+      <%= link_to "90j", admin_shop_path(shop, analytics_start_date: 90.days.ago.to_date, analytics_end_date: Date.today), 
+          class: "px-3 py-1 text-xs font-medium bg-green-50 hover:bg-green-100 dark:bg-green-900/30 dark:hover:bg-green-900/50 text-green-700 dark:text-green-300 rounded border border-green-200 dark:border-green-800 transition-colors" %>
+    </div>
+  <% end %>
+</div>
+

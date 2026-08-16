@@ -1,0 +1,492 @@
+<% 
+  # Numéro d'assistance par défaut (Sénégal)
+  assistance_phone_display = "+221778818383"
+  assistance_phone_link = "+221778818383"
+  
+  # Utiliser les catégories pré-chargées si disponibles, sinon fallback
+  categories = defined?(@navbar_categories) && @navbar_categories.present? ? @navbar_categories : active_categories_with_subcategories
+%>
+<header class="bg-white sticky top-0 z-50" data-controller="mobile-menu" role="banner">
+  <!-- ===== CTA MOBILE EN TÊTE ===== -->
+  <% unless content_for?(:hide_vendor_cta) %>
+    <div class="md:hidden bg-[#F4F4F5] border-b border-[#EBEEF6]/95">
+      <div class="container mx-auto px-4 py-2">
+        <div class="flex items-center justify-between gap-2">
+          <%= link_to assistance_phone_display, "tel:#{assistance_phone_link}", class: "text-[#551694] font-semibold text-xs whitespace-nowrap" %>
+          <div class="flex-shrink-0">
+            <%= render 'shared/language_selector', variant: 'utility-bar' %>
+          </div>
+          <% if vendor_signed_in? %>
+            <%= link_to vendors_dashboard_path,
+                class: "inline-flex items-center justify-center bg-[#551694] text-white px-3 py-1.5 rounded-full text-xs font-medium hover:bg-[#451384] transition-colors whitespace-nowrap" do %>
+              <%= t('shared.public_navbar.my_shops') %>
+            <% end %>
+          <% elsif employee_signed_in? %>
+            <%= link_to employees_dashboard_path,
+                class: "inline-flex items-center justify-center bg-[#551694] text-white px-3 py-1.5 rounded-full text-xs font-medium hover:bg-[#451384] transition-colors whitespace-nowrap" do %>
+              <%= t('shared.public_navbar.my_workspace', default: 'Mon espace') %>
+            <% end %>
+          <% else %>
+            <%= link_to become_vendor_path,
+                class: "inline-flex items-center justify-center bg-[#551694] text-white px-3 py-1.5 rounded-full text-xs font-medium hover:bg-[#451384] transition-colors whitespace-nowrap" do %>
+              <%= t('shared.public_navbar.vendor_signup') %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <!-- ===== BARRE UTILITAIRE SUPÉRIEURE ===== -->
+  <% unless content_for?(:hide_vendor_cta)%>
+    <div class="bg-[#F4F4F5] hidden md:block">
+      <div class="container mx-auto px-4 lg:px-[50px]">
+        <div class="flex justify-between items-center py-2.5 text-sm">
+          <!-- Gauche: Assistance + Langue + Tracker -->
+          <div class="flex items-center gap-6">
+            <!-- Numéro d'assistance -->
+            <div class="flex items-center gap-1.5">
+              <svg class="w-[18px] h-[18px] text-[#551694]" viewBox="0 0 18 18" fill="currentColor">
+                <path d="M17 12.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H1.5C.9 0 0 .5 0 1.5 0 10.4 7.6 18 16.5 18c.6 0 1.5-.4 1.5-1.5v-3c0-.6-.4-1-1-1z"/>
+              </svg>
+              <%= link_to assistance_phone_display, "tel:#{assistance_phone_link}", class: "text-[#551694] font-semibold text-xs hover:underline" %>
+            </div>
+            <!-- Sélecteur de langue + Tracker -->
+            <div class="flex items-center gap-4">
+              <%= render 'shared/language_selector', variant: 'utility-bar' %>
+              <%# link_to t('navigation.track_order'), root_path, class: "text-[#4B5675] hover:text-[#551694] text-xs" %>
+            </div>
+          </div>
+          <!-- Droite: Blog + Devenir vendeur + Espace vendeur (masqué si flag actif) -->
+          <div class="flex items-center gap-3">
+            <%= link_to blog_path, class: "text-[#551694] font-medium text-xs hover:text-[#451384] transition-colors" do %>
+              <%= t('pages.blog.nav_label', default: 'Blog') %>
+            <% end %>
+            <% if vendor_signed_in? %>
+              <%= link_to vendors_dashboard_path, class: "flex items-center gap-1.5 text-[#551694] font-medium text-xs hover:text-[#451384] transition-colors" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <%= t('shared.public_navbar.my_shops') %>
+              <% end %>
+            <% elsif employee_signed_in? %>
+              <%= link_to employees_dashboard_path, class: "flex items-center gap-1.5 text-[#551694] font-medium text-xs hover:text-[#451384] transition-colors" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <%= t('shared.public_navbar.my_workspace', default: 'Mon espace') %>
+              <% end %>
+            <% else %>
+              <%= link_to new_vendors_session_path, class: "text-[#551694] font-medium text-xs hover:text-[#451384] transition-colors" do %>
+                <%= t('shared.public_navbar.vendor_login') %>
+              <% end %>
+              <%= link_to become_vendor_path, class: "flex items-center justify-center bg-[#551694] text-white px-3.5 py-1.5 rounded-full text-xs font-medium hover:bg-[#451384] transition-colors" do %>
+                <%= t('shared.public_navbar.vendor_signup') %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <!-- ===== BARRE PRINCIPALE (Logo, Recherche, Compte, Panier) ===== -->
+  <div class="border-b border-[#EBEEF6]/95">
+    <div class="container mx-auto px-4 lg:px-[50px] py-2.5 md:py-3">
+      <div class="flex items-center justify-between gap-6">
+        <!-- Logo -->
+        <div class="flex-shrink-0">
+          <%= link_to root_path, class: "block" do %>
+            <%= image_tag "logo-2.svg", alt: "aa", class: "h-[24px] md:h-[26px] w-auto", loading: "eager", fetchpriority: "high", decoding: "async", width: 96, height: 26 %>
+          <% end %>
+        </div>
+        <!-- Barre de recherche centrale (masquée si flag actif) -->
+        <% unless content_for?(:hide_nav_search) %>
+          <div class="hidden md:block flex-1 max-w-[677px] relative"
+             data-controller="search"
+             data-search-url-value="<%= search_suggestions_path %>"
+             data-search-see-all-url-value="<%= items_path %>">
+            <div class="relative border border-[#EBEEF6] rounded-[30px] overflow-hidden bg-[#F1F1F4]">
+              <%= form_with url: items_path, method: :get, local: true, class: "flex items-center", html: { role: "search", "aria-label": t('navigation.search_label_products_shops', default: 'Rechercher des produits ou des boutiques') } do |f| %>
+                <label for="desktop-search" class="sr-only"><%= t('navigation.search_label_products_shops', default: 'Rechercher des produits ou des boutiques') %></label>
+                <%= f.search_field :search,
+                  id: "desktop-search",
+                  placeholder: t('navigation.search_placeholder_products_shops', default: 'Produit ou boutique…'),
+                  value: params[:search],
+                  autocomplete: "off",
+                  data: {
+                    search_target: "input",
+                    action: "input->search#onInput focus->search#onFocus keydown->search#onKeydown"
+                  },
+                  class: "flex-1 h-[47px] bg-transparent px-5 py-2 focus:outline-none text-[13px] text-gray-800 placeholder-gray-500" %>
+                <%= f.button type: :submit, class: "bg-[#551694] text-white w-[59px] h-[38px] rounded-[20px] mr-1 hover:bg-[#4a1468] transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#551694]", "aria-label": t('navigation.search_button', default: 'Rechercher') do %>
+                  <svg class="w-5 h-5" fill="white" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                  </svg>
+                <% end %>
+              <% end %>
+            </div>
+            <!-- Dropdown suggestions -->
+            <div data-search-target="dropdown"
+               class="hidden absolute top-full left-0 right-0 mt-2 bg-white shadow-xl rounded-2xl border border-gray-100 max-h-[70vh] overflow-y-auto z-50"
+               role="listbox">
+              <div data-search-target="loading" class="hidden px-4 py-3 text-xs text-gray-400 flex items-center gap-2">
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" class="opacity-25"></circle>
+                  <path fill="currentColor" class="opacity-75" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"></path>
+                </svg>
+                Recherche en cours…
+              </div>
+              <div data-search-target="productsSection" class="hidden">
+                <div class="px-4 pt-3 pb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Produits</div>
+                <div data-search-target="productsList"></div>
+              </div>
+              <div data-search-target="shopsSection" class="hidden border-t border-gray-100">
+                <div class="px-4 pt-3 pb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Boutiques</div>
+                <div data-search-target="shopsList"></div>
+              </div>
+              <div data-search-target="categoriesSection" class="hidden border-t border-gray-100">
+                <div class="px-4 pt-3 pb-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Catégories</div>
+                <div data-search-target="categoriesList"></div>
+              </div>
+              <div data-search-target="empty" class="hidden px-4 py-6 text-center text-sm text-gray-500">
+                Aucun résultat trouvé.
+              </div>
+              <div data-search-target="footer" class="hidden border-t border-gray-100 px-4 py-2.5 bg-gray-50">
+                <a href="#" data-search-target="footerLink" class="text-sm text-[#551694] font-medium hover:underline">Voir tous les résultats</a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <!-- Section droite: Compte + Panier + Devenir vendeur -->
+        <div class="flex items-center gap-4">
+          <!-- Compte utilisateur -->
+          <% if user_signed_in? %>
+            <%= link_to client_dashboard_path, class: "hidden md:flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" do %>
+              <div class="w-10 h-10 rounded-full bg-[#F3F6F9] border border-[#E4E7E9] flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#551694]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <div class="hidden lg:flex flex-col">
+                <span class="text-[11px] text-[#666666] uppercase"><%= t('navigation.welcome') %></span>
+                <span class="text-sm font-semibold text-[#3F4254] uppercase"><%= current_user.first_name %></span>
+              </div>
+            <% end %>
+          <% elsif vendor_signed_in? %>
+            <%= link_to vendors_dashboard_path, class: "hidden md:flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" do %>
+              <div class="w-10 h-10 rounded-full bg-[#F3F6F9] border border-[#E4E7E9] flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#551694]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <div class="hidden lg:flex flex-col">
+                <span class="text-[11px] text-[#666666] uppercase"><%= t('navigation.my_shops') %></span>
+                <span class="text-sm font-semibold text-[#3F4254] uppercase"><%= current_vendor.first_name %></span>
+              </div>
+            <% end %>
+          <% elsif employee_signed_in? %>
+            <%= link_to employees_dashboard_path, class: "hidden md:flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity" do %>
+              <div class="w-10 h-10 rounded-full bg-[#F3F6F9] border border-[#E4E7E9] flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#551694]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <div class="hidden lg:flex flex-col">
+                <span class="text-[11px] text-[#666666] uppercase"><%= t('navigation.my_workspace', default: 'Mon espace') %></span>
+                <span class="text-sm font-semibold text-[#3F4254] uppercase"><%= current_employee.first_name %></span>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="hidden md:flex items-center gap-3">
+              <%= link_to new_client_session_path, class: "w-10 h-10 rounded-full bg-[#F3F6F9] border border-[#E4E7E9] flex items-center justify-center hover:bg-[#EEF0F4] transition-colors", title: t('navigation.login'), aria: { label: t('navigation.login') } do %>
+                <svg class="w-6 h-6" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#55169430" d="M12 13c2.396 0 4.575.694 6.178 1.671c.8.49 1.484 1.065 1.978 1.69c.486.616.844 1.352.844 2.139c0 .845-.411 1.511-1.003 1.986c-.56.45-1.299.748-2.084.956c-1.578.417-3.684.558-5.913.558s-4.335-.14-5.913-.558c-.785-.208-1.524-.506-2.084-.956C3.41 20.01 3 19.345 3 18.5c0-.787.358-1.523.844-2.139c.494-.625 1.177-1.2 1.978-1.69C7.425 13.694 9.605 13 12 13"/>
+                  <path fill="#551694" d="M12 2c3.849 0 6.255 4.167 4.33 7.5A5 5 0 0 1 12 12c-3.849 0-6.255-4.167-4.33-7.5A5 5 0 0 1 12 2"/>
+                </svg>
+              <% end %>
+              <div class="hidden lg:flex flex-col">
+                <span class="text-[11px] text-[#666666] uppercase"><%= t('navigation.welcome') %></span>
+                <div class="flex items-center gap-1 text-[#3F4254] font-semibold uppercase text-sm">
+                  <%= link_to t('navigation.login'), new_client_session_path, class: "hover:text-[#551694] transition-colors" %>
+                  <span class="text-[#666666]">/</span>
+                  <%= link_to t('navigation.signup'), new_client_registration_path, class: "hover:text-[#551694] transition-colors" %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <!-- Panier -->
+          <% unless vendor_signed_in? || employee_signed_in? %>
+            <div id="cart-navbar-section">
+              <turbo-frame id="cart-navbar-section_frame" src="<%= client_cart_path(frame: :navbar) %>"></turbo-frame>
+            </div>
+          <% end %>
+          <!-- Déconnexion -->
+          <% if user_signed_in? %>
+            <%= button_to client_session_path, method: :delete,
+                class: "hidden md:flex p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors",
+                title: t('navigation.logout'),
+                data: { } do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            <% end %>
+          <% elsif vendor_signed_in? %>
+            <%= button_to vendors_session_path, method: :delete,
+                class: "hidden md:flex p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors",
+                title: t('navigation.logout') do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            <% end %>
+          <% elsif employee_signed_in? %>
+            <%= button_to employees_logout_path, method: :delete,
+                class: "hidden md:flex p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors",
+                title: t('navigation.logout') do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+            <% end %>
+          <% end %>
+          <!-- Menu mobile (hamburger) -->
+          <button type="button" 
+                  data-action="click->mobile-menu#toggle"
+            data-mobile-menu-target="toggleButton"
+            aria-expanded="false"
+            aria-controls="mobile-menu-panel"
+            aria-label="<%= t('navigation.toggle_menu', default: 'Ouvrir le menu') %>"
+            class="md:hidden p-2 text-gray-700 hover:text-[#551694] focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 rounded">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ===== BARRE DE CATÉGORIES ===== (masquée si flag actif) -->
+  <% unless content_for?(:hide_categories_bar) %>
+    <div class="hidden md:block bg-white border-b border-[#EBEEF6]/50">
+      <div class="container mx-auto px-4 lg:px-[50px]">
+        <!-- Liste des catégories avec scroll horizontal -->
+        <div class="flex items-center" data-controller="horizontal-scroll">
+          <div data-horizontal-scroll-target="scrollable" 
+             class="flex items-center gap-1 overflow-x-auto flex-1 scrollbar-hide" 
+             style="scrollbar-width: none; -ms-overflow-style: none;">
+            <!-- Toutes les catégories (mega menu) -->
+            <%= render 'shared/categories_mega_menu', categories: categories %>
+            <!-- Liste des catégories individuelles -->
+            <div class="flex items-center gap-1">
+              <% categories.each do |category| %>
+                <%= link_to category_path(category.slug),
+                  class: "flex-shrink-0 block px-4 py-3 rounded-md text-gray-700 hover:bg-purple-50 hover:text-[#551694] font-medium text-sm whitespace-nowrap transition-colors" do %>
+                  <%= category.name %>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+          <!-- Indicateur de scroll (flèches) -->
+          <div class="flex-shrink-0 px-2 text-gray-400 flex items-center gap-2 border-l border-[#EBEEF6] py-3">
+            <svg data-horizontal-scroll-target="leftButton" 
+               data-action="click->horizontal-scroll#scrollLeft"
+              width="1em" height="1em" viewBox="0 0 256 512" class="cursor-pointer hover:text-gray-600 transition-colors"><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l137.3-137.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg>
+            <svg data-horizontal-scroll-target="rightButton" 
+               data-action="click->horizontal-scroll#scrollRight"
+              width="1em" height="1em" viewBox="0 0 256 512" class="cursor-pointer hover:text-gray-600 transition-colors"><path fill="currentColor" d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256L41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <!-- Menu mobile (overlay) -->
+  <nav data-mobile-menu-target="menu"
+       id="mobile-menu-panel"
+       aria-label="<%= t('navigation.mobile_menu', default: 'Menu de navigation mobile') %>"
+       class="hidden fixed inset-0 z-50 bg-white transform transition-transform duration-300 ease-in-out md:hidden">
+    <div class="flex flex-col h-full">
+      <!-- Header mobile -->
+      <div class="flex items-center justify-between p-4 border-b border-gray-200">
+        <span class="text-lg font-bold text-[#551694]" id="mobile-menu-heading">Menu</span>
+        <button type="button" 
+                data-action="click->mobile-menu#toggle"
+          aria-label="<%= t('navigation.close_menu', default: 'Fermer le menu') %>"
+          class="p-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 rounded">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <!-- Recherche mobile (masquée si flag actif) -->
+      <% unless content_for?(:hide_nav_search) %>
+        <div class="p-4">
+          <div class="relative border border-[#EBEEF6] rounded-full overflow-hidden bg-[#F1F1F4]">
+            <%= form_with url: client_items_path, method: :get, local: true, class: "flex items-center" do |f| %>
+              <%= f.search_field :search,
+                placeholder: t('navigation.search_placeholder'),
+                value: params[:search],
+                class: "flex-1 h-[44px] bg-transparent px-4 py-2 focus:outline-none text-sm" %>
+              <%= f.button type: :submit, class: "bg-[#551694] text-white w-10 h-9 rounded-full mr-1 flex items-center justify-center", "aria-label": t('navigation.search_button', default: 'Rechercher') do %>
+                <svg class="w-4 h-4" fill="white" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+                </svg>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <!-- Navigation mobile -->
+      <div class="flex-1 overflow-y-auto">
+        <div class="p-4">
+          <div class="font-bold text-gray-900 mb-3">Catégories</div>
+          <% categories.each do |category| %>
+            <div class="mb-4">
+              <%= link_to category_path(category.slug), 
+                  class: "block font-medium text-[#551694] mb-2" do %>
+                <%= category.name %>
+              <% end %>
+              <% if category.sub_categories.any? %>
+                <div class="pl-4 space-y-1">
+                  <% category.sub_categories.each do |sub_category| %>
+                    <%= link_to category_sub_category_path(category.slug, sub_category.slug), 
+                        class: "block text-sm text-gray-600 hover:text-[#551694]" do %>
+                      <%= sub_category.name %>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <div class="border-t border-gray-200">
+          <% if user_signed_in? %>
+            <div class="bg-gradient-to-r from-[#551694] to-[#6a1fa8] px-4 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-base border-2 border-white/30">
+                  <%= current_user.first_name&.first&.upcase || 'U' %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-white font-semibold text-sm truncate">
+                    <%= current_user.first_name %> <%= current_user.last_name %>
+                  </h3>
+                  <p class="text-white/80 text-xs truncate">
+                    <%= current_user.email_address.presence || current_user.formatted_phone_number %>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 space-y-1">
+              <%= link_to client_dashboard_path, class: "flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" do %>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <span class="font-medium"><%= t('shared.public_navbar.dashboard') %></span>
+              <% end %>
+              <%= link_to client_orders_path, class: "flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" do %>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+                <span class="font-medium">Mes commandes</span>
+              <% end %>
+              <button type="button" onclick="document.dispatchEvent(new CustomEvent('cart-sheet:open'))" class="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors text-left">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span class="font-medium">Mon panier</span>
+              </button>
+              <div class="border-t border-gray-200 pt-3 mt-3">
+                <%= button_to client_session_path, method: :delete, class: "w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors" do %>
+                  <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  <span class="font-medium"><%= t('shared.public_navbar.logout') %></span>
+                <% end %>
+              </div>
+            </div>
+          <% elsif vendor_signed_in? %>
+            <div class="bg-gradient-to-r from-[#551694] to-[#6a1fa8] px-4 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-base border-2 border-white/30">
+                  <%= current_vendor.first_name&.first&.upcase || 'V' %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-white font-semibold text-sm truncate">
+                    <%= current_vendor.first_name %> <%= current_vendor.last_name %>
+                  </h3>
+                  <p class="text-white/80 text-xs truncate">
+                    <%= current_vendor.email %>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 space-y-1">
+              <%= link_to vendors_dashboard_path, class: "flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" do %>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <span class="font-medium"><%= t('shared.public_navbar.dashboard') %></span>
+              <% end %>
+              <div class="border-t border-gray-200 pt-3 mt-3">
+                <%= button_to vendors_session_path, method: :delete, class: "w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors" do %>
+                  <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  <span class="font-medium"><%= t('shared.public_navbar.logout') %></span>
+                <% end %>
+              </div>
+            </div>
+          <% elsif employee_signed_in? %>
+            <div class="bg-gradient-to-r from-[#551694] to-[#6a1fa8] px-4 py-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-base border-2 border-white/30">
+                  <%= current_employee.first_name&.first&.upcase || 'E' %>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-white font-semibold text-sm truncate">
+                    <%= current_employee.first_name %> <%= current_employee.last_name %>
+                  </h3>
+                  <p class="text-white/80 text-xs truncate">
+                    <%= current_employee.email %>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 space-y-1">
+              <%= link_to employees_dashboard_path, class: "flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors" do %>
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <span class="font-medium"><%= t('shared.public_navbar.dashboard') %></span>
+              <% end %>
+              <div class="border-t border-gray-200 pt-3 mt-3">
+                <%= button_to employees_logout_path, method: :delete, class: "w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors" do %>
+                  <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  <span class="font-medium"><%= t('shared.public_navbar.logout') %></span>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <div class="p-4 space-y-3">
+              <!-- Espace client -->
+              <div class="space-y-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1"><%= t('shared.public_navbar.client_space') %></p>
+                <%= link_to t('shared.public_navbar.login'), new_client_session_path, class: "block py-2.5 px-4 text-center text-sm font-medium text-[#551694] border border-[#551694] rounded-full hover:bg-[#551694] hover:text-white transition-colors" %>
+                <%= link_to t('shared.public_navbar.signup'), new_client_registration_path, class: "block py-2.5 px-4 text-center text-sm font-medium text-white bg-[#551694] rounded-full hover:bg-[#4a1468] transition-colors" %>
+              </div>
+              <!-- Espace vendeur -->
+              <div class="space-y-2 pt-2 border-t border-gray-100">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1"><%= t('shared.public_navbar.vendor_space') %></p>
+                <%= link_to t('shared.public_navbar.vendor_login'), new_vendors_session_path, class: "block py-2.5 px-4 text-center text-sm font-medium text-[#551694] border border-[#551694] rounded-full hover:bg-[#551694] hover:text-white transition-colors" %>
+                <%= link_to t('shared.public_navbar.vendor_signup'), become_vendor_path, class: "block py-2.5 px-4 text-center text-sm font-medium text-[#551694] border border-dashed border-[#551694] rounded-full hover:bg-purple-50 transition-colors" %>
+              </div>
+              <!-- Espace collaborateur -->
+              <div class="space-y-2 pt-2 border-t border-gray-100">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider px-1"><%= t('shared.public_navbar.employee_space') %></p>
+                <%= link_to t('shared.public_navbar.employee_login'), new_employees_session_path, class: "block py-2.5 px-4 text-center text-sm font-medium text-gray-600 border border-gray-300 rounded-full hover:bg-gray-50 transition-colors" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,42 @@
+# Do not commit anything with a runtime secret in it — this checkpoint
+# is intended to be published in a PUBLIC repository.
+
+# macOS
+.DS_Store
+
+# Rails secrets — the .enc files can only be read with master.key,
+# but the safest posture for a public repo is to ship neither.
+ecom/config/master.key
+ecom/config/credentials.yml.enc
+ecom/config/credentials/*.key
+ecom/config/credentials/*.enc
+
+# Kamal deployment secrets (plain-text env vars for deploy)
+ecom/.kamal/secrets
+ecom/.kamal/secrets.preprod
+ecom/.kamal/secrets*
+
+# Env / dotenv variants
+ecom/.env
+ecom/.env.*
+!ecom/.env.example
+!ecom/.env.sample
+
+# Rails runtime state — not source
+ecom/log/*
+!ecom/log/.keep
+ecom/tmp/*
+!ecom/tmp/.keep
+ecom/storage/*
+!ecom/storage/.keep
+ecom/public/uploads/
+ecom/coverage/
+
+# Node
+ecom/node_modules/
+ecom/.yarn/*
+!ecom/.yarn/patches
+!ecom/.yarn/plugins
+!ecom/.yarn/releases
+!ecom/.yarn/sdks
+!ecom/.yarn/versions

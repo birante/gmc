@@ -1,0 +1,96 @@
+<% content_for :client_content do %>
+  <div>
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+      <nav class="text-sm text-gray-500 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+        <%= link_to "Accueil", root_path, class: "hover:text-[#551694] transition-colors duration-150" %> 
+        <span class="text-gray-400">/</span>
+        <%= link_to "Mon compte", client_account_path, class: "hover:text-[#551694] transition-colors duration-150" %>
+        <span class="text-gray-400">/</span>
+        <span class="text-gray-900 font-medium">Mes adresses</span>
+      </nav>
+    </div>
+
+    <!-- Titre de la page -->
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Mes adresses</h1>
+
+    <% if @addresses.any? %>
+      <div class="grid md:grid-cols-2 gap-6">
+        <% @addresses.each_with_index do |address, index| %>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 relative hover:shadow-md hover:border-[#551694]/20 transition-all duration-200 animate-slide-in-right" style="animation-delay: <%= index * 0.05 %>s;">
+            <% if address.is_default %>
+              <span class="absolute top-4 right-4 px-3 py-1 bg-[#551694] text-white text-xs font-semibold rounded-full shadow-sm">
+                Adresse par défaut
+              </span>
+            <% end %>
+
+            <div class="mb-4">
+              <div class="flex items-start gap-2 mb-3">
+                <svg class="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <div class="flex-1">
+                  <p class="text-sm text-gray-900 font-medium mb-1"><%= address.city %></p>
+                  <p class="text-sm text-gray-600 leading-relaxed"><%= address.street_address %></p>
+                  <% if address.postal_code.present? %>
+                    <p class="text-xs text-gray-500 mt-1"><%= address.postal_code %></p>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-2 pt-4 border-t border-gray-200">
+              <%= link_to edit_client_address_path(address), class: "p-2 text-gray-400 hover:text-[#551694] hover:bg-[#551694]/10 rounded-lg transition-all duration-150" do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              <% end %>
+              <%= button_to client_address_path(address), method: :delete, 
+                  data: { confirm: t('.delete_confirm', default: 'Êtes-vous sûr de vouloir supprimer cette adresse ?') },
+                  class: "p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-150" do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- État vide -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div class="relative inline-block mb-6">
+          <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">Aucune adresse enregistrée</h2>
+        <p class="text-gray-500 mb-8 max-w-md mx-auto">Ajoutez votre première adresse pour faciliter vos prochaines commandes.</p>
+      </div>
+    <% end %>
+
+    <!-- Bouton/Ajouter une nouvelle adresse -->
+    <div class="mt-6">
+      <%= link_to new_client_address_path, class: "group block bg-white rounded-lg shadow-sm border-2 border-[#551694] border-dashed p-8 text-center hover:bg-gradient-to-br hover:from-[#551694]/5 hover:to-[#551694]/10 hover:shadow-md hover:border-solid hover:border-[#551694] transition-all duration-200 transform hover:-translate-y-0.5" do %>
+        <div class="flex flex-col items-center justify-center">
+          <div class="w-14 h-14 bg-gradient-to-br from-[#551694] to-[#6a1fa8] rounded-full flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-90 transition-all duration-300 shadow-lg">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </div>
+          <p class="text-[#551694] font-semibold text-lg group-hover:text-[#451384] transition-colors">Ajouter une nouvelle adresse</p>
+          <p class="text-sm text-gray-500 mt-2">Gérez vos adresses de livraison</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<%= render "shared/client_sidebar_wrapper" do %>
+  <%= content_for(:client_content) %>
+<% end %>

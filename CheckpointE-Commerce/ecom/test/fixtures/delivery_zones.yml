@@ -1,0 +1,13 @@
+one:
+  name: Zone Centre
+  base_fee: 1500.00
+  min_delivery_time: 30
+  max_delivery_time: 60
+  is_active: true
+
+two:
+  name: Zone Nord
+  base_fee: 2000.00
+  min_delivery_time: 45
+  max_delivery_time: 90
+  is_active: true

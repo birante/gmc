@@ -1,0 +1,43 @@
+<%# Carte produit promo %>
+<% promo_item = local_assigns[:promo_item] %>
+<% primary_color = local_assigns[:primary_color] || "#551694" %>
+<% show_discount_badge = local_assigns[:show_discount_badge] || false %>
+
+<% if promo_item.present? %>
+  <% variant = promo_item.variants.first %>
+  <% price_style = "color: #{primary_color};" %>
+  <% link_style = "color: #{primary_color};" %>
+  
+  <div class="bg-white rounded-xl p-4 hover:shadow-lg transition-shadow" style="border: 2px solid <%= primary_color %>15;">
+    <div class="flex gap-4">
+      <div class="relative w-24 h-24 bg-gray-50 rounded-lg flex-shrink-0 overflow-hidden">
+        <% if promo_item.has_image? %>
+          <%= storage_image_tag(promo_item.display_image, variant_name: :card, alt: promo_item.name, class: "w-full h-full object-contain p-2", width: 400, height: 400) %>
+        <% end %>
+        <% if variant.present? %>
+          <% discount_percent = discount_percentage_for(variant) %>
+          <% if show_discount_badge && discount_percent > 0 %>
+            <span class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">-<%= discount_percent %>%</span>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="flex-1">
+        <h4 class="font-semibold text-gray-900 text-sm mb-1"><%= promo_item.name.truncate(40) %></h4>
+        <% if variant.present? %>
+          <% current_price = current_price_for(variant) %>
+          <% original_price = original_price_for(variant) %>
+          <% discount_percent = discount_percentage_for(variant) %>
+          <div class="text-lg font-bold mb-2" style="<%= price_style %>">
+            <%= number_to_currency(current_price, unit: "", precision: 0, delimiter: ".") %> <%= promo_item.currency&.symbol || "FCFA" %>
+          </div>
+          <% if discount_percent > 0 && original_price > current_price %>
+            <div class="text-sm text-gray-500 line-through mb-1">
+              <%= number_to_currency(original_price, unit: "", precision: 0, delimiter: ".") %> <%= promo_item.currency&.symbol || "FCFA" %>
+            </div>
+          <% end %>
+        <% end %>
+        <%= link_to "ACHETER →", item_path(promo_item), class: "inline-block text-xs font-semibold hover:underline", style: link_style %>
+      </div>
+    </div>
+  </div>
+<% end %>

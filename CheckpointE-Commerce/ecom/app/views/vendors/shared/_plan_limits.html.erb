@@ -1,0 +1,137 @@
+<%# Partial pour afficher les limites du plan %>
+<% if shop && shop.current_subscription %>
+  <% capabilities = shop.capabilities %>
+  <% current_plan = shop.current_subscription.plan %>
+  
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-semibold text-gray-900">
+        <%= t('vendors.plan_limits.title') %>
+      </h3>
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+        <%= current_plan.name %>
+      </span>
+    </div>
+
+    <div class="space-y-3">
+      <%# Limite de produits %>
+      <% max_products = capabilities.max_products %>
+      <% current_products = shop.items_count %>
+      <% products_percentage = max_products.present? ? (current_products.to_f / max_products.to_f * 100) : 0 %>
+      <% products_warning = max_products && products_percentage >= 80 %>
+      <% products_danger = max_products && products_percentage >= 95 %>
+      
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs text-gray-600">
+            <%= t('vendors.plan_limits.products') %>
+          </span>
+          <span class="text-xs font-medium <%= products_danger ? 'text-red-600' : products_warning ? 'text-yellow-600' : 'text-gray-900' %>">
+            <%= format_limit(max_products, current_products) %>
+          </span>
+        </div>
+        <% if max_products %>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="h-2 rounded-full <%= products_danger ? 'bg-red-500' : products_warning ? 'bg-yellow-500' : 'bg-purple-500' %>" 
+                 style="width: <%= [products_percentage, 100].min %>%"></div>
+          </div>
+        <% else %>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="h-2 rounded-full bg-green-500" style="width: 100%"></div>
+          </div>
+          <p class="text-xs text-green-600 mt-1">
+            <%= t('vendors.plan_limits.unlimited') %>
+          </p>
+        <% end %>
+        <% if products_danger && !can_create_product?(shop) %>
+          <p class="text-xs text-red-600 mt-1">
+            <%= t('vendors.plan_limits.products_limit_reached') %>
+          </p>
+        <% elsif products_warning %>
+          <p class="text-xs text-yellow-600 mt-1">
+            <%= t('vendors.plan_limits.products_warning', remaining: max_products.to_i - current_products) %>
+          </p>
+        <% end %>
+      </div>
+
+      <%# Limite d'employés %>
+      <% max_employees = capabilities.max_employees %>
+      <% current_employees = shop.employees.active.count %>
+      <% employees_percentage = max_employees.present? ? (current_employees.to_f / max_employees.to_f * 100) : 0 %>
+      <% employees_warning = max_employees && employees_percentage >= 80 %>
+      <% employees_danger = max_employees && employees_percentage >= 95 %>
+      
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs text-gray-600">
+            <%= t('vendors.plan_limits.employees') %>
+          </span>
+          <span class="text-xs font-medium <%= employees_danger ? 'text-red-600' : employees_warning ? 'text-yellow-600' : 'text-gray-900' %>">
+            <%= format_limit(max_employees, current_employees) %>
+          </span>
+        </div>
+        <% if max_employees %>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="h-2 rounded-full <%= employees_danger ? 'bg-red-500' : employees_warning ? 'bg-yellow-500' : 'bg-purple-500' %>" 
+                 style="width: <%= [employees_percentage, 100].min %>%"></div>
+          </div>
+        <% else %>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="h-2 rounded-full bg-green-500" style="width: 100%"></div>
+          </div>
+          <p class="text-xs text-green-600 mt-1">
+            <%= t('vendors.plan_limits.unlimited') %>
+          </p>
+        <% end %>
+        <% if employees_danger && !can_add_employee?(shop) %>
+          <p class="text-xs text-red-600 mt-1">
+            <%= t('vendors.plan_limits.employees_limit_reached') %>
+          </p>
+        <% elsif employees_warning %>
+          <p class="text-xs text-yellow-600 mt-1">
+            <%= t('vendors.plan_limits.employees_warning', remaining: max_employees.to_i - current_employees) %>
+          </p>
+        <% end %>
+      </div>
+
+      <%# Fonctionnalités %>
+      <div class="pt-2 border-t border-gray-200">
+        <p class="text-xs font-semibold text-gray-600 mb-2">
+          <%= t('vendors.plan_limits.features') %>
+        </p>
+        <div class="space-y-1">
+          <div class="flex items-center text-xs">
+            <% if capabilities.analytics_enabled? %>
+              <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            <% else %>
+              <svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+            <% end %>
+            <span class="<%= capabilities.analytics_enabled? ? 'text-gray-900' : 'text-gray-400' %>">
+              Analytics
+            </span>
+          </div>
+
+          <div class="flex items-center text-xs">
+            <% if capabilities.multi_users? %>
+              <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+            <% else %>
+              <svg class="w-4 h-4 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+            <% end %>
+            <span class="<%= capabilities.multi_users? ? 'text-gray-900' : 'text-gray-400' %>">
+              <%= t('vendors.plan_limits.collaborators') %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+

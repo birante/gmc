@@ -1,0 +1,140 @@
+<%# Composant de filtres unifié (multi-sélection) %>
+<%
+  form_url = local_assigns[:url] || request.path
+  available_categories = local_assigns[:available_categories] || @available_categories || []
+  available_sub_categories = local_assigns[:available_sub_categories] || @available_sub_categories || []
+  available_attribute_values = local_assigns[:available_attribute_values] || @available_attribute_values || {}
+  min_price_available = local_assigns[:min_price_available] || @min_price_available
+  max_price_available = local_assigns[:max_price_available] || @max_price_available
+  shops = local_assigns[:shops] || @shops
+  reset_url = local_assigns[:reset_url] || (defined?(@shop) && @shop.present? ? shop_path(@shop.slug) : form_url)
+%>
+
+<%= form_with url: form_url, method: :get, local: true, class: "space-y-6", data: { controller: "auto-filter", auto_filter_debounce_value: 300 } do |form| %>
+  <!-- Recherche -->
+  <div class="border-b border-gray-200 pb-4">
+    <label class="block text-xs text-gray-600 mb-1">Recherche</label>
+    <%= form.text_field :search, value: params[:search], placeholder: "Nom ou description", class: "w-full rounded-lg border-gray-300 text-sm py-2 px-3", style: "--accent: var(--primary-color);", data: { action: "input->auto-filter#debounceSubmit" } %>
+  </div>
+
+  <!-- Catégorie (multi) -->
+  <% if available_categories.present? %>
+    <div class="border-b border-gray-200 pb-4">
+      <details class="group" open>
+        <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+          <span style="color: var(--primary-color);">Catégorie</span>
+          <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+          </svg>
+        </summary>
+        <div class="space-y-2">
+          <% selected_categories = Array(params[:product_category_ids]).map(&:to_s) %>
+          <% available_categories.each do |cat| %>
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+              <%= check_box_tag "product_category_ids[]", cat.id, selected_categories.include?(cat.id.to_s), class: "rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]", data: { action: "change->auto-filter#submit" } %>
+              <span><%= cat.name %></span>
+            </label>
+          <% end %>
+        </div>
+      </details>
+    </div>
+  <% end %>
+
+  <!-- Sous-catégorie (multi) -->
+  <% if available_sub_categories.present? %>
+    <div class="border-b border-gray-200 pb-4">
+      <details class="group" open>
+        <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+          <span style="color: var(--primary-color);">Sous-catégorie</span>
+          <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+          </svg>
+        </summary>
+        <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+          <% selected_sub_categories = Array(params[:product_sub_category_ids]).map(&:to_s) %>
+          <% available_sub_categories.each do |subcat| %>
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+              <%= check_box_tag "product_sub_category_ids[]", subcat.id, selected_sub_categories.include?(subcat.id.to_s), class: "rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]", data: { action: "change->auto-filter#submit" } %>
+              <span><%= subcat.name %></span>
+            </label>
+          <% end %>
+        </div>
+      </details>
+    </div>
+  <% end %>
+
+  <!-- Intervalle de prix -->
+  <div class="border-b border-gray-200 pb-4">
+    <details class="group" open>
+      <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+        <span style="color: var(--primary-color);">Intervalle de prix</span>
+        <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+        </svg>
+      </summary>
+      <div class="space-y-3 mt-2">
+        <div>
+          <%= form.label :min_price, "Minimum", class: "block text-xs text-gray-600 mb-1" %>
+          <%= form.number_field :min_price, value: params[:min_price], placeholder: (min_price_available ? number_to_currency(min_price_available, unit: "", precision: 0, delimiter: ".") : "0 FCFA"), class: "w-full rounded-lg border-gray-300 text-sm py-2 px-3", data: { action: "input->auto-filter#debounceSubmit" } %>
+        </div>
+        <div>
+          <%= form.label :max_price, "Maximum", class: "block text-xs text-gray-600 mb-1" %>
+          <%= form.number_field :max_price, value: params[:max_price], placeholder: (max_price_available ? number_to_currency(max_price_available, unit: "", precision: 0, delimiter: ".") : "500.000 FCFA"), class: "w-full rounded-lg border-gray-300 text-sm py-2 px-3", data: { action: "input->auto-filter#debounceSubmit" } %>
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Attributs de variantes (multi) -->
+  <% if available_attribute_values.present? %>
+    <% selected_attr_values = Array(params[:attribute_value_ids]).map(&:to_s) %>
+    <% available_attribute_values.each do |attr_name, values| %>
+      <div class="border-b border-gray-200 pb-4">
+        <details class="group" open>
+          <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+            <span style="color: var(--primary-color);"><%= attr_name %></span>
+            <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+            </svg>
+          </summary>
+          <div class="space-y-2 max-h-52 overflow-y-auto pr-1">
+            <% values.each do |val| %>
+              <label class="flex items-center gap-2 text-sm text-gray-700">
+                <%= check_box_tag "attribute_value_ids[]", val[:id], selected_attr_values.include?(val[:id].to_s), class: "rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]", data: { action: "change->auto-filter#submit" } %>
+                <span><%= val[:value] %></span>
+              </label>
+            <% end %>
+          </div>
+        </details>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%# Boutique / Marque (multi) si fourni %>
+  <% if shops.present? %>
+    <div class="border-b border-gray-200 pb-4">
+      <details class="group" open>
+        <summary class="cursor-pointer flex items-center justify-between text-sm font-medium text-gray-900 mb-3">
+          <span style="color: var(--primary-color);">Marque</span>
+          <svg class="w-4 h-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+          </svg>
+        </summary>
+        <div class="space-y-2 mt-2 max-h-60 overflow-y-auto">
+          <% selected_shops = Array(params[:shop_ids]).map(&:to_s) %>
+          <% shops.each do |shop| %>
+            <label class="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <%= check_box_tag "shop_ids[]", shop.id, selected_shops.include?(shop.id.to_s), class: "rounded border-gray-300 text-[var(--primary-color)] focus:ring-[var(--primary-color)]", data: { action: "change->auto-filter#submit" } %>
+              <span><%= shop.name %></span>
+            </label>
+          <% end %>
+        </div>
+      </details>
+    </div>
+  <% end %>
+
+  <!-- Actions -->
+  <div class="flex gap-2 pt-4">
+    <%= link_to "RÉINITIALISER", reset_url, class: "w-full px-4 py-2 rounded-lg transition-colors text-sm font-medium text-center border", style: "color: var(--primary-color); border-color: var(--primary-color);", data: { action: "click->auto-filter#reset" } %>
+  </div>
+<% end %>

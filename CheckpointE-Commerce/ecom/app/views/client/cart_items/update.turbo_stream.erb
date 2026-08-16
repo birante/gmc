@@ -1,0 +1,100 @@
+<% if @item_removed %>
+  <%= turbo_stream.remove "cart-item-#{@cart_item_id}" %>
+  <%= turbo_stream.remove "cart-sheet-item-#{@cart_item_id}" %>
+  <% _item_btn    = @item_id.present? ? Item.find_by(id: @item_id) : nil %>
+  <% _variant_btn = _item_btn&.variants&.find_by(id: @item_variant_id) %>
+  <% if _item_btn && _variant_btn %>
+    <%= turbo_stream.replace "add-to-cart-#{@item_id}-#{@item_variant_id}" do %>
+      <%= render "shared/add_to_cart_button",
+            item:      _item_btn,
+            variant:   _variant_btn,
+            size:      @item_size      || "md",
+            style:     @item_style     || "outline",
+            show_icon: @item_show_icon.nil? ? true : @item_show_icon,
+            full_width: true %>
+    <% end %>
+  <% end %>
+  <%= turbo_stream.append "flash-notifications" do %>
+    <%= render "shared/flash_notification_toast", message: t("storefront.products.removed_from_cart", default: "Article retiré du panier"), type: "success" %>
+  <% end %>
+<% elsif @cart_item.present? %>
+  <%= turbo_stream.replace "cart-item-#{@cart_item.id}" do %>
+    <%= render partial: 'client/carts/cart_item', locals: { cart_item: @cart_item } %>
+  <% end %>
+  <% _item_btn    = @item_id.present? ? Item.find_by(id: @item_id) : nil %>
+  <% _variant_btn = _item_btn&.variants&.find_by(id: @item_variant_id) %>
+  <% if _item_btn && _variant_btn %>
+    <%= turbo_stream.replace "add-to-cart-#{@item_id}-#{@item_variant_id}" do %>
+      <%= render "shared/add_to_cart_button",
+            item:      _item_btn,
+            variant:   _variant_btn,
+            size:      @item_size      || "md",
+            style:     @item_style     || "outline",
+            show_icon: @item_show_icon.nil? ? true : @item_show_icon,
+            full_width: true %>
+    <% end %>
+  <% end %>
+  <%= turbo_stream.append "flash-notifications" do %>
+    <% _msg = @quantity_change.to_i > 0 \
+         ? t("storefront.products.quantity_increased", default: "Quantité augmentée") \
+         : t("storefront.products.quantity_decreased", default: "Quantité réduite") %>
+    <%= render "shared/flash_notification_toast", message: _msg, type: "success" %>
+  <% end %>
+<% end %>
+
+<%= turbo_stream.replace "cart-navbar-section" do %>
+  <div id="cart-navbar-section">
+    <%= render 'shared/cart_navbar_section' %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "cart-subtotal" do %>
+  <span id="cart-subtotal" data-cart-total-target="subtotal" class="font-semibold text-gray-900">
+    <%= number_to_currency(current_cart.total_amount, unit: current_cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+  </span>
+<% end %>
+
+<%= turbo_stream.replace "cart-total" do %>
+  <span id="cart-total" data-cart-total-target="total" class="text-2xl sm:text-3xl font-bold text-[#551694]">
+    <%= number_to_currency(current_cart.total_amount, unit: current_cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+  </span>
+<% end %>
+
+<%= turbo_stream.replace "cart-sheet-content" do %>
+  <div class="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 min-h-0" id="cart-sheet-content" data-action="click->cart-sheet#stopPropagation">
+    <%= render 'shared/cart_sheet_items', cart: current_cart %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "cart-sheet-footer" do %>
+  <div id="cart-sheet-footer" class="flex-shrink-0 mt-auto">
+    <%= render 'shared/cart_sheet_footer', cart: current_cart %>
+  </div>
+<% end %>
+
+<%# Mettre à jour le total directement pour s'assurer qu'il est toujours à jour (seulement si le panier n'est pas vide) %>
+<% if current_cart.cart_items.any? && current_cart.cart_items.first&.item %>
+  <%= turbo_stream.replace "cart-sheet-total" do %>
+    <p class="text-[18px] font-bold text-[#18181b]" id="cart-sheet-total">
+      <%= number_to_currency(current_cart.total_amount, unit: current_cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </p>
+  <% end %>
+<% end %>
+
+
+<% if current_cart.cart_items.empty? %>
+  <%= turbo_stream.replace "cart-content" do %>
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-8 sm:p-12 text-center">
+      <svg class="w-20 h-20 sm:w-24 sm:h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+      <h2 class="text-xl sm:text-2xl font-semibold text-gray-600 mb-2">Votre panier est vide</h2>
+      <p class="text-gray-500 mb-6 text-sm sm:text-base">Commencez vos achats dès maintenant!</p>
+      <%= link_to client_items_path, class: "inline-block px-6 py-3 bg-[#551694] text-white rounded-lg hover:bg-[#6a1fa8] transition-colors text-sm sm:text-base font-medium" do %>
+        Voir le catalogue
+      <% end %>
+    </div>
+  <% end %>
+  <%= turbo_stream.remove "cart-summary" %>
+<% end %>
+

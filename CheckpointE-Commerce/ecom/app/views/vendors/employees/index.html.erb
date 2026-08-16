@@ -1,0 +1,196 @@
+<div class="container mx-auto px-4 py-8">
+  <!-- Vérifier si les collaborateurs sont disponibles en tant que fonctionnalité -->
+  <% any_shop_has_multi_users = current_vendor.shops.any? { |shop| multi_users_enabled?(shop) } %>
+  
+  <% unless any_shop_has_multi_users %>
+    <!-- Alerte fonctionnalité non disponible -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm text-yellow-700">
+            <%= t('vendors.plan_limits.collaborators') %> <%= t('vendors.plan_limits.collaborators_not_available') %>
+            <%= link_to t('vendors.plan_limits.upgrade_plan'), "#", class: "font-medium underline hover:text-yellow-600" %>
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Header -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900"><%= t('.title') %></h1>
+      <p class="text-gray-600 mt-1"><%= t('.subtitle') %></p>
+    </div>
+    
+    <% if current_vendor.shops.any? %>
+      <%# Trouver la première boutique active pour vérifier les limites %>
+      <% first_shop = current_vendor.shops.active.first %>
+      <% if !any_shop_has_multi_users || (first_shop && !can_add_employee?(first_shop)) %>
+        <button type="button"
+                disabled
+                title="<%= any_shop_has_multi_users ? t('vendors.plan_limits.employees_limit_reached') : t('vendors.plan_limits.collaborators') %>"
+                class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-400 rounded-lg cursor-not-allowed">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <%= t('.new_employee') %>
+        </button>
+      <% else %>
+        <%= link_to new_vendors_employee_path, 
+            class: "inline-flex items-center px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#4a1468] transition-colors" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <%= t('.new_employee') %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <!-- Alertes de limites -->
+  <% if current_vendor.shops.active.any? %>
+    <% current_vendor.shops.active.each do |shop| %>
+      <%= render "vendors/shared/limit_alert", shop: shop %>
+    <% end %>
+  <% end %>
+
+  <% if @employees.empty? %>
+    <!-- État vide -->
+    <div class="bg-white rounded-lg shadow p-12 text-center">
+      <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900"><%= t('.no_employees_title') %></h3>
+      <p class="mt-2 text-gray-600"><%= t('.no_employees_message') %></p>
+      <% if current_vendor.shops.any? && any_shop_has_multi_users %>
+        <%= link_to t('.create_employee'), new_vendors_employee_path, 
+            class: "mt-4 inline-flex items-center px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#4a1468] transition-colors" %>
+      <% end %>
+    </div>
+  <% else %>
+    <!-- Liste des collaborateurs -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= t('.employee') %>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= t('.shops') %>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= t('.role') %>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= t('.contact') %>
+            </th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= t('.status') %>
+            </th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= t('.actions') %>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @employees.each do |employee| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold">
+                      <%= employee.first_name.first.upcase %>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      <%= employee.full_name %>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      <%= employee.email %>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <% if employee.shops.any? %>
+                  <% employee_shop_hash = employee.employee_shops.index_by(&:shop_id) %>
+                  <div class="flex flex-wrap gap-1">
+                    <% employee.shops.each do |shop| %>
+                      <% is_primary = employee_shop_hash[shop.id]&.is_primary %>
+                      <span class="px-2 py-1 text-xs rounded <%= is_primary ? 'bg-purple-100 text-purple-800 font-semibold' : 'bg-gray-100 text-gray-800' %>">
+                        <%= shop.name %>
+                        <%= "★" if is_primary %>
+                      </span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span class="text-sm text-gray-400"><%= t('vendors.navigation.no_shop') %></span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                  <%= case employee.role
+                      when 'manager' then 'bg-purple-100 text-purple-800'
+                      when 'cashier' then 'bg-blue-100 text-blue-800'
+                      when 'stock_manager' then 'bg-green-100 text-green-800'
+                      when 'delivery' then 'bg-yellow-100 text-yellow-800'
+                      end %>">
+                  <%= employee.role_name %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= employee.formatted_phone_number %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if employee.active? %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    <%= t('.active') %>
+                  </span>
+                <% else %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                    <%= t('.inactive') %>
+                  </span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <div class="flex justify-end gap-2">
+                  <%= link_to edit_vendors_employee_path(employee), 
+                      class: "text-blue-600 hover:text-blue-900" do %>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                  <% end %>
+                  
+                  <%= button_to toggle_status_vendors_employee_path(employee), method: :patch,
+                      class: "text-yellow-600 hover:text-yellow-900" do %>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"></path>
+                    </svg>
+                  <% end %>
+                  
+                  <%= button_to vendors_employee_path(employee), method: :delete,
+                      data: { turbo_confirm: t('common.confirm') },
+                      class: "text-red-600 hover:text-red-900" do %>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        </table>
+      </div>
+    </div>
+  <% end %>
+</div>

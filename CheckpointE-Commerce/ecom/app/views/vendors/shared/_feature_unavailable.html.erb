@@ -1,0 +1,65 @@
+<% 
+  available_plans = available_plans_with_feature(shop, feature_code)
+  current_plan = shop.current_subscription&.plan
+  feature_names = {
+    'order_management' => t('vendors.plans.order_management', default: 'Gestion des commandes'),
+    'max_employees' => t('vendors.plan_limits.collaborators', default: 'Collaborateurs multiples'),
+    'multi_users' => t('vendors.plan_limits.collaborators', default: 'Collaborateurs multiples'),
+    'aa_delivery' => t('vendors.plans.aa_delivery', default: 'Livraison aa'),
+    'analytics_enabled' => t('vendors.plans.analytics', default: 'Analytics')
+  }
+  feature_name = feature_names[feature_code] || feature_code.humanize
+%>
+<div class="relative">
+  <!-- Overlay pour bloquer les interactions avec le contenu -->
+  <div class="absolute inset-0 z-10 bg-white/80 rounded-lg pointer-events-auto"></div>
+  <!-- Contenu original (grisé et non-cliquable) -->
+  <div class="relative opacity-50 pointer-events-none">
+    <%= yield %>
+  </div>
+  <!-- Message de fonctionnalité non disponible (cliquable) -->
+  <div class="absolute inset-0 z-20 flex items-center justify-center p-6 pointer-events-auto">
+    <div class="bg-white border-2 border-yellow-300 rounded-lg shadow-xl p-6 max-w-md w-full">
+      <div class="flex items-start gap-3 mb-4">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">Fonctionnalité non disponible</h3>
+          <p class="text-sm text-gray-600 mb-1">
+            La fonctionnalité <strong><%= feature_name %></strong> n'est pas incluse dans votre abonnement actuel
+            <% if current_plan %>
+              (<%= current_plan.name %>)
+            <% end %>.
+          </p>
+          <p class="text-xs text-gray-500 mt-2">
+            Mettez à niveau votre plan pour accéder à cette fonctionnalité.
+          </p>
+        </div>
+      </div>
+      <% if available_plans.any? %>
+        <div class="mt-4 pt-4 border-t border-gray-200">
+          <p class="text-xs font-medium text-gray-700 mb-2">Plans disponibles avec cette fonctionnalité :</p>
+          <div class="space-y-2">
+            <% available_plans.first(2).each do |plan| %>
+              <div class="flex items-center justify-between p-2 bg-purple-50 rounded border border-purple-200">
+                <div class="flex-1">
+                  <p class="text-sm font-semibold text-gray-900"><%= plan.name %></p>
+                  <p class="text-xs text-gray-600"><%= plan.description %></p>
+                </div>
+                <%= link_to "Souscrire", new_vendors_plan_path(shop_slug: shop.slug, plan_id: plan.id, upgrade: true), 
+                    class: "ml-3 px-3 py-1.5 text-xs font-medium text-white bg-[#551694] rounded-md hover:bg-[#451384] transition-colors" %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      <div class="mt-4 flex gap-2">
+        <%= link_to "Voir les offres", new_vendors_plan_path(shop_slug: shop.slug, upgrade: true), 
+            class: "flex-1 text-center px-4 py-2 text-sm font-medium text-[#551694] border-2 border-[#551694] rounded-md hover:bg-[#551694] hover:text-white transition-colors" %>
+      </div>
+    </div>
+  </div>
+</div>

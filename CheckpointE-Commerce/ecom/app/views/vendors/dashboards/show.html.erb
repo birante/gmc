@@ -1,0 +1,20 @@
+<% content_for :active_tab, 'dashboard' %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <%= render "shared/dashboards/show",
+        items_index_path:       url_with_shop(vendors_items_path, @current_shop),
+        item_path_for:          ->(item)  { url_with_shop(vendors_item_path(item), @current_shop) },
+        orders_index_path_for:  ->()      { vendors_orders_path(shop_slug: @current_shop&.slug) },
+        order_path_for:         ->(order) { vendors_order_path(order.id, shop_slug: @current_shop&.slug) },
+        employees_index_path:   vendors_employees_path,
+        new_employee_path:      new_vendors_employee_path,
+        finances_path_for:      ->()      { url_with_shop(vendors_finances_path, @current_shop) },
+        signup_path:            new_vendors_registration_path,
+        signup_label:           t('vendors.dashboards.show.signup'),
+        can_manage_items_buttons:     true,
+        can_manage_employees_buttons: true %>
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>

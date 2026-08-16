@@ -1,0 +1,346 @@
+<%# Local Shops - Boutiques locales partenaires (version digitalisée) %>
+<%
+  # Charger les bannières depuis la base de  données via @local_shops (LocalShopBanner)
+  local_shop_banners = local_assigns[:local_shops] || []
+  local_shop_banners = local_shop_banners.to_a if local_shop_banners.respond_to?(:to_a)
+  
+  # Charger la bannière latérale Made in Senegal
+  side_banner = local_assigns[:side_banner]
+  
+  # Produits "Made in Senegal" pour la section produits
+  featured_products = local_assigns[:local_products] || Item.available_for_sale
+                                                              .made_in_senegal
+                                                              .select(:id, :name, :slug, :shop_id, :currency_id, :is_on_sale, :sale_discount_percent, :sale_start_date, :sale_end_date)
+                                                              .includes(:variants, :currency, :shop, main_image_attachment: :blob)
+                                                              .order(Arel.sql("RANDOM()"))
+                                                              .limit(6)
+                                                              .to_a
+  
+  # Si aucune bannière, ne pas afficher la section
+  return if local_shop_banners.empty?
+%>
+
+<div class="bg-white py-6 md:py-8">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    
+    <!-- ===== SECTION 1: Carousel Boutiques Locales ===== -->
+    <section class="mb-8" data-controller="horizontal-scroll" aria-labelledby="local-shops-heading">
+      <!-- Header -->
+      <header class="mb-6">
+        <h2 id="local-shops-heading" class="text-xl md:text-2xl font-semibold text-[#362526]">
+          <%= link_to t('storefront.local_shops.title'), local_client_shops_path, class: "hover:text-[#551694] hover:underline underline-offset-4", data: { turbo_frame: "_top" } %>
+        </h2>
+      </header>
+      
+      <!-- Banners Carousel Container -->
+      <div class="relative">
+           <nav data-horizontal-scroll-target="scrollable" 
+             class="flex gap-4 md:gap-5 overflow-x-auto pb-4 px-6 md:px-8 scrollbar-hide" 
+             style="scrollbar-width: none; -ms-overflow-style: none;"
+             role="list"
+             aria-label="<%= t('storefront.local_shops.nav_label') %>">
+          <% local_shop_banners.each do |banner| %>
+            <%= link_to banner.link, 
+                class: "flex-shrink-0 group focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 rounded-[23px] flex flex-col",
+                role: "listitem",
+                "aria-label": t('storefront.local_shops.visit_shop', shop: banner.name) do %>
+              <article class="relative w-[140px] h-[140px] md:w-[172px] md:h-[172px] rounded-[23px] overflow-hidden">
+                <!-- Banner Image -->
+                <% if banner.image.attached? %>
+                  <%= image_tag(banner.image,
+                      alt: banner.name, 
+                      class: "absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300",
+                      width: 172,
+                      height: 172) %>
+                <% else %>
+                  <!-- Fallback si pas d'image (même style que Boutiques officielles) -->
+                  <div class="absolute inset-0 bg-[#f9f9f9] flex items-center justify-center p-4">
+                    <span class="text-gray-400 font-semibold text-sm text-center"><%= banner.name %></span>
+                  </div>
+                <% end %>
+              </article>
+              <span class="mt-2 text-[13px] md:text-[14px] font-semibold text-gray-900 leading-snug line-clamp-2 px-1 text-center">
+                <%= banner.name %>
+              </span>
+            <% end %>
+          <% end %>
+        </nav>
+        
+        <!-- Navigation Buttons (sur les côtés) -->
+        <button type="button"
+                data-horizontal-scroll-target="leftButton"
+                data-action="click->horizontal-scroll#scrollLeft"
+                aria-label="<%= t('storefront.carousel.scroll_left') %>"
+                class="hidden md:flex absolute left-0 top-[70px] md:top-[86px] -translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button type="button"
+                data-horizontal-scroll-target="rightButton"
+                data-action="click->horizontal-scroll#scrollRight"
+                aria-label="<%= t('storefront.carousel.scroll_right') %>"
+                class="hidden md:flex absolute right-0 top-[70px] md:top-[86px] translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    
+    <!-- ===== SECTION 2: Made in Senegal + Produits en vedette ===== -->
+    <div class="grid grid-cols-1 lg:grid-cols-[312px_1fr] gap-4 lg:gap-6">
+      
+      <!-- Colonne gauche: Bannière Made in Senegal -->
+      <% if side_banner %>
+        <aside class="relative h-[400px] lg:h-[614px] rounded-[13px] overflow-hidden" 
+               style="background-color: <%= side_banner.bg_color %>;" 
+               aria-labelledby="made-in-senegal-heading">
+          <!-- Background Image -->
+          <% if side_banner.image.attached? %>
+            <%= image_tag(side_banner.image,
+                alt: "", 
+                role: "presentation",
+                class: "absolute inset-0 w-full h-full object-cover",
+                loading: "lazy",
+                decoding: "async",
+                width: 312,
+                height: 614) %>
+          <% end %>
+          
+          <!-- Gradient Overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/50" aria-hidden="true"></div>
+          
+          <!-- Content -->
+          <div class="relative h-full flex flex-col items-center justify-start text-center p-6 pt-8">
+            <div class="space-y-3">
+              <% if side_banner.subtitle.present? %>
+                <p class="text-sm md:text-[14px] font-semibold" style="color: <%= side_banner.text_color %>;">
+                  <%= side_banner.subtitle %>
+                </p>
+              <% end %>
+              <h3 id="made-in-senegal-heading" class="text-2xl md:text-[27px] font-semibold leading-tight" 
+                  style="color: <%= side_banner.text_color == '#ffffff' ? '#fbbf24' : side_banner.text_color %>;">
+                <%= side_banner.title %>
+              </h3>
+              <% if side_banner.description.present? %>
+                <p class="text-sm md:text-[16px]" style="color: <%= side_banner.text_color %>;">
+                  <%= side_banner.description %>
+                </p>
+              <% end %>
+            </div>
+          </div>
+          
+          <!-- CTA Button at bottom -->
+          <% if side_banner.cta_link.present? %>
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 w-full px-4 flex justify-center">
+              <%= link_to side_banner.cta_link, 
+                  class: "inline-flex items-center justify-center gap-2 bg-white border border-[#cebff6] text-[#551694] font-medium text-sm md:text-base uppercase tracking-wide px-6 md:px-8 py-3 rounded-full hover:bg-[#551694] hover:text-white hover:border-[#551694] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#551694] whitespace-nowrap",
+                  "aria-label": side_banner.cta_text || t('storefront.local_shops.see_more_products', default: 'Voir plus de produits Made in Senegal') do %>
+                <%= side_banner.cta_text || t('storefront.local_shops.see_more', default: 'Voir plus') %>
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+              <% end %>
+            </div>
+          <% end %>
+        </aside>
+      <% else %>
+        <!-- Fallback à l'ancienne bannière si pas encore configurée -->
+        <aside class="relative h-[400px] lg:h-[614px] rounded-[13px] overflow-hidden bg-[#f3de6d]" aria-labelledby="made-in-senegal-heading">
+          <%= image_tag "storefront/local-shops/made-in-senegal-bg.jpg", 
+              alt: "", 
+              role: "presentation",
+              class: "absolute inset-0 w-full h-full object-cover",
+              loading: "lazy",
+              decoding: "async",
+              width: 312,
+              height: 614 %>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/50" aria-hidden="true"></div>
+          <div class="relative h-full flex flex-col items-center justify-start text-center p-6 pt-8">
+            <div class="space-y-3">
+              <p class="text-white text-sm md:text-[14px] font-semibold"><%= t('storefront.local_shops.local_products') %></p>
+              <h3 id="made-in-senegal-heading" class="text-yellow-400 text-2xl md:text-[27px] font-semibold leading-tight">Made in Senegal</h3>
+              <p class="text-white text-sm md:text-[16px]"><%= t('storefront.local_shops.explore_local') %></p>
+            </div>
+          </div>
+          <div class="absolute bottom-8 left-1/2 -translate-x-1/2 w-full px-4 flex justify-center">
+            <%= link_to local_client_shops_path, 
+                class: "inline-flex items-center justify-center gap-2 bg-white border border-[#cebff6] text-[#551694] font-medium text-sm md:text-base uppercase tracking-wide px-6 md:px-8 py-3 rounded-full hover:bg-[#551694] hover:text-white hover:border-[#551694] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#551694] whitespace-nowrap" do %>
+              <%= t('storefront.local_shops.see_more', default: 'Voir plus') %>
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            <% end %>
+          </div>
+        </aside>
+      <% end %>
+      
+      <!-- Colonne droite: Grille de produits -->
+      <section aria-labelledby="featured-local-products-heading">
+        <h3 id="featured-local-products-heading" class="sr-only"><%= t('storefront.local_shops.featured_products') %></h3>
+        
+        <%# Mobile: Layout vertical en 2 colonnes %>
+        <div class="grid grid-cols-2 gap-2 lg:hidden" role="list">
+          <% featured_products.each do |item| %>
+            <% variant = item.default_variant || item.variants.first %>
+            <% next unless variant %>
+            <article class="bg-white border border-gray-200 rounded-lg overflow-hidden" role="listitem">
+              <%= link_to item_path(item), class: "block" do %>
+                <!-- Image produit -->
+                <div class="relative bg-[#f0f2f4] aspect-square flex items-center justify-center">
+                  <% if item.has_image? %>
+                    <%= storage_image_tag(item.display_image,
+                        variant_name: :card,
+                        alt: item.name,
+                        class: "w-full h-full object-contain p-2",
+                        width: 400,
+                        height: 400, disable_lazy: true) %>
+                  <% else %>
+                    <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  <% end %>
+                  
+                  <!-- Discount Badge -->
+                  <% discount_percent = discount_percentage_for(variant) %>
+                  <% if discount_percent > 0 %>
+                    <div class="absolute top-2 left-2 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                      <%= discount_percent %>%
+                    </div>
+                  <% end %>
+                  
+                </div>
+              <% end %>
+              
+              <!-- Infos produit -->
+              <div class="p-2.5">
+                <%= link_to item_path(item), class: "block" do %>
+                  <h4 class="text-[11px] font-medium text-gray-900 line-clamp-2 leading-tight mb-1.5 min-h-[28px] hover:text-[#551694] transition-colors">
+                    <%= item.name %>
+                  </h4>
+                <% end %>
+                
+                <!-- Rating -->
+                <% if item.average_rating.present? %>
+                  <% rounded_rating = item.average_rating.round %>
+                  <div class="flex items-center gap-0.5 mb-1.5" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_rating) %>">
+                    <div class="flex" aria-hidden="true">
+                      <% 5.times do |i| %>
+                        <svg class="w-2.5 h-2.5 <%= i < rounded_rating ? 'text-yellow-400' : 'text-gray-300' %>" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      <% end %>
+                    </div>
+                    <span class="text-[10px] text-gray-500 ml-0.5"><%= item.average_rating.round(1) %></span>
+                  </div>
+                <% end %>
+                
+                <!-- Prix -->
+                <div class="mb-2">
+                  <% current_price = current_price_for(variant) %>
+                  <% original_price = original_price_for(variant) %>
+                  <% discount_percent = discount_percentage_for(variant) %>
+                  <span class="text-sm font-bold text-red-600">
+                    <%= number_to_currency(current_price, unit: item.currency&.symbol || "FCFA", precision: 0) %>
+                  </span>
+                  <% if discount_percent > 0 && original_price > current_price %>
+                    <span class="text-[10px] text-gray-400 line-through ml-1">
+                      <%= number_to_currency(original_price, unit: item.currency&.symbol || "FCFA", precision: 0) %>
+                    </span>
+                  <% end %>
+                </div>
+                
+                <!-- Bouton Ajouter au panier -->
+                <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "outline" %>
+              </div>
+            </article>
+          <% end %>
+        </div>
+
+        <%# Desktop: Layout horizontal en grille 2x3 %>
+        <div class="hidden lg:grid grid-cols-2 gap-0 border border-gray-200" role="list">
+          <% featured_products.each do |item| %>
+            <% variant = item.default_variant || item.variants.first %>
+            <% next unless variant %>
+            <article class="border border-gray-200 p-4 flex gap-4" role="listitem">
+              <%= link_to item_path(item), class: "flex-shrink-0" do %>
+                <!-- Image produit -->
+                <div class="relative bg-[#f0f2f4] w-[180px] h-[173px] flex items-center justify-center">
+                  <% if item.has_image? %>
+                    <%= storage_image_tag(item.display_image,
+                        variant_name: :card,
+                        alt: item.name,
+                        class: "max-w-full max-h-full object-contain",
+                        width: 180,
+                        height: 173, disable_lazy: true) %>
+                  <% else %>
+                    <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                  <% end %>
+                  
+                  <!-- Discount Badge -->
+                  <% discount_percent = discount_percentage_for(variant) %>
+                  <% if discount_percent > 0 %>
+                    <div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-extrabold uppercase px-2 py-1 rounded-md" aria-label="<%= t('storefront.products.discount', discount: discount_percent) %>">
+                      <%= discount_percent %>%
+                    </div>
+                  <% end %>
+                  
+                </div>
+              <% end %>
+              
+              <!-- Infos produit -->
+              <div class="flex flex-col flex-1 min-w-0">
+                <%= link_to item_path(item), class: "block" do %>
+                  <h4 class="text-[13px] font-medium text-gray-950 line-clamp-2 leading-[1.4] mb-2 hover:text-[#551694] transition-colors">
+                    <%= item.name %>
+                  </h4>
+                <% end %>
+                
+                <!-- Rating -->
+                <% if item.average_rating.present? %>
+                  <% rounded_rating = item.average_rating.round %>
+                  <div class="flex items-center gap-1 mb-2" role="img" aria-label="<%= t('storefront.products.rating', rating: rounded_rating) %>">
+                    <div class="flex" aria-hidden="true">
+                      <% 5.times do |i| %>
+                        <svg class="w-[11px] h-[11px] <%= i < rounded_rating ? 'text-yellow-400' : 'text-gray-300' %>" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                      <% end %>
+                    </div>
+                    <span class="text-[12px] text-gray-500"><%= item.average_rating.round(1) %></span>
+                  </div>
+                <% end %>
+              
+                <!-- Prix -->
+                <div class="flex items-end gap-2 mb-3 flex-wrap">
+                  <% current_price = current_price_for(variant) %>
+                  <% original_price = original_price_for(variant) %>
+                  <% discount_percent = discount_percentage_for(variant) %>
+                  <span class="text-[22px] font-bold text-red-600 leading-none">
+                    <%= number_to_currency(current_price, unit: item.currency&.symbol || "FCFA", precision: 0) %>
+                  </span>
+                  <% if discount_percent > 0 && original_price > current_price %>
+                    <span class="text-[16px] text-gray-900 line-through leading-none">
+                      <span class="sr-only"><%= t('storefront.products.original_price') %></span>
+                      <%= number_to_currency(original_price, unit: item.currency&.symbol || "FCFA", precision: 0) %>
+                    </span>
+                  <% end %>
+                </div>
+              
+                <!-- Bouton Ajouter au panier -->
+                <div class="mt-auto w-full max-w-[200px]">
+                  <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "outline" %>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      </section>
+      
+    </div>
+  </div>
+</div>

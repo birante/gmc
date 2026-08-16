@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Votre commande est partiellement livrée</h1>
+    <p>Bonjour <%= @user.first_name %>,</p>
+    <p>Nous vous informons que votre commande <strong>#{@order.order_number}</strong> est partiellement livrée.</p>
+    <p>Certains articles de votre commande sont déjà arrivés, tandis que d'autres sont encore en cours de livraison.</p>
+    <p>Nous vous tiendrons informé de l'avancement pour les articles restants.</p>
+    <p>Merci pour votre patience !</p>
+  </body>
+</html>

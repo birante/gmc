@@ -1,0 +1,123 @@
+<%# Partial partagé : Vue d'ensemble analytics (vendor + employees) %>
+<%# Variables d'instance attendues du contrôleur :
+      @shop_views, @unique_visitors, @items_views, @items_added_to_cart,
+      @orders_count, @revenue, @conversion_rate,
+      @shop_views_by_day, @top_viewed_items %>
+
+<!-- KPIs Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <!-- Vues Boutique -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600">Vues Boutique</p>
+        <p class="text-3xl font-bold text-gray-900"><%= @shop_views %></p>
+      </div>
+    </div>
+    <p class="text-xs text-gray-500 mt-2"><%= @unique_visitors %> visiteurs uniques</p>
+  </div>
+
+  <!-- Vues Produits -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600">Vues Produits</p>
+        <p class="text-3xl font-bold text-gray-900"><%= @items_views %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ajouts au Panier -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600">Ajouts au Panier</p>
+        <p class="text-3xl font-bold text-gray-900"><%= @items_added_to_cart %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commandes -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm text-gray-600">Commandes</p>
+        <p class="text-3xl font-bold text-gray-900"><%= @orders_count %></p>
+      </div>
+    </div>
+    <p class="text-xs text-gray-500 mt-2"><%= number_to_currency(@revenue, unit: "FCFA", format: "%n %u") %></p>
+  </div>
+</div>
+
+<!-- Taux de Conversion -->
+<div class="bg-gradient-to-r from-[#551694]/10 to-[#551694]/20 rounded-lg shadow p-6 mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm font-medium text-[#551694]">Taux de Conversion</p>
+      <p class="text-4xl font-bold text-[#551694]"><%= @conversion_rate %>%</p>
+      <p class="text-sm text-[#551694]/80 mt-2">Visiteurs → Commandes</p>
+    </div>
+  </div>
+</div>
+
+<!-- Graphiques -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <!-- Évolution des vues boutique -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Évolution des Vues Boutique</h3>
+    <% if @shop_views_by_day.any? && @shop_views_by_day.values.sum > 0 %>
+      <%= line_chart @shop_views_by_day, thousands: ",", colors: ["#551694"], height: "250px",
+          library: {
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#F3F4F6' } },
+              x: { grid: { display: false } }
+            }
+          } %>
+    <% else %>
+      <div class="h-[250px] flex flex-col items-center justify-center bg-gray-50 rounded">
+        <svg class="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucune vue sur cette période</p>
+        <p class="text-xs text-gray-500 text-center px-4">Les vues de votre boutique apparaîtront ici une fois que les visiteurs commenceront à consulter votre page.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Top 5 Produits Vus -->
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Top 5 Produits Vus</h3>
+    <% if @top_viewed_items.any? %>
+      <div class="space-y-3">
+        <% @top_viewed_items.each_with_index do |data, index| %>
+          <% next unless data[:item] %>
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="flex items-center justify-center w-8 h-8 rounded-full bg-[#551694]/10 text-[#551694] text-sm font-bold flex-shrink-0">
+                <%= index + 1 %>
+              </span>
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-gray-900 truncate"><%= data[:item].name %></p>
+                <p class="text-xs text-gray-500 truncate"><%= data[:item].product_sub_category&.name || "Sans catégorie" %></p>
+              </div>
+            </div>
+            <span class="font-bold text-gray-900 ml-3 flex-shrink-0">
+              <%= data[:count] %> <%= data[:count] == 1 ? 'vue' : 'vues' %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+      <% if @top_viewed_items.all? { |data| data[:count] == 0 } %>
+        <p class="text-xs text-gray-500 text-center mt-4 italic">Aucune vue enregistrée pour ces produits sur cette période</p>
+      <% end %>
+    <% else %>
+      <div class="text-center py-8">
+        <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <p class="text-sm font-medium text-gray-900 mb-1">Aucun produit consulté</p>
+        <p class="text-xs text-gray-500 px-4">Les vues de vos produits apparaîtront ici une fois que les visiteurs commenceront à les consulter.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

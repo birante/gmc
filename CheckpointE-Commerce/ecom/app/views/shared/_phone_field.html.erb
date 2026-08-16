@@ -1,0 +1,115 @@
+<%
+  # Paramètres par défaut
+  country_code_field ||= :country_code
+  phone_number_field ||= :phone_number
+  placeholder ||= "77XXXXXXX"
+  error_object ||= form.object
+  selected_country ||= 'SN'
+  priority_countries ||= ['SN', 'FR', 'ML', 'CI', 'BF', 'MR', 'GN', 'GM']
+  label_text ||= "Numéro de téléphone"
+  show_label ||= true
+  required ||= false
+  autocomplete_value ||= "tel"
+  
+  # Obtenir la liste des pays
+  countries = countries_for_phone_field(priority_countries)
+  # Utiliser la valeur du formulaire si elle existe, sinon utiliser selected_country
+  current_country_code = form.object&.send(country_code_field) || selected_country
+  selected_country_data = countries.find { |c| c[:code] == current_country_code } || countries.first
+  
+  # Gestion des erreurs
+  has_country_error = error_object&.errors && error_object.errors[country_code_field].any?
+  has_phone_error = error_object&.errors && error_object.errors[phone_number_field].any?
+  
+  border_error_class = (has_country_error || has_phone_error) ? "border-red-400 focus-within:border-red-600" : "border-[#E9E9E9] focus-within:border-[#551694]"
+%>
+
+<div class="my-4 md:my-5" data-controller="phone-country" 
+     data-phone-country-countries-value="<%= countries.to_json %>"
+     data-phone-country-selected-value="<%= selected_country_data[:code] %>"
+     data-phone-country-phone-code-value="<%= selected_country_data[:phoneCode] %>">
+  <% if show_label %>
+    <%= form.label phone_number_field, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+      <%= label_text %>
+      <% if required %>
+        <span class="text-xs text-red-500">*</span>
+      <% end %>
+    <% end %>
+  <% end %>
+  
+  <div class="relative mt-2">
+    <!-- Container principal avec bordure unifiée -->
+    <div class="flex min-w-0 items-center bg-[#F9F9F9] rounded-md border <%= border_error_class %> focus-within:ring-2 focus-within:ring-[#551694] focus-within:ring-opacity-20 transition-all">
+      <!-- Bouton sélecteur de pays -->
+      <button 
+        type="button"
+        data-phone-country-target="button"
+        data-action="click->phone-country#toggle"
+        class="flex shrink-0 items-center gap-2 px-3 py-2.5 md:py-3 border-r border-[#E9E9E9] hover:bg-gray-50 transition-colors focus:outline-none"
+      >
+        <span class="text-xl"><%= get_country_flag(selected_country_data[:code]) %></span>
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+        <span class="text-sm font-medium"><%= selected_country_data[:phoneCode] %></span>
+      </button>
+      
+      <!-- Champ de saisie du numéro -->
+      <div class="min-w-0 flex-1">
+        <%= form.telephone_field phone_number_field,
+            placeholder: placeholder,
+            autocomplete: autocomplete_value,
+            required: required,
+            data: { phone_country_target: "phoneInput" },
+            class: "block bg-transparent border-0 px-3 py-2.5 md:py-3 w-full text-base focus:outline-none focus:ring-0" %>
+      </div>
+    </div>
+    
+    <!-- Champ caché pour le code pays -->
+    <%= form.hidden_field country_code_field, 
+        value: selected_country_data[:code],
+        data: { phone_country_target: "hidden" },
+        required: required %>
+    
+    <!-- Dropdown de sélection de pays -->
+    <div 
+      data-phone-country-target="dropdown"
+      class="hidden absolute z-50 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 max-h-80 overflow-hidden"
+    >
+      <!-- Barre de recherche -->
+      <div class="p-3 border-b border-gray-200">
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input 
+            type="text"
+            data-phone-country-target="search"
+            data-action="input->phone-country#search"
+            placeholder="<%= t('common.search_countries') %>"
+            class="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-transparent"
+          />
+        </div>
+      </div>
+      
+      <!-- Liste des pays (scrollable) -->
+      <div 
+        data-phone-country-target="list"
+        class="overflow-y-auto max-h-64"
+      >
+        <!-- Les pays seront rendus par JavaScript -->
+      </div>
+    </div>
+  </div>
+  
+  <% if has_phone_error %>
+    <p class="text-xs text-red-500 mt-1">
+      <%= error_object.errors[phone_number_field].join(', ') %>
+    </p>
+  <% end %>
+  <% if has_country_error %>
+    <p class="text-xs text-red-500 mt-1">
+      <%= error_object.errors[country_code_field].join(', ') %>
+    </p>
+  <% end %>
+</div>

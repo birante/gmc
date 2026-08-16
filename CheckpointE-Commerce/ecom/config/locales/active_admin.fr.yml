@@ -1,0 +1,226 @@
+fr:
+  active_admin:
+    # Titres des ressources
+    shops: "Boutiques"
+    items: "Produits"
+    vendors: "Vendeurs"
+    orders: "Commandes"
+    order_items: "Articles de commande"
+    employees: "Employés"
+    users: "Utilisateurs"
+    payments: "Paiements"
+    payment_methods: "Modes de paiement"
+    delivery_zones: "Zones de livraison"
+    delivery_slots: "Créneaux de livraison"
+    delivery_categories: "Catégories de livraison"
+    delivery_prices: "Prix de livraison"
+    currencies: "Devises"
+    sectors: "Secteurs"
+    product_categories: "Catégories de produits"
+    product_sub_categories: "Sous-catégories"
+    social_platforms: "Plateformes sociales"
+    addresses: "Adresses"
+    rules: "Règles"
+    plans: "Plans"
+    subscriptions: "Abonnements"
+    plan_rules: "Règles de plan"
+    shop_rules: "Règles boutique"
+    add_ons: "Add-ons"
+    shop_add_ons: "Add-ons boutique"
+    
+    # Colonnes communes
+    columns:
+      id: "ID"
+      created_at: "Créé le"
+      updated_at: "Modifié le"
+      name: "Nom"
+      description: "Description"
+      status: "Statut"
+      position: "Position"
+      is_active: "Actif"
+      
+      # Shops
+      vendor: "Vendeur"
+      address: "Adresse"
+      primary_color: "Couleur primaire"
+      secondary_color: "Couleur secondaire"
+      code: "Code"
+      total_views: "Vues Totales"
+      
+      # Items
+      shop: "Boutique"
+      product_sub_category: "Sous-catégorie"
+      currency: "Devise"
+      variants_count: "Variantes"
+      views_count: "Vues"
+      validation_status: "Statut de validation"
+      price: "Prix"
+      stock_quantity: "Stock"
+      
+      # Orders
+      user: "Utilisateur"
+      delivery_zone: "Zone de livraison"
+      delivery_slot: "Créneau"
+      total_amount: "Montant total"
+      delivery_fee: "Frais de livraison"
+      final_amount: "Montant final"
+      delivery_address: "Adresse de livraison"
+      delivery_notes: "Notes de livraison"
+      delivery_date: "Date de livraison"
+      order_number: "N° de commande"
+      
+      # Employees
+      email: "Email"
+      role: "Rôle"
+      shops_access: "Accès boutiques"
+      
+      # Payments
+      order: "Commande"
+      payment_method: "Mode de paiement"
+      amount: "Montant"
+      transaction_id: "ID Transaction"
+      payment_status: "Statut paiement"
+      
+      # Delivery
+      zone_name: "Nom de la zone"
+      base_price: "Prix de base"
+      slot_time: "Horaire"
+      capacity: "Capacité"
+      category_name: "Nom de la catégorie"
+      size_category: "Taille"
+      max_dimensions: "Dimensions max"
+      
+      # Rules & Plans
+      rule: "Règle"
+      plan: "Plan"
+      subscription: "Abonnement"
+      plan_rule: "Règle de plan"
+      shop_rule: "Règle boutique"
+      add_on: "Add-on"
+      shop_add_on: "Add-on boutique"
+      code: "Code"
+      rule_type: "Type de règle"
+      default_value: "Valeur par défaut"
+      value: "Valeur"
+      is_custom: "Personnalisé"
+      status: "Statut"
+      started_at: "Début"
+      ends_at: "Fin"
+      quantity: "Quantité"
+      duration_remaining: "Durée restante"
+      active: "Actif"
+      expired: "Expiré"
+      cancelled: "Annulé"
+      upcoming: "À venir"
+      
+    # Actions
+    actions:
+      view: "Voir"
+      edit: "Modifier"
+      delete: "Supprimer"
+      new: "Nouveau"
+      analytics: "Analytics"
+      
+    # Statuts
+    statuses:
+      pending: "En attente"
+      active: "Actif"
+      approved: "Approuvé"
+      rejected: "Rejeté"
+      suspended: "Suspendu"
+      deactivate: "Désactivé"
+      confirmed: "Confirmé"
+      processing: "En cours"
+      shipped: "Expédié"
+      delivered: "Livré"
+      cancelled: "Annulé"
+      expired: "Expiré"
+      unlimited: "Illimité"
+      
+    # Messages
+    messages:
+      no_data: "Aucune donnée disponible"
+      confirm_delete: "Êtes-vous sûr de vouloir supprimer cet élément ?"
+      successfully_created: "Créé avec succès"
+      successfully_updated: "Mis à jour avec succès"
+      successfully_deleted: "Supprimé avec succès"
+      
+    # Analytics page
+    analytics:
+      menu: "📊 Analytics"
+      title: "Analytics"
+      filter_button: "Filtrer"
+      
+      # KPIs
+      total_visits: "Visites Totales"
+      unique_visitors: "Visiteurs Uniques"
+      pages_viewed: "Pages Vues"
+      shops_visited: "Boutiques Visitées"
+      products_viewed: "Produits Vus"
+      cart_additions: "Ajouts au Panier"
+      orders: "Commandes"
+      conversion_rate: "Taux de Conversion"
+      
+      # Charts
+      page_evolution: "📊 Évolution des Pages Vues"
+      shops_evolution: "🛍️ Évolution des Vues Boutiques"
+      
+      # Top lists
+      top_pages: "📄 Pages les Plus Visitées"
+      top_shops: "🏪 Top 15 Boutiques"
+      top_products: "🏷️ Top 15 Produits"
+      
+      # Events
+      events_distribution: "📊 Répartition des Événements"
+      traffic_sources: "🔗 Top 10 Sources de Trafic"
+      
+      # Technical
+      devices: "💻 Appareils"
+      browsers: "🌐 Navigateurs"
+      top_countries: "🌍 Top 15 Pays"
+      
+      # Columns
+      page: "Page"
+      views: "Vues"
+      percentage: "% du Total"
+      code: "Code"
+      visitors: "visiteurs"
+      no_utm_data: "Aucune source UTM pour cette période"
+      no_geo_data: "Aucune donnée de géolocalisation pour cette période"
+      enable_geo: "💡 Activez la géolocalisation dans config/initializers/ahoy.rb"
+    
+    # Rules & Plans
+    rules:
+      associated_plan_rules: "PlanRules associées"
+      associated_shop_rules: "ShopRules associées"
+      unlimited_nil: "nil (illimité)"
+      json_value: "Valeur JSON"
+    plans:
+      plan_rules: "Règles du plan"
+      active_subscriptions: "Abonnements actifs"
+      no_plan: "Aucun plan associé"
+      modify_rule: "Modifier"
+    subscriptions:
+      applied_rules: "Règles appliquées (via le plan)"
+      shop_overrides: "Overrides boutique (ShopRules)"
+      no_overrides: "Aucun override pour cette boutique"
+      remaining_duration: "Durée restante"
+      days_remaining: "jours restants"
+      expires_today: "Expire aujourd'hui"
+      expired: "Expiré"
+    shop_rules:
+      plan_default_value: "Valeur du plan (par défaut)"
+      no_active_plan: "Aucun plan actif pour cette boutique"
+      disable_hint: "Désactiver pour revenir à la valeur du plan"
+    add_ons:
+      shops_using: "Boutiques utilisant cet add-on"
+      status: "Statut"
+      active: "Actif"
+      expired: "Expiré"
+      upcoming: "À venir"
+    shop_add_ons:
+      status: "Statut"
+      remaining_duration: "Durée restante"
+      days_remaining: "jours restants"
+      expires_today: "Expire aujourd'hui"
+

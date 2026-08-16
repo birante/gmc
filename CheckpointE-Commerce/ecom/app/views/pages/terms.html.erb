@@ -1,0 +1,342 @@
+<% content_for :title, "aa | Conditions Générales d'Utilisation" %>
+<% content_for :meta_description, "Conditions générales d'utilisation de aa pour les acheteurs et les vendeurs." %>
+<% content_for :meta_keywords, "aa, conditions utilisation, CGU, acheteurs, vendeurs" %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<% content_for :structured_data do %>
+  <%= combined_json_ld_tag(
+    simple_page_schema(
+      name: "Conditions Générales d'Utilisation",
+      description: "Conditions générales d'utilisation de aa pour les acheteurs et les vendeurs.",
+      url: terms_url
+    ),
+    breadcrumb_schema([
+      [ t("breadcrumbs.home", default: "Accueil"), root_url ],
+      [ "Conditions Générales d'Utilisation", terms_url ]
+    ])
+  ) %>
+<% end %>
+<section class="bg-[#ECEAF5] border-b border-[#DDD6F0] py-10 md:py-12">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="max-w-5xl mx-auto text-center">
+      <p class="text-xs uppercase tracking-[0.18em] text-[#551694] font-semibold mb-3">aa</p>
+      <h1 class="text-xl md:text-3xl font-semibold text-[#201A40] leading-snug">
+        Conditions Générales d'Utilisation pour les Acheteurs et les Vendeurs
+      </h1>
+    </div>
+  </div>
+</section>
+<section class="bg-[#F5F3FB] py-8 md:py-10">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="max-w-5xl mx-auto">
+      <div class="bg-[#551694] text-white rounded-sm p-5 md:p-6">
+        <h2 class="text-lg font-semibold mb-3">Bienvenue sur aa.</h2>
+        <p class="text-sm leading-6 text-[#EEE8FF]">
+          Les présentes Conditions Générales d'Utilisation (ci-après "CGU") régissent l'accès et
+          l'utilisation de la plateforme aa, accessible via le site web aa.com (ci-après "la Plateforme"),
+          exploitée par la société aa West Africa SASU, dont le siège social est établi à Dakar, Sénégal.
+        </p>
+        <p class="text-sm leading-6 text-[#EEE8FF] mt-3">
+          En accédant à la Plateforme et en créant un compte, vous acceptez sans réserve les présentes CGU dans leur
+          intégralité. Si vous n'acceptez pas ces conditions, vous devez cesser immédiatement toute utilisation de la Plateforme.
+        </p>
+        <p class="text-sm leading-6 text-[#EEE8FF] mt-3">
+          Ces CGU s'appliquent à tous les utilisateurs de la Plateforme, qu'ils soient acheteurs,
+          vendeurs ou simples visiteurs.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="bg-[#F5F3FB] pb-12 md:pb-16">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <div class="max-w-5xl mx-auto text-[#2A2640] text-sm leading-7 space-y-8">
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 1 - Définitions</h2>
+        <p class="mb-3">Dans les présentes CGU, les termes suivants ont la signification qui leur est attribuée ci-dessous :</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li><strong>Plateforme</strong> : le site web aa.com, ainsi que l'ensemble des services associés.</li>
+          <li><strong>aa</strong> : la société exploitant la Plateforme, ses dirigeants, employés et prestataires.</li>
+          <li><strong>Utilisateur</strong> : toute personne physique ou morale accédant à la Plateforme, qu'elle soit acheteur, vendeur ou simple visiteur.</li>
+          <li><strong>Acheteur</strong> : tout utilisateur ayant créé un compte dans le but de consulter des offres et d'effectuer des achats sur la Plateforme.</li>
+          <li><strong>Vendeur</strong> : tout utilisateur, micro-entrepreneur, marque locale ou grande enseigne, ayant ouvert une boutique sur la Plateforme afin de proposer des produits à la vente.</li>
+          <li><strong>Boutique</strong> : l'espace personnalisé mis à disposition du Vendeur sur la Plateforme pour présenter et vendre ses produits.</li>
+          <li><strong>Produit</strong> : tout bien ou article proposé à la vente par un Vendeur sur la Plateforme.</li>
+          <li><strong>Commande</strong> : la transaction initiée par un Acheteur pour l'achat d'un ou de plusieurs Produits auprès d'un Vendeur.</li>
+          <li><strong>Compte</strong> : l'espace personnel créé par l'Utilisateur lors de son inscription sur la Plateforme, accessible via son numéro de téléphone.</li>
+        </ul>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 2 - Accès à la Plateforme et Création de Compte</h2>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">2.1 Conditions d'accès</h3>
+        <p class="mb-3">
+          L'accès à la Plateforme est ouvert à toute personne physique majeure ou toute personne morale régulièrement
+          constituée. L'utilisation de la Plateforme par des mineurs est soumise à l'autorisation préalable de leurs parents
+          ou tuteurs légaux.
+        </p>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">2.2 Création de compte</h3>
+        <p class="mb-3">
+          L'inscription sur la Plateforme se fait exclusivement via un numéro de téléphone mobile valide, auquel un code
+          de vérification (OTP) est envoyé par SMS. En créant un compte, l'Utilisateur garantit que :
+        </p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Les informations fournies lors de l'inscription sont exactes, complètes et à jour.</li>
+          <li>Il est le titulaire légitime du numéro de téléphone utilisé.</li>
+          <li>Il n'a pas fait l'objet d'une suspension ou d'un bannissement préalable de la Plateforme.</li>
+        </ul>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">2.3 Sécurité du compte</h3>
+        <p>
+          L'Utilisateur est seul responsable de la confidentialité de ses informations d'accès. Toute connexion ou action
+          effectuée depuis son compte est réputée avoir été réalisée par l'Utilisateur lui-même. En cas d'utilisation non
+          autorisée de son compte, l'Utilisateur doit en informer immédiatement aa à l'adresse : contact@aa.com.
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 3 - Conditions applicables aux Acheteurs</h2>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">3.1 Processus de commande</h3>
+        <p class="mb-3">L'Acheteur peut passer commande en suivant les étapes suivantes :</p>
+        <ol class="list-decimal pl-6 space-y-1 mb-3">
+          <li>Sélection du ou des Produits et ajout au panier.</li>
+          <li>Validation du panier et saisie des informations de livraison.</li>
+          <li>Choix du mode de paiement et confirmation de la commande.</li>
+          <li>Réception d'une confirmation de commande par SMS ou via son tableau de bord.</li>
+        </ol>
+        <div class="bg-[#EDEAF8] border-l-2 border-[#551694] px-4 py-2 mb-4 text-[#3C3760]">
+          La commande ne devient définitive qu'à compter de la réception de la confirmation de commande et du paiement effectif.
+        </div>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">3.2 Prix et paiement</h3>
+        <p class="mb-3">
+          Les prix affichés sur la Plateforme sont exprimés en Francs CFA (FCFA), toutes taxes comprises. aa se
+          réserve le droit de modifier les prix à tout moment, sans que cela n'affecte les commandes déjà confirmées.
+          Les moyens de paiement acceptés sur la Plateforme sont les suivants :
+        </p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Mobile Money : Wave, Orange Money, Mix by Yas.</li>
+          <li>Paiement en ligne sécurisé via PayDunya.</li>
+          <li>Paiement à la livraison (selon disponibilité et zone).</li>
+        </ul>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">3.3 Livraison</h3>
+        <p class="mb-3">
+          Les délais et frais de livraison sont indiqués au moment de la commande et varient en fonction de la zone
+          géographique de livraison. aa s'efforce de respecter les délais annoncés mais ne peut être tenue
+          responsable de retards indépendants de sa volonté (conditions climatiques, grèves, etc.).
+        </p>
+        <p class="mb-3">
+          L'Acheteur s'engage à être joignable et disponible pour réceptionner sa commande. En cas d'absence lors de la
+          livraison, un nouveau délai pourra être convenu avec le livreur.
+        </p>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">3.4 Retours et remboursements</h3>
+        <p class="mb-3">
+          L'Acheteur dispose d'un délai de 48 heures à compter de la réception de sa commande pour signaler tout
+          problème (produit endommagé, non conforme ou manquant). Passé ce délai, aucune réclamation ne pourra
+          être prise en compte.
+        </p>
+        <p class="mb-2">Les retours sont acceptés dans les conditions suivantes :</p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Le Produit doit être retourné dans son état d'origine, non utilisé et dans son emballage d'origine.</li>
+          <li>La demande de retour doit être initiée via l'espace client ou en contactant le support aa.</li>
+          <li>Les frais de retour sont à la charge de l'Acheteur, sauf en cas de produit défectueux ou non conforme.</li>
+        </ul>
+        <p>
+          Certains produits ne peuvent faire l'objet d'un retour (produits alimentaires, articles personnalisés,
+          produits d'hygiène ouverts). Ces exclusions sont indiquées sur la fiche produit concernée.
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 4 - Conditions applicables aux Vendeurs</h2>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">4.1 Inscription et activation du compte vendeur</h3>
+        <p class="mb-3">
+          Pour vendre sur aa, le Vendeur doit créer un compte vendeur et fournir les informations requises selon
+          son profil (micro-entrepreneur, marque locale ou grande enseigne). L'activation du compte intervient après
+          vérification des informations fournies, dans un délai de 24 à 48 heures ouvrées.
+        </p>
+        <p class="mb-2">En s'inscrivant comme Vendeur, celui-ci déclare et garantit que :</p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Il dispose de tous les droits nécessaires pour vendre les Produits proposés sur la Plateforme.</li>
+          <li>Les Produits sont conformes à la réglementation en vigueur au Sénégal et dans la zone de vente.</li>
+          <li>Les informations et visuels fournis (descriptions, photos) sont exacts et ne sont pas trompeurs.</li>
+          <li>Il assumera seul la responsabilité de tout litige lié aux Produits qu'il vend.</li>
+        </ul>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">4.2 Gestion de la boutique et du catalogue</h3>
+        <p class="mb-3">
+          Le Vendeur est seul responsable du contenu de sa boutique : descriptions de produits, prix, photos, niveaux de
+          stock et disponibilité. Il s'engage à maintenir ces informations à jour et à retirer sans délai tout produit
+          indisponible ou non conforme.
+        </p>
+        <p class="mb-3">
+          aa se réserve le droit de retirer tout Produit ou contenu qui contreviendrait aux présentes CGU, à la
+          réglementation applicable ou aux standards de qualité de la Plateforme, sans préavis ni indemnisation.
+        </p>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">4.3 Commissions et facturation</h3>
+        <p class="mb-3">
+          L'utilisation de la Plateforme par les Vendeurs est soumise aux conditions tarifaires en vigueur, disponibles sur la
+          page dédiée de la Plateforme. Ces conditions comprennent selon le profil du Vendeur :
+        </p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Des frais d'abonnement mensuel ou annuel (formules Basic, Standard ou Premium).</li>
+          <li>Des commissions sur les ventes réalisées via la Plateforme, dont le taux est précisé dans les conditions tarifaires.</li>
+        </ul>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">4.4 Traitement des commandes</h3>
+        <p class="mb-3">
+          Le Vendeur s'engage à traiter les commandes reçues dans les délais annoncés sur sa boutique. En cas
+          d'incapacité à honorer une commande, le Vendeur doit en informer immédiatement aa et l'Acheteur
+          concerné, afin qu'un remboursement puisse être initié sans délai.
+        </p>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">4.5 Produits interdits</h3>
+        <p class="mb-2">Il est strictement interdit de mettre en vente sur la Plateforme les catégories de produits suivantes :</p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Produits contrefaits, piratés ou portant atteinte à des droits de propriété intellectuelle.</li>
+          <li>Substances illicites, médicaments non autorisés ou produits dangereux.</li>
+          <li>Armes, munitions ou tout article à usage militaire non autorisé.</li>
+          <li>Contenus à caractère pornographique, raciste, haineux ou illégal.</li>
+          <li>Tout produit dont la vente est interdite par la législation sénégalaise en vigueur.</li>
+        </ul>
+        <div class="bg-[#EDEAF8] border-l-2 border-[#551694] px-4 py-2 text-[#3C3760]">
+          Tout manquement à ces interdictions entraînera la suppression immédiate du contenu concerné et pourra conduire
+          à la suspension définitive du compte vendeur, sans préjudice de toute poursuite légale.
+        </div>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 5 - Rôle et responsabilité de aa</h2>
+        <p class="mb-3">
+          aa agit en qualité d'intermédiaire technique entre les Acheteurs et les Vendeurs. À ce titre, aa n'est
+          pas vendeur des Produits proposés sur la Plateforme et n'est pas partie aux transactions conclues entre Acheteurs et Vendeurs.
+        </p>
+        <p class="mb-2">aa s'engage à :</p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Assurer le bon fonctionnement technique de la Plateforme dans la mesure du possible.</li>
+          <li>Mettre en œuvre les mesures de sécurité nécessaires pour protéger les données des Utilisateurs.</li>
+          <li>Traiter les réclamations des Utilisateurs dans les meilleurs délais.</li>
+          <li>Intervenir en cas de litige entre Acheteur et Vendeur, sans obligation de résultat.</li>
+        </ul>
+        <p class="mb-2">aa ne peut être tenue responsable :</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>De la qualité, de la conformité ou de la disponibilité des Produits proposés par les Vendeurs.</li>
+          <li>Des retards ou défaillances de livraison imputables aux prestataires logistiques.</li>
+          <li>De toute interruption temporaire de la Plateforme pour maintenance ou mise à jour.</li>
+          <li>Des dommages indirects résultant de l'utilisation de la Plateforme.</li>
+        </ul>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 6 - Protection des Données Personnelles</h2>
+        <p class="mb-3">
+          aa accorde une importance primordiale à la protection des données personnelles de ses Utilisateurs. La
+          collecte et le traitement des données sont effectués dans le strict respect de la réglementation applicable,
+          notamment la loi sénégalaise n° 2008-12 du 25 janvier 2008 sur la protection des données à caractère personnel.
+        </p>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">6.1 Données collectées</h3>
+        <p class="mb-2">Dans le cadre de l'utilisation de la Plateforme, aa collecte les données suivantes :</p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Données d'identification : numéro de téléphone, nom, prénom.</li>
+          <li>Données de localisation : adresse de livraison, ville de résidence.</li>
+          <li>Données de transaction : historique des commandes, moyens de paiement utilisés.</li>
+          <li>Données de navigation : pages consultées, durée des sessions, appareil utilisé.</li>
+        </ul>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">6.2 Utilisation des données</h3>
+        <p class="mb-2">Les données collectées sont utilisées exclusivement pour :</p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>La gestion des comptes et des transactions sur la Plateforme.</li>
+          <li>L'amélioration de l'expérience utilisateur et des fonctionnalités de la Plateforme.</li>
+          <li>L'envoi de communications relatives aux commandes (confirmations, suivi).</li>
+          <li>L'envoi de communications marketing, sous réserve du consentement préalable de l'Utilisateur.</li>
+        </ul>
+        <p class="mb-3">aa ne vend ni ne cède les données personnelles des Utilisateurs à des tiers, sauf obligation légale.</p>
+        <h3 class="text-base md:text-lg font-semibold text-[#3B2B71] mb-2">6.3 Droits des Utilisateurs</h3>
+        <p>
+          Conformément à la réglementation applicable, chaque Utilisateur dispose d'un droit d'accès, de rectification, de
+          suppression et d'opposition au traitement de ses données personnelles. Ces droits peuvent être exercés en
+          contactant aa à l'adresse : admin@aa.com.
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 7 - Propriété Intellectuelle</h2>
+        <p class="mb-3">
+          L'ensemble des éléments constituant la Plateforme, logo, charte graphique, textes, images, fonctionnalités,
+          architecture, sont la propriété exclusive de aa ou de ses partenaires et sont protégés par les lois
+          applicables en matière de propriété intellectuelle.
+        </p>
+        <p class="mb-3">
+          Toute reproduction, représentation, modification ou exploitation non autorisée de tout ou partie de ces éléments
+          est strictement interdite et pourra faire l'objet de poursuites judiciaires.
+        </p>
+        <p>
+          En publiant du contenu sur la Plateforme (photos, descriptions, logos), le Vendeur accorde à aa une
+          licence non exclusive, mondiale et gratuite d'utilisation de ce contenu dans le cadre de la promotion de la
+          Plateforme et de ses services.
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 8 - Comportements Interdits</h2>
+        <p class="mb-2">Il est interdit à tout Utilisateur, sous peine de suspension ou de suppression de son compte :</p>
+        <ul class="list-disc pl-6 space-y-1">
+          <li>D'utiliser la Plateforme à des fins illégales ou frauduleuses.</li>
+          <li>De publier des contenus faux, trompeurs, diffamatoires ou portant atteinte aux droits de tiers.</li>
+          <li>De tenter de contourner les systèmes de sécurité ou de paiement de la Plateforme.</li>
+          <li>De créer plusieurs comptes pour un même utilisateur sans autorisation expresse de aa.</li>
+          <li>De collecter des données personnelles d'autres Utilisateurs sans leur consentement.</li>
+          <li>De perturber le fonctionnement normal de la Plateforme par tout moyen technique.</li>
+          <li>D'effectuer des transactions fictives ou de manipuler le système d'avis et de notation.</li>
+        </ul>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 9 - Suspension et Résiliation de Compte</h2>
+        <p class="mb-3">
+          aa se réserve le droit de suspendre ou de supprimer tout compte Utilisateur, sans préavis ni
+          indemnisation, dans les cas suivants :
+        </p>
+        <ul class="list-disc pl-6 space-y-1 mb-3">
+          <li>Non-respect des présentes CGU ou des règles de la Plateforme.</li>
+          <li>Fourniture d'informations fausses lors de l'inscription ou au cours de l'utilisation.</li>
+          <li>Comportement frauduleux, abusif ou contraire aux intérêts de la communauté aa.</li>
+          <li>Inactivité prolongée du compte (plus de 12 mois consécutifs sans connexion).</li>
+        </ul>
+        <p>
+          L'Utilisateur peut à tout moment fermer son compte en adressant une demande à contact@aa.com. La
+          fermeture du compte entraîne la suppression définitive des données associées, à l'exception des données dont la
+          conservation est requise par la loi.
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 10 - Modification des CGU</h2>
+        <p class="mb-3">
+          aa se réserve le droit de modifier les présentes CGU à tout moment. Les modifications entrent en vigueur
+          dès leur publication sur la Plateforme. Les Utilisateurs seront informés de toute modification substantielle par
+          notification via l'application ou par SMS.
+        </p>
+        <p>
+          La poursuite de l'utilisation de la Plateforme après notification des modifications vaut acceptation des nouvelles
+          CGU. Si l'Utilisateur n'accepte pas les modifications, il doit cesser d'utiliser la Plateforme et peut demander la
+          suppression de son compte.
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-3">Article 11 - Droit Applicable et Règlement des Litiges</h2>
+        <p class="mb-3">
+          Les présentes CGU sont régies par le droit sénégalais. En cas de litige relatif à l'interprétation ou à l'exécution
+          des présentes CGU, les parties s'engagent à rechercher une solution amiable dans un délai de 30 jours à
+          compter de la notification du litige.
+        </p>
+        <p>
+          À défaut d'accord amiable, tout litige sera soumis à la compétence exclusive des tribunaux compétents de Dakar
+          (Sénégal).
+        </p>
+      </article>
+      <article>
+        <h2 class="text-xl md:text-2xl font-semibold text-[#551694] mb-4">Article 12 - Contact et Support</h2>
+        <div class="overflow-hidden rounded-sm border border-[#DDD6F0]">
+          <div class="grid grid-cols-1 md:grid-cols-3 text-sm">
+            <div class="bg-[#551694] text-white font-semibold px-4 py-3 border-b md:border-r border-[#6E2DB4]">Support général</div>
+            <div class="bg-[#EEEAFB] px-4 py-3 border-b md:col-span-2 border-[#DDD6F0]">contact@aa.com</div>
+            <div class="bg-[#551694] text-white font-semibold px-4 py-3 border-b md:border-r border-[#6E2DB4]">Protection des données</div>
+            <div class="bg-[#EEEAFB] px-4 py-3 border-b md:col-span-2 border-[#DDD6F0]">admin@aa.com</div>
+            <div class="bg-[#551694] text-white font-semibold px-4 py-3 border-b md:border-r border-[#6E2DB4]">Litiges vendeurs</div>
+            <div class="bg-[#EEEAFB] px-4 py-3 border-b md:col-span-2 border-[#DDD6F0]">+221 77 581 78 78</div>
+            <div class="bg-[#551694] text-white font-semibold px-4 py-3 border-b md:border-r border-[#6E2DB4]">Site web</div>
+            <div class="bg-[#EEEAFB] px-4 py-3 border-b md:col-span-2 border-[#DDD6F0]">www.aa.com</div>
+            <div class="bg-[#551694] text-white font-semibold px-4 py-3 md:border-r border-[#6E2DB4]">Adresse</div>
+            <div class="bg-[#EEEAFB] px-4 py-3 md:col-span-2">Dakar, Sénégal</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>

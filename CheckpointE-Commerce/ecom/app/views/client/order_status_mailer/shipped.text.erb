@@ -1,0 +1,10 @@
+Votre commande a été expédiée
+
+Bonjour <%= @user.first_name %>,
+
+Votre commande #{@order.order_number} a été expédiée<% if @order.departure_date %> le <%= @order.departure_date.strftime('%d/%m/%Y à %H:%M') %><% end %>.
+
+Elle arrivera bientôt à destination.
+
+Merci pour votre confiance !
+

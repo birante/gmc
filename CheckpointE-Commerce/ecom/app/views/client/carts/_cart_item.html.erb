@@ -1,0 +1,99 @@
+<% variant = cart_item.variant %>
+<% max_quantity = [variant&.stock_quantity.to_i, cart_item.quantity].max %>
+
+<tr id="cart-item-<%= cart_item.id %>"
+    class="group hover:bg-gray-50/60 transition-colors"
+    data-controller="cart-quantity"
+    data-cart-quantity-max-value="<%= max_quantity %>"
+    data-cart-quantity-current-value="<%= cart_item.quantity %>">
+
+  <!-- Image -->
+  <td class="py-4 pl-4 sm:pl-6 pr-3 w-16">
+    <div class="w-12 h-12 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+      <% if cart_item.item.has_image? %>
+        <%= storage_image_tag(cart_item.item.display_image, variant_name: :thumbnail, alt: cart_item.item.name, class: "w-full h-full object-cover") %>
+      <% else %>
+        <div class="w-full h-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+      <% end %>
+    </div>
+  </td>
+
+  <!-- Nom + boutique + variante -->
+  <td class="py-4 pr-4">
+    <div class="min-w-0">
+      <p class="font-semibold text-gray-900 text-sm leading-tight line-clamp-2"><%= cart_item.item.name %></p>
+      <p class="text-xs text-gray-500 mt-0.5"><%= cart_item.item.shop.name %></p>
+      <% if variant&.display_name.present? %>
+        <span class="inline-block mt-1 text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded"><%= variant.display_name %></span>
+      <% end %>
+    </div>
+  </td>
+
+  <!-- Prix unitaire -->
+  <td class="hidden sm:table-cell py-4 pr-4 text-right whitespace-nowrap">
+    <span class="text-sm text-gray-600 font-medium">
+      <%= number_to_currency(cart_item.unit_price, unit: cart_item.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </span>
+  </td>
+
+  <!-- Quantité -->
+  <td class="py-4 pr-4">
+    <%= form_with url: client_cart_item_path(cart_item), method: :patch,
+          id: "cart-item-form-#{cart_item.id}",
+          class: "flex items-center justify-center",
+          data: { turbo: true, 'cart-quantity-target': 'form' } do |form| %>
+      <%= form.hidden_field :quantity, value: 1, id: "quantity_#{cart_item.id}", data: { 'cart-quantity-target': 'hidden' } %>
+      <div class="inline-flex items-center border border-gray-200 rounded-lg overflow-hidden bg-white">
+        <button type="button"
+                class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                data-action="click->cart-quantity#decrease"
+                data-cart-quantity-target="decrease">
+          <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"/>
+          </svg>
+        </button>
+        <input type="number"
+               id="quantity_input_cart_<%= cart_item.id %>"
+               aria-label="Quantité pour <%= cart_item.item.name %>"
+               value="<%= cart_item.quantity %>"
+               min="1"
+               max="<%= max_quantity %>"
+               class="w-9 text-center text-sm font-bold text-gray-900 border-0 focus:outline-none focus:ring-0 bg-transparent py-1"
+               data-current="<%= cart_item.quantity %>"
+               data-cart-quantity-target="input"
+               data-action="change->cart-quantity#validate input->cart-quantity#validate" />
+        <button type="button"
+                class="w-7 h-7 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                data-action="click->cart-quantity#increase"
+                data-cart-quantity-target="increase">
+          <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+        </button>
+      </div>
+    <% end %>
+  </td>
+
+  <!-- Total ligne -->
+  <td class="py-4 pr-2 text-right whitespace-nowrap">
+    <span class="font-bold text-gray-900 text-sm" id="total-price-<%= cart_item.id %>" data-cart-total-target="itemTotal">
+      <%= number_to_currency(cart_item.total_price, unit: cart_item.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </span>
+  </td>
+
+  <!-- Supprimer -->
+  <td class="py-4 pl-2 pr-4 sm:pr-6 text-center w-10">
+    <%= button_to client_cart_item_path(cart_item), method: :delete,
+          class: "p-1.5 text-gray-300 group-hover:text-gray-400 hover:!text-red-500 hover:bg-red-50 rounded-lg transition-all duration-150",
+          title: t('client.carts.show.remove_item'),
+          data: { turbo: true } do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+    <% end %>
+  </td>
+</tr>

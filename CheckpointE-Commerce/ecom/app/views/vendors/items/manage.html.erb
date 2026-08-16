@@ -1,0 +1,750 @@
+<% content_for :active_tab, 'catalogue' %>
+<% is_xof_currency = @item.currency&.code == "XOF" %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <!-- Header -->
+      <nav class="mb-3" aria-label="Fil d'Ariane">
+        <ol class="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+        <li>
+          <%= link_to url_with_shop(vendors_items_path, @current_shop), class: "flex items-center gap-1 text-gray-500 hover:text-gray-900 text-sm transition-colors" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <%= t('vendors.items.index.title') %>
+          <% end %>
+        </li>
+        <li aria-hidden="true" class="text-gray-400">/</li>
+        <li><%= link_to @item.name, url_with_shop(vendors_item_path(@item), @current_shop), class: "text-gray-500 hover:text-gray-900 transition-colors truncate max-w-xs" %></li>
+        <li aria-hidden="true" class="text-gray-400">/</li>
+        <li class="font-medium text-gray-900"><%= t('vendors.items.manage.title') %></li>
+        </ol>
+      </nav>
+
+      <div class="mb-6 flex flex-wrap items-center gap-3">
+
+        <div class="ml-auto flex flex-wrap gap-2">
+          <%= link_to url_with_shop(edit_vendors_item_path(@item), @current_shop),
+              class: "flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+            <%= t('vendors.items.manage.modify_info') %>
+          <% end %>
+          <%= link_to @item.name.present? ? client_item_path(@item) : '#', target: '_blank',
+              class: "flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+            <%= t('vendors.items.manage.view_in_store') %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Product summary card -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 mb-6">
+        <div class="flex items-start gap-4">
+          <% if @item.main_image.attached? %>
+            <div class="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-100">
+              <%= storage_image_tag(@item.main_image.blob, variant_name: :card, alt: @item.name, class: "w-full h-full object-cover", width: 64, height: 64) %>
+            </div>
+          <% else %>
+            <div class="flex-shrink-0 w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+              <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          <% end %>
+
+          <div class="flex-1 min-w-0">
+            <div class="flex flex-wrap items-start gap-2 mb-1">
+              <h1 class="text-lg font-bold text-gray-900 truncate"><%= @item.name %></h1>
+              <span class="px-2 py-0.5 rounded-full text-xs font-medium <%= 
+                case @item.validation_status
+                when 'approved' then 'bg-emerald-100 text-emerald-800'
+                when 'pending' then 'bg-amber-100 text-amber-800'
+                else 'bg-red-100 text-red-800'
+                end
+              %>"><%= t("vendors.items.index.statuses.#{@item.validation_status}") %></span>
+            </div>
+            <div class="flex flex-wrap gap-3 text-sm text-gray-500">
+              <% if @item.product_sub_category %>
+                <span><%= @item.product_sub_category.name %></span>
+              <% end %>
+              <span><%= @variants.size %> variante(s)</span>
+              <span>Stock: <%= @variants.sum(:stock_quantity) %></span>
+              <% if @variants.any? %>
+                <span>Prix: <%= number_to_currency(@min_price || 0, unit: @item.currency.symbol, precision: 0) %> – <%= number_to_currency(@max_price || 0, unit: @item.currency.symbol, precision: 0) %></span>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Quick stats -->
+          <div class="hidden sm:flex gap-4 text-center text-sm flex-shrink-0">
+            <div>
+              <div class="text-lg font-bold text-gray-900"><%= @total_sales %></div>
+              <div class="text-xs text-gray-500">Ventes</div>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-gray-900"><%= @total_views %></div>
+              <div class="text-xs text-gray-500">Vues</div>
+            </div>
+            <div>
+              <div class="text-lg font-bold text-green-600"><%= number_to_currency(@total_revenue || 0, unit: @item.currency.symbol, precision: 0) %></div>
+              <div class="text-xs text-gray-500">Revenus</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div data-controller="tabs">
+        <!-- Tab navigation -->
+        <div class="border-b border-gray-200 mb-6">
+          <nav class="-mb-px flex gap-0 overflow-x-auto">
+            <button type="button"
+                    data-tabs-target="tab"
+                    data-action="click->tabs#select"
+                    data-index="0"
+                    class="whitespace-nowrap px-4 sm:px-6 py-3 text-sm font-medium border-b-2 border-[#551694] text-gray-900 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+              Attributs
+              <% if @item_attributes.any? %>
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-[#551694]/10 text-[#551694] font-semibold"><%= @item_attributes.size %></span>
+              <% end %>
+            </button>
+            <button type="button"
+                    data-tabs-target="tab"
+                    data-action="click->tabs#select"
+                    data-index="1"
+                    class="whitespace-nowrap px-4 sm:px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              Variantes
+              <% if @variants.any? %>
+                <span class="px-1.5 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600 font-semibold"><%= @variants.size %></span>
+              <% end %>
+            </button>
+            <button type="button"
+                    data-tabs-target="tab"
+                    data-action="click->tabs#select"
+                    data-index="2"
+                    class="whitespace-nowrap px-4 sm:px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              Infos produit
+            </button>
+          </nav>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- TAB 1 : ATTRIBUTS -->
+        <!-- ======================================================= -->
+        <div data-tabs-target="panel">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2">
+              <!-- Attributes form -->
+              <%= form_with model: [:vendors, @item], url: url_with_shop(vendors_item_path(@item), @current_shop), method: :patch, data: { turbo: true }, class: "space-y-4" do |f| %>
+                <%= hidden_field_tag :return_to, 'manage' %>
+                <% if @item.errors.any? %>
+                  <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    <ul class="list-disc list-inside text-sm">
+                      <% @item.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                      <% end %>
+                    </ul>
+                  </div>
+                <% end %>
+
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                  <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base font-semibold text-gray-900">Attributs du produit</h2>
+                    <button type="button"
+                            class="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium"
+                            onclick="addAttribute()">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                      </svg>
+                      Ajouter un attribut
+                    </button>
+                  </div>
+
+                  <p class="text-sm text-gray-500 mb-4">
+                    Définissez les caractéristiques de votre produit (Couleur, Taille, Matière…). Ces attributs permettront de générer automatiquement les combinaisons de variantes.
+                  </p>
+
+                  <div id="attributes-container" class="space-y-4">
+                    <% @item.item_attributes.ordered.each_with_index do |attribute, attr_index| %>
+                      <div class="p-4 border border-gray-200 rounded-xl bg-gray-50" data-attribute-index="<%= attr_index %>">
+                        <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][id]" value="<%= attribute.id %>" />
+
+                        <div class="flex items-start gap-2 mb-3">
+                          <div class="flex-1">
+                            <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">Nom de l'attribut</label>
+                            <input type="text"
+                                   name="item[item_attributes_attributes][<%= attr_index %>][name]"
+                                   value="<%= attribute.name %>"
+                                   placeholder="Ex: Couleur, Taille, Matière…"
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694]" />
+                          </div>
+                          <button type="button" class="mt-6 text-red-500 hover:text-red-700 transition-colors" onclick="markAttributeForDestroy(this)" title="Supprimer cet attribut">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                          </button>
+                          <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][_destroy]" value="false" class="destroy-field" />
+                        </div>
+
+                        <div>
+                          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Valeurs</label>
+                          <div class="space-y-2" data-values-container data-attr-index="<%= attr_index %>">
+                            <% attribute.attribute_values.each_with_index do |value, value_index| %>
+                              <div class="flex gap-2" data-value-index="<%= value_index %>">
+                                <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][attribute_values_attributes][<%= value_index %>][id]" value="<%= value.id %>" />
+                                <input type="hidden" name="item[item_attributes_attributes][<%= attr_index %>][attribute_values_attributes][<%= value_index %>][_destroy]" value="false" class="destroy-field" />
+                                <input type="text"
+                                       name="item[item_attributes_attributes][<%= attr_index %>][attribute_values_attributes][<%= value_index %>][value]"
+                                       value="<%= value.value %>"
+                                       placeholder="Ex: Rouge, Bleu, XL…"
+                                       class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694]" />
+                                <button type="button" class="text-red-400 hover:text-red-600 transition-colors px-2" onclick="markValueForDestroy(this)" title="Supprimer cette valeur">
+                                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                  </svg>
+                                </button>
+                              </div>
+                            <% end %>
+                          </div>
+                          <button type="button"
+                                  class="mt-2 flex items-center gap-1 text-sm text-[#551694] hover:text-[#451384] font-medium transition-colors add-value-btn"
+                                  data-attr-index="<%= attr_index %>">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                            Ajouter une valeur
+                          </button>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <% if @item_attributes.empty? %>
+                    <div class="mt-4 p-6 border-2 border-dashed border-gray-200 rounded-xl text-center" id="empty-attributes-hint">
+                      <svg class="mx-auto w-10 h-10 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                      </svg>
+                      <p class="text-sm text-gray-500 mb-3">Aucun attribut pour l'instant.</p>
+                      <p class="text-xs text-gray-400">Cliquez sur <strong>Ajouter un attribut</strong> pour commencer. Par exemple : <em>Couleur</em> avec les valeurs <em>Rouge, Bleu, Vert</em>.</p>
+                    </div>
+                  <% end %>
+                </div>
+
+                <!-- Save button -->
+                <div class="flex flex-wrap justify-between gap-3">
+                  <%= f.submit "Enregistrer les attributs",
+                      class: "px-5 py-2.5 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium text-sm cursor-pointer" %>
+                  <p class="text-xs text-gray-500 self-center">Après l'enregistrement, vous pourrez générer les variantes dans l'onglet Variantes.</p>
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Sidebar: tips -->
+            <div class="lg:col-span-1 space-y-4">
+              <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <h3 class="text-sm font-semibold text-blue-900 mb-2">💡 Comment ça marche ?</h3>
+                <ol class="text-xs text-blue-700 space-y-2 list-decimal list-inside">
+                  <li>Ajoutez un attribut (ex: <strong>Couleur</strong>)</li>
+                  <li>Ajoutez les valeurs (ex: <strong>Rouge, Bleu, Vert</strong>)</li>
+                  <li>Enregistrez les attributs</li>
+                  <li>Dans l'onglet <strong>Variantes</strong>, générez toutes les combinaisons</li>
+                  <li>Personnalisez le prix et le stock de chaque variante</li>
+                </ol>
+              </div>
+
+              <% if @item_attributes.any? %>
+                <div class="bg-white border border-gray-200 rounded-xl p-4">
+                  <h3 class="text-sm font-semibold text-gray-900 mb-3">Combinaisons possibles</h3>
+                  <% @item_attributes.each do |attr| %>
+                    <div class="mb-2">
+                      <span class="text-xs font-medium text-gray-700"><%= attr.name %>:</span>
+                      <div class="mt-1 flex flex-wrap gap-1">
+                        <% attr.attribute_values.each do |val| %>
+                          <span class="px-2 py-0.5 text-xs bg-[#551694]/10 text-[#551694] rounded-full"><%= val.value %></span>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                  <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                    <%= @item.variant_combinations_count %> combinaison(s) possible(s)
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- TAB 2 : VARIANTES -->
+        <!-- ======================================================= -->
+        <div data-tabs-target="panel" class="hidden">
+          <!-- Action bar -->
+          <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
+            <div class="flex flex-wrap gap-2">
+              <% if @item_attributes.any? && @variants.select { |v| !v.is_default? }.size < @item.variant_combinations_count %>
+                <%= button_to url_with_shop(generate_variants_vendors_item_path(@item), @current_shop),
+                    method: :post,
+                    params: { return_to: 'manage' },
+                    class: "flex items-center gap-2 px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors text-sm font-medium cursor-pointer" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  Générer les combinaisons manquantes
+                <% end %>
+              <% elsif @item_attributes.empty? %>
+                <span class="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-lg text-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
+                  Définissez des attributs d'abord
+                </span>
+              <% else %>
+                <span class="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Toutes les combinaisons sont générées
+                </span>
+              <% end %>
+            </div>
+
+            <%= link_to url_with_shop(new_vendors_item_variant_path(@item), @current_shop),
+                class: "flex items-center gap-1.5 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors" do %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Ajouter une variante manuellement
+            <% end %>
+          </div>
+
+          <!-- Stats summary -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-3 text-center">
+              <div class="text-xl font-bold text-gray-900"><%= @variants.size %></div>
+              <div class="text-xs text-gray-500 mt-0.5">Variantes</div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-3 text-center">
+              <div class="text-xl font-bold text-green-600"><%= @variants.sum(:stock_quantity) %></div>
+              <div class="text-xs text-gray-500 mt-0.5">Stock total</div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-3 text-center">
+              <div class="text-xl font-bold text-gray-900"><%= number_to_currency(@min_price || 0, unit: @item.currency.symbol, precision: 0) %></div>
+              <div class="text-xs text-gray-500 mt-0.5">Prix min</div>
+            </div>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-3 text-center">
+              <div class="text-xl font-bold text-gray-900"><%= number_to_currency(@max_price || 0, unit: @item.currency.symbol, precision: 0) %></div>
+              <div class="text-xs text-gray-500 mt-0.5">Prix max</div>
+            </div>
+          </div>
+
+          <!-- Attributes info bar -->
+          <% if @item_attributes.any? %>
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-5 flex flex-wrap gap-3 items-center">
+              <span class="text-xs font-medium text-blue-700">Attributs actifs :</span>
+              <% @item_attributes.each do |attr| %>
+                <div class="flex items-center gap-1">
+                  <span class="text-xs font-medium text-blue-900"><%= attr.name %> :</span>
+                  <% attr.attribute_values.each do |val| %>
+                    <span class="px-1.5 py-0.5 text-xs bg-white text-blue-700 border border-blue-200 rounded-full"><%= val.value %></span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- Variants table -->
+          <% if @variants.any? %>
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                      <% @item_attributes.each do |attr| %>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"><%= attr.name %></th>
+                      <% end %>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+                      <% if @item.is_on_sale? %>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix promo</th>
+                      <% end %>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                      <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                      <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    <% @variants.each do |variant| %>
+                      <tr class="hover:bg-gray-50/60 transition-colors">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="font-mono text-xs text-gray-700 bg-gray-100 px-2 py-0.5 rounded"><%= variant.sku.presence || '—' %></span>
+                        </td>
+                        <% @item_attributes.each do |attr| %>
+                          <td class="px-4 py-3 whitespace-nowrap">
+                            <% value = variant.attribute_values.find { |av| av.item_attribute_id == attr.id }&.value %>
+                            <% if value %>
+                              <span class="px-2 py-0.5 text-xs rounded-full bg-[#551694]/10 text-[#551694] font-medium"><%= value %></span>
+                            <% else %>
+                              <span class="text-gray-300 text-xs">—</span>
+                            <% end %>
+                          </td>
+                        <% end %>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <%= number_to_currency(variant.price, unit: @item.currency.symbol, precision: (is_xof_currency ? 0 : 2)) %>
+                        </td>
+                        <% if @item.is_on_sale? %>
+                          <td class="px-4 py-3 whitespace-nowrap text-sm">
+                            <% if variant.sale_price.present? %>
+                              <span class="text-orange-600 font-medium"><%= number_to_currency(variant.sale_price, unit: @item.currency.symbol, precision: (is_xof_currency ? 0 : 2)) %></span>
+                            <% else %>
+                              <span class="text-gray-400 text-xs">Globale (<%= @item.sale_discount_percent %>%)</span>
+                            <% end %>
+                          </td>
+                        <% end %>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <span class="px-2 py-0.5 text-xs rounded-full font-medium <%= variant.stock_quantity.to_i > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800' %>">
+                            <%= variant.stock_quantity %>
+                          </span>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                          <% if variant.is_default? %>
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                              Défaut
+                            </span>
+                          <% else %>
+                            <span class="text-gray-400 text-xs">Standard</span>
+                          <% end %>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right">
+                          <div class="flex justify-end items-center gap-3">
+                            <%= link_to url_with_shop(edit_vendors_item_variant_path(@item, variant), @current_shop),
+                                class: "text-[#551694] hover:text-[#451384] text-xs font-medium transition-colors" do %>
+                              Modifier
+                            <% end %>
+                            <% unless variant.is_default? %>
+                              <%= button_to url_with_shop(vendors_item_variant_path(@item, variant), @current_shop),
+                                  method: :delete,
+                                  data: { turbo_confirm: "Supprimer cette variante ? Cette action est irréversible." },
+                                  class: "text-red-500 hover:text-red-700 text-xs font-medium transition-colors bg-transparent border-0 p-0 cursor-pointer" do %>
+                                Supprimer
+                              <% end %>
+                            <% end %>
+                          </div>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          <% else %>
+            <div class="bg-white rounded-xl border border-dashed border-gray-300 p-10 text-center">
+              <svg class="mx-auto w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              <h3 class="text-base font-medium text-gray-700 mb-2">Aucune variante</h3>
+              <% if @item_attributes.any? %>
+                <p class="text-sm text-gray-500 mb-4">Vos attributs sont prêts. Cliquez sur <strong>Générer les combinaisons</strong> pour créer toutes les variantes.</p>
+              <% else %>
+                <p class="text-sm text-gray-500 mb-4">Commencez par définir des attributs dans l'onglet <strong>Attributs</strong>, puis revenez ici pour générer les variantes.</p>
+              <% end %>
+              <%= link_to url_with_shop(new_vendors_item_variant_path(@item), @current_shop),
+                  class: "inline-flex items-center gap-1.5 px-4 py-2 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors text-sm font-medium" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Ajouter une variante manuellement
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- Bottom link to full variants page -->
+          <% if @variants.size > 5 %>
+            <div class="mt-4 text-center">
+              <%= link_to "Gérer toutes les variantes sur la page dédiée →", url_with_shop(vendors_item_variants_path(@item), @current_shop),
+                  class: "text-sm text-[#551694] hover:text-[#451384] font-medium transition-colors" %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- ======================================================= -->
+        <!-- TAB 3 : INFOS PRODUIT -->
+        <!-- ======================================================= -->
+        <div data-tabs-target="panel" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 space-y-5">
+              <!-- Images -->
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-base font-semibold text-gray-900">Images</h2>
+                  <%= link_to url_with_shop(edit_vendors_item_path(@item), @current_shop),
+                      class: "text-xs text-[#551694] hover:text-[#451384] font-medium" do %>
+                    Modifier les images →
+                  <% end %>
+                </div>
+                <% if @item.has_image? %>
+                  <% all_images = [] %>
+                  <% all_images << @item.main_image.blob if @item.main_image.attached? %>
+                  <% @item.images.each { |img| all_images << (img.respond_to?(:blob) ? img.blob : img) if img.present? } if @item.images.attached? %>
+                  <div class="flex flex-wrap gap-3">
+                    <% all_images.each_with_index do |img, i| %>
+                      <div class="relative">
+                        <div class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                          <%= storage_image_tag(img, variant_name: :card, alt: "#{@item.name} #{i + 1}", class: "w-full h-full object-cover") %>
+                        </div>
+                        <% if i == 0 %>
+                          <span class="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 text-[10px] bg-[#551694] text-white rounded-full font-medium">Principale</span>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="p-6 border-2 border-dashed border-gray-200 rounded-xl text-center">
+                    <p class="text-sm text-gray-500">Aucune image.</p>
+                    <%= link_to "Ajouter des images", url_with_shop(edit_vendors_item_path(@item), @current_shop),
+                        class: "text-sm text-[#551694] hover:underline" %>
+                  </div>
+                <% end %>
+              </div>
+
+              <!-- General info -->
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-base font-semibold text-gray-900">Informations générales</h2>
+                  <%= link_to url_with_shop(edit_vendors_item_path(@item), @current_shop),
+                      class: "text-xs text-[#551694] hover:text-[#451384] font-medium" do %>
+                    Modifier →
+                  <% end %>
+                </div>
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                  <div>
+                    <dt class="text-xs text-gray-500 mb-0.5">Nom</dt>
+                    <dd class="font-medium text-gray-900"><%= @item.name %></dd>
+                  </div>
+                  <% if @item.product_sub_category %>
+                    <div>
+                      <dt class="text-xs text-gray-500 mb-0.5">Sous-catégorie</dt>
+                      <dd class="font-medium text-gray-900"><%= @item.product_sub_category.name %></dd>
+                    </div>
+                  <% end %>
+                  <div>
+                    <dt class="text-xs text-gray-500 mb-0.5">Devise</dt>
+                    <dd class="font-medium text-gray-900"><%= @item.currency.symbol %> (<%= @item.currency.code %>)</dd>
+                  </div>
+                  <div>
+                    <dt class="text-xs text-gray-500 mb-0.5">Validation</dt>
+                    <dd>
+                      <span class="px-2 py-0.5 rounded-full text-xs font-medium <%= 
+                        case @item.validation_status
+                        when 'approved' then 'bg-emerald-100 text-emerald-800'
+                        when 'pending' then 'bg-amber-100 text-amber-800'
+                        else 'bg-red-100 text-red-800'
+                        end
+                      %>"><%= t("vendors.items.index.statuses.#{@item.validation_status}") %></span>
+                    </dd>
+                  </div>
+                  <% if @item.is_on_sale? %>
+                    <div>
+                      <dt class="text-xs text-gray-500 mb-0.5">Promotion</dt>
+                      <dd class="font-medium text-orange-600"><%= @item.sale_discount_percent %>% de réduction</dd>
+                    </div>
+                  <% end %>
+                  <div class="sm:col-span-2">
+                    <dt class="text-xs text-gray-500 mb-0.5">Description</dt>
+                    <dd class="text-gray-900 leading-relaxed"><%= @item.description.presence || '<em class="text-gray-400">Aucune description</em>'.html_safe %></dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            <!-- Sidebar: links -->
+            <div class="lg:col-span-1 space-y-4">
+              <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                <h3 class="text-sm font-semibold text-gray-900 mb-3">Actions rapides</h3>
+                <div class="space-y-2">
+                  <%= link_to url_with_shop(edit_vendors_item_path(@item), @current_shop),
+                      class: "flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors font-medium" do %>
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                    </svg>
+                    Modifier les informations
+                  <% end %>
+                  <%= link_to url_with_shop(vendors_item_variants_path(@item), @current_shop),
+                      class: "flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors font-medium" do %>
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    Page de gestion des variantes
+                  <% end %>
+                  <%= link_to client_item_path(@item), target: '_blank',
+                      class: "flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors font-medium" do %>
+                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                    Voir en boutique
+                  <% end %>
+                  <% if @item.shop.capabilities.ai_background_generation_enabled? && (@item.ai_enrichment_failed? || @item.ai_enrichment_pending?) %>
+                    <%= button_to url_with_shop(retry_ai_enrichment_vendors_item_path(@item), @current_shop),
+                        method: :post,
+                        class: "flex items-center gap-2 w-full px-3 py-2.5 text-sm text-[#551694] bg-[#551694]/5 rounded-lg hover:bg-[#551694]/10 transition-colors font-medium text-left cursor-pointer" do %>
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      Relancer l'enrichissement IA
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </main>
+
+  <%= render "vendors/shared/footer" %>
+</div>
+
+<script type="module">
+  let attributeCount = <%= @item.item_attributes.count %>;
+  let valueCounters = {};
+
+  <% @item.item_attributes.ordered.each_with_index do |attribute, attr_index| %>
+    valueCounters[<%= attr_index %>] = <%= attribute.attribute_values.count %>;
+  <% end %>
+
+  function markAttributeForDestroy(button) {
+    const container = button.closest('[data-attribute-index]');
+    const destroyField = container.querySelector('.destroy-field');
+    if (destroyField) {
+      destroyField.value = 'true';
+      container.style.display = 'none';
+    } else {
+      container.remove();
+    }
+    // Hide the empty hint if attributes exist
+    updateEmptyHint();
+  }
+
+  function markValueForDestroy(button) {
+    const container = button.closest('[data-value-index]');
+    const destroyField = container.querySelector('.destroy-field');
+    if (destroyField) {
+      destroyField.value = 'true';
+      container.style.display = 'none';
+    } else {
+      container.remove();
+    }
+  }
+
+  function addAttribute() {
+    const container = document.getElementById('attributes-container');
+    const hint = document.getElementById('empty-attributes-hint');
+    if (hint) hint.style.display = 'none';
+
+    const newAttr = document.createElement('div');
+    newAttr.className = 'p-4 border border-gray-200 rounded-xl bg-gray-50';
+    newAttr.setAttribute('data-attribute-index', attributeCount);
+    valueCounters[attributeCount] = 1;
+
+    newAttr.innerHTML = `
+      <div class="flex items-start gap-2 mb-3">
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">Nom de l'attribut</label>
+          <input type="text"
+                 name="item[item_attributes_attributes][${attributeCount}][name]"
+                 placeholder="Ex: Couleur, Taille, Matière…"
+                 class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694]" />
+        </div>
+        <button type="button" class="mt-6 text-red-500 hover:text-red-700 transition-colors" onclick="this.closest('[data-attribute-index]').remove(); updateEmptyHint();" title="Supprimer cet attribut">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </button>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Valeurs</label>
+        <div class="space-y-2" data-values-container data-attr-index="${attributeCount}">
+          <div class="flex gap-2" data-value-index="0">
+            <input type="text"
+                   name="item[item_attributes_attributes][${attributeCount}][attribute_values_attributes][0][value]"
+                   placeholder="Ex: Rouge, Bleu, XL…"
+                   class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694]" />
+            <button type="button" class="text-red-400 hover:text-red-600 transition-colors px-2" onclick="this.closest('[data-value-index]').remove()">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <button type="button"
+                class="mt-2 flex items-center gap-1 text-sm text-[#551694] hover:text-[#451384] font-medium transition-colors add-value-btn"
+                data-attr-index="${attributeCount}">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Ajouter une valeur
+        </button>
+      </div>
+    `;
+
+    container.appendChild(newAttr);
+    attributeCount++;
+  }
+
+  function addValue(attrIndex) {
+    const container = document.querySelector(`[data-values-container][data-attr-index="${attrIndex}"]`);
+    if (!container) return;
+
+    const valueIndex = valueCounters[attrIndex] || 0;
+    valueCounters[attrIndex] = valueIndex + 1;
+
+    const newValue = document.createElement('div');
+    newValue.className = 'flex gap-2';
+    newValue.setAttribute('data-value-index', valueIndex);
+    newValue.innerHTML = `
+      <input type="text"
+             name="item[item_attributes_attributes][${attrIndex}][attribute_values_attributes][${valueIndex}][value]"
+             placeholder="Ex: Rouge, Bleu, XL…"
+             class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694]" />
+      <button type="button" class="text-red-400 hover:text-red-600 transition-colors px-2" onclick="this.closest('[data-value-index]').remove()">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    `;
+    container.appendChild(newValue);
+  }
+
+  window.addAttribute = addAttribute;
+  window.markAttributeForDestroy = markAttributeForDestroy;
+  window.markValueForDestroy = markValueForDestroy;
+  window.updateEmptyHint = updateEmptyHint;
+
+  function updateEmptyHint() {
+    const container = document.getElementById('attributes-container');
+    const hint = document.getElementById('empty-attributes-hint');
+    if (!container || !hint) return;
+    const visible = Array.from(container.querySelectorAll('[data-attribute-index]'))
+      .filter(el => el.style.display !== 'none');
+    hint.style.display = visible.length === 0 ? '' : 'none';
+  }
+
+  document.addEventListener('click', function(e) {
+    const btn = e.target.classList.contains('add-value-btn') ? e.target : e.target.closest('.add-value-btn');
+    if (btn) addValue(parseInt(btn.getAttribute('data-attr-index')));
+  });
+</script>

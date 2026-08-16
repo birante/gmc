@@ -1,0 +1,97 @@
+en:
+  employees:
+    authentication:
+      must_be_logged_in: "You must be logged in to access this page."
+      no_permission: "You don't have the required permissions."
+
+    sessions:
+      new:
+        title: "Collaborator Area"
+        subtitle: "Log in to access your workspace"
+        email: "Email address"
+        password: "Password"
+        submit: "Log in"
+        client_space: "Are you a customer?"
+        access_client_space: "Go to customer area"
+        vendor_space: "Are you a vendor?"
+        access_vendor_space: "Go to vendor area"
+        help: "📞 Need help? Contact your manager"
+      create:
+        success: "Welcome %{name}!"
+        account_disabled: "Your account has been disabled. Please contact your manager."
+        failure: "Invalid email or password."
+      destroy:
+        success: "You have been logged out."
+
+    orders:
+      not_found: "Order not found or access denied"
+      status_updated: "Order status updated"
+      status_update_failed: "Unable to update the status. Invalid transition or order not found."
+      delivery_status_updated: "Delivery status updated"
+      delivery_status_update_failed: "Unable to update the status: %{errors}"
+      invalid_transition: "Invalid status transition"
+      no_permission: "You don't have permission to manage orders."
+
+    analytics:
+      shop_not_found: "Shop not found"
+
+    dashboards:
+      show:
+        title: "Dashboard"
+        subtitle: "Welcome to your workspace"
+        greeting: "Hello, %{name}!"
+        logout: "Log out"
+        error_no_shop: "No shop associated. Please contact your manager."
+
+        stats:
+          views: "Total orders"
+          sessions: "Items in catalog"
+          traffic: "This month's traffic"
+          traffic_desc: "Number of orders this month"
+          traffic_witness: "Orders this month"
+          cart_abandoned: "Pending carts"
+          orders_pending: "Pending orders"
+          new_clients: "New customers"
+          heroes_title: "Top customers"
+          sales_volume: "Sales volume"
+          sales_revenue: "This month's revenue"
+          sales_vs_previous: "vs previous month"
+
+        recent_orders: "Latest orders"
+        article: "Item"
+        quantity: "Quantity"
+        price: "Unit price"
+        total: "Total"
+        article_label: "Ref"
+        no_orders_for: "No orders for"
+
+        # Legacy translations kept for compatibility
+        pending_orders: "Pending orders"
+        pending_deliveries: "Pending deliveries"
+        low_stock_items: "Out-of-stock items"
+        today_sales: "Today's sales"
+        status: "Status"
+        active: "Active"
+        inactive: "Inactive"
+        shop: "Shop"
+        quick_actions: "Quick actions"
+        view_orders: "View orders"
+        manage_products: "Manage products"
+        manage_stock: "Manage stock"
+        view_reports: "View reports"
+        my_info: "My information"
+        full_name: "Full name"
+        email: "Email"
+        phone: "Phone"
+        role: "Role"
+
+    shared:
+      topbar:
+        employee: "Collaborator"
+        dashboard: "Dashboard"
+        logout: "Log out"
+        logout_confirm: "Are you sure you want to log out?"
+
+    layouts:
+      employee:
+        title: "aaapps - Collaborator"

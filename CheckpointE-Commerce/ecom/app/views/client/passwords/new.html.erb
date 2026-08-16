@@ -1,0 +1,22 @@
+<%= render "shared/auth/auth_header", title: t('client.passwords.new.title'), subtitle: t('client.passwords.new.subtitle') %>
+
+<div class="w-full max-w-md mx-auto">
+  <%= form_with url: client_passwords_path, local: true do |f| %>
+    <%= render "shared/auth/auth_alert", type: :alert, message: flash[:alert] %>
+    <%= render "shared/auth/auth_alert", type: :notice, message: flash[:notice] %>
+
+    <div class="space-y-5">
+      <%= render "shared/phone_field", form: f, label_text: t('client.passwords.new.phone_label'), placeholder: t('client.passwords.new.phone_placeholder'), required: true %>
+    </div>
+
+    <div class="mt-6">
+      <%= f.submit t('client.passwords.new.submit'), class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-gray-200 text-center">
+      <p class="text-sm text-gray-600">
+        <%= link_to t('client.passwords.new.back_to_login'), new_client_session_path, class: "text-[#551694] hover:text-[#451384] font-medium focus:outline-none focus-visible:underline" %>
+      </p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:sn.aa.com)",
+      "Bash(curl -s -o /tmp/aa-kermel.html -w \"HTTP_STATUS:%{http_code}\\\\nSIZE:%{size_download}\\\\n\" -L \"https://sn.aa.com/fr/boutiques/aa-kermel\" --max-time 30)",
+      "Bash(curl -s -o /tmp/aa-junasen.html -w \"HTTP_STATUS:%{http_code}\\\\nSIZE:%{size_download}\\\\n\" -L \"https://sn.aa.com/fr/boutiques/junasen\" --max-time 30)",
+      "Bash(curl -s -o /tmp/aa-home.html -w \"HTTP_STATUS:%{http_code}\\\\nSIZE:%{size_download}\\\\n\" -L \"https://sn.aa.com/fr\" --max-time 30)",
+      "Read(//private/tmp/**)",
+      "Bash(git -C /Users/macbook/Codes/OKEMAMY/aa/aaapps status)",
+      "Bash(git -C /Users/macbook/Codes/OKEMAMY/aa/aaapps log --oneline -10)",
+      "Bash(git -C /Users/macbook/Codes/OKEMAMY/aa/aaapps/ status)",
+      "Bash(git -C /Users/macbook/Codes/OKEMAMY/aa/aaapps/ diff --stat)",
+      "Bash(git -C /Users/macbook/Codes/OKEMAMY/aa/aaapps/ add app/views/shared/storefront/_promo_banner_carousel.html.erb app/views/shared/storefront/_recommendation_item_card.html.erb app/views/shared/storefront/_official_brands.html.erb)",
+      "Bash(git -C /Users/macbook/Codes/OKEMAMY/aa/aaapps/ commit -m ' *)",
+      "Bash(curl -s -o /tmp/babolat.html -w \"HTTP_STATUS:%{http_code}\\\\nSIZE:%{size_download}\\\\n\" -L \"https://sn.aa.com/fr/boutiques/babolat-sn\" --max-time 30)"
+    ]
+  }
+}

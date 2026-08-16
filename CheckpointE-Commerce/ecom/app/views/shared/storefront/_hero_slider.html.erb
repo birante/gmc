@@ -1,0 +1,204 @@
+<%# Hero Slider - Design Figma avec données dynamiques et accessibilité %>
+<%
+  # Configuration des slides
+  slides = if defined?(@hero_slider_slides) && @hero_slider_slides.present?
+    @hero_slider_slides.map do |slide|
+      desktop_image = slide.image.attached? ? slide.image : slide.bg_image
+      tablet_image = slide.image_tablet.attached? ? slide.image_tablet : desktop_image
+      mobile_image = slide.image_mobile.attached? ? slide.image_mobile : tablet_image
+      {
+        id: "slide-#{slide.id}",
+        badge_text: slide.badge_text,
+        badge_bg: slide.badge_bg_color,
+        badge_text_color: slide.badge_text_color,
+        title: slide.title,
+        cta_text: slide.cta_text,
+        cta_path: slide.cta_link,
+        gradient: slide.gradient,
+        bg_image_desktop: desktop_image,
+        bg_image_tablet: tablet_image,
+        bg_image_mobile: mobile_image
+      }
+    end
+  else
+    []
+  end
+%>
+
+<% return if slides.empty? %>
+
+<div class="container mx-auto px-4 lg:px-[50px] py-4 md:py-6">
+  <section 
+    aria-label="<%= t('storefront.carousel.hero_label', default: 'Promotions et offres spéciales') %>"
+    aria-roledescription="carousel"
+    data-controller="carousel" 
+    data-carousel-autoplay-value="true" 
+    data-carousel-interval-value="5000">
+    
+    <div class="relative rounded-md overflow-hidden">
+      <!-- Live Region pour les annonces aux lecteurs d'écran -->
+      <div 
+        aria-live="polite" 
+        aria-atomic="true" 
+        class="sr-only" 
+        data-carousel-target="liveRegion">
+        Slide 1 sur <%= slides.length %>
+      </div>
+
+      <!-- Contrôles de navigation (précédent/suivant) -->
+      <button 
+        type="button"
+        class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2"
+        aria-label="<%= t('storefront.carousel.previous', default: 'Slide précédent') %>"
+        data-action="click->carousel#previous"
+        data-carousel-target="prevButton">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      
+      <button 
+        type="button"
+        class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2"
+        aria-label="<%= t('storefront.carousel.next', default: 'Slide suivant') %>"
+        data-action="click->carousel#next"
+        data-carousel-target="nextButton">
+        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+
+      <!-- Slides Container -->
+      <div 
+        class="relative h-[200px] sm:h-[280px] md:h-[322px] lg:h-[350px]" 
+        data-carousel-target="slidesContainer"
+        role="group"
+        aria-label="<%= t('storefront.carousel.slides', default: 'Slides') %>">
+        
+        <% slides.each_with_index do |slide, index| %>
+          <div 
+            id="<%= slide[:id] %>"
+            role="group"
+            aria-roledescription="slide"
+            aria-label="<%= t('storefront.carousel.slide_label', default: 'Slide %{current} sur %{total}', current: index + 1, total: slides.length) %>"
+            aria-hidden="<%= index != 0 %>"
+            tabindex="<%= index == 0 ? '0' : '-1' %>"
+            class="absolute inset-0 transition-opacity duration-500 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" 
+            data-carousel-target="slide">
+            <div class="relative h-full w-full overflow-hidden">
+              <!-- Background Image / Gradient - LCP optimisé pour premier slide -->
+              <% if slide[:bg_image_mobile].present? %>
+                <%= image_tag webp_variant(slide[:bg_image_mobile], max_width: 768, max_height: 350),
+                    alt: "",
+                    role: "presentation",
+                    class: "absolute inset-0 w-full h-full object-cover md:hidden",
+                    loading: index == 0 ? "eager" : "lazy",
+                    fetchpriority: index == 0 ? "high" : nil,
+                    decoding: "async",
+                    width: 768,
+                    height: 350,
+                    onerror: "this.style.display='none'" %>
+              <% end %>
+
+              <% if slide[:bg_image_tablet].present? %>
+                <%= image_tag webp_variant(slide[:bg_image_tablet], max_width: 1024, max_height: 450),
+                    alt: "",
+                    role: "presentation",
+                    class: "absolute inset-0 w-full h-full object-cover hidden md:block lg:hidden",
+                    loading: index == 0 ? "eager" : "lazy",
+                    fetchpriority: index == 0 ? "high" : nil,
+                    decoding: "async",
+                    width: 1024,
+                    height: 450,
+                    onerror: "this.style.display='none'" %>
+              <% end %>
+
+              <% if slide[:bg_image_desktop].present? %>
+                <%= image_tag webp_variant(slide[:bg_image_desktop], max_width: 1280, max_height: 560),
+                    alt: "",
+                    role: "presentation",
+                    class: "absolute inset-0 w-full h-full object-cover hidden lg:block",
+                    loading: index == 0 ? "eager" : "lazy",
+                    fetchpriority: index == 0 ? "high" : nil,
+                    decoding: "async",
+                    width: 1280,
+                    height: 560,
+                    onerror: "this.style.display='none'" %>
+              <% end %>
+
+              <!-- Fallback Gradient -->
+              <div class="absolute inset-0 bg-gradient-to-r <%= slide[:gradient] %> <%= (slide[:bg_image_desktop].present? || slide[:bg_image_tablet].present? || slide[:bg_image_mobile].present?) ? '-z-10' : '' %>" aria-hidden="true"></div>
+              
+              <% if slide[:cta_path].present? %>
+                <%= link_to slide[:cta_path], class: "absolute inset-0 z-10 block cursor-pointer", data: { turbo_frame: "_top" }, "aria-label": "#{slide[:cta_text].presence || 'Voir'} — #{slide[:title]}" do %><% end %>
+              <% end %>
+              
+              <!-- Content Container : masqué à l’écran, conservé pour le SEO et lecteurs d’écran -->
+              <div class="relative h-full flex items-center sr-only">
+                <!-- Text Content -->
+                <div class="pl-4 sm:pl-8 md:pl-10 lg:pl-12 max-w-[70%] sm:max-w-[55%] md:max-w-[50%] z-10">
+                  <!-- Badge -->
+                  <div class="inline-block <%= slide[:badge_bg] %> <%= slide[:badge_text_color] %> text-[10px] sm:text-[11px] md:text-xs font-extrabold uppercase px-2 py-2 sm:py-3 rounded-l-[14px] rounded-r-[40px] mb-1 md:mb-2 tracking-tight">
+                    <%= slide[:badge_text] %>
+                  </div>
+                  
+                  <!-- Title -->
+                  <h2 class="text-white text-base sm:text-xl md:text-3xl lg:text-[42px] font-semibold leading-[1.05] tracking-[-2px] mb-4 md:mb-8">
+                    <%= slide[:title] %>
+                  </h2>
+                  
+                  <!-- CTA (lien conservé pour le SEO ; clic géré par l’overlay sur la slide) -->
+                  <%= link_to slide[:cta_path], 
+                      class: "inline-flex items-center gap-1.5 bg-white text-black font-bold text-xs sm:text-sm px-4 md:px-[18px] py-2.5 md:py-[10px] rounded-[9px] hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#551694]",
+                      "aria-label": "#{slide[:cta_text]} - #{slide[:title]}" do %>
+                    <%= slide[:cta_text] %>
+                    <%= render 'shared/icons/arrow_right' %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+      </div>
+
+      <!-- Pagination Dots avec Tablist -->
+      <div 
+        class="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-[3px] bg-white/50 rounded-full p-1.5"
+        role="tablist"
+        aria-label="<%= t('storefront.carousel.pagination', default: 'Navigation des slides') %>">
+        <% slides.each_with_index do |slide, index| %>
+          <button 
+            type="button" 
+            role="tab"
+            aria-selected="<%= index == 0 %>"
+            aria-controls="<%= slide[:id] %>"
+            aria-label="<%= t('storefront.carousel.go_to_slide', default: 'Aller au slide %{number}', number: index + 1) %>"
+            class="p-0.5 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-1 rounded" 
+            data-carousel-target="dot" 
+            data-action="click->carousel#goToSlide" 
+            data-index="<%= index %>">
+            <span class="block w-2.5 h-2.5 rounded-full <%= index == 0 ? 'bg-gray-900' : 'bg-white' %> transition-colors"></span>
+          </button>
+        <% end %>
+      </div>
+
+      <!-- Bouton Pause/Play pour l'autoplay -->
+      <button 
+        type="button"
+        class="absolute bottom-3 md:bottom-4 right-3 md:right-4 z-20 w-8 h-8 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2"
+        aria-label="<%= t('storefront.carousel.pause', default: 'Mettre en pause le défilement automatique') %>"
+        data-action="click->carousel#toggleAutoplay"
+        data-carousel-target="playPauseButton">
+        <!-- Icône Pause (visible par défaut) -->
+        <svg data-carousel-target="pauseIcon" class="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+        </svg>
+        <!-- Icône Play (masquée par défaut) -->
+        <svg data-carousel-target="playIcon" class="w-4 h-4 text-gray-800 hidden" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </div>
+  </section>
+</div>

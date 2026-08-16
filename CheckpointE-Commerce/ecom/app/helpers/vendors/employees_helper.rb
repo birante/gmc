@@ -1,0 +1,2 @@
+module Vendors::EmployeesHelper
+end

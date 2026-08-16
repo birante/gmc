@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+---
+## Convention de commit avec Gitmoji
+
+Commence chaque message de commit par un Gitmoji suivi d'un espace et d'une courte description impérative en français.
+
+- Exemples:
+  - `✨ Ajouter le modèle Currency et la migration`
+  - `🐛 Corriger la validation du code ISO`
+  - `🧪 Ajouter des tests pour Currency`
+
+### Raccourcis utiles (non exhaustif)
+- `✨` (nouvelle fonctionnalité)
+- `🐛` (correction de bug)
+- `♻️` (refactor)
+- `🧪` (tests)
+- `📝` (docs)
+- `⚙️` (config)
+- `🚀` (déploiement/performances)
+- `✅` (CI)
+
+### Modèle recommandé
+
+1. Titre (une ligne): `:gitmoji: Description courte`
+2. Corps (optionnel, puces concises des changements clés)
+3. Pied (optionnel): références issues, scope, co-authors
+
+Exemple complet:
+
+```
+✨ Ajouter le modèle Currency, migration, seeds et tests
+
+- Créer la table currencies (code ISO, nom, symbole)
+- Ajouter validations sur le modèle
+- Initialiser des seeds de devises principales
+- Écrire fixtures et tests unitaires
+
+Gitflow: feature issue-123
+Refs: #123
+```
+
+Pour la signification des Gitmojis, voir `gitmoji.dev`.
+
+## Gitflow (modèle de branches)
+
+- Branches principales: `main` (prod), `develop` (intégration)
+- Branches de support:
+  - `feature/<nom>` à partir de `develop`, fusionner vers `develop`
+  - `release/<version>` à partir de `develop`, fusionner vers `main` et `develop`
+  - `hotfix/<nom>` à partir de `main`, fusionner vers `main` et `develop`
+
+Bonnes pratiques:
+- Un commit logique et atomique par changement cohérent
+- PRs petites, descriptives et liées à une issue si possible
+- Mettre à jour `CHANGELOG` si nécessaire lors des releases
+
+## Modèles prêts à l'emploi
+
+Nouvelles fonctionnalités:
+```
+✨ Ajouter <résumé court>
+
+- <changement 1>
+- <changement 2>
+
+Gitflow: feature/<nom-branch>
+Refs: #<issue>
+```
+
+Corrections de bugs:
+```
+🐛 Corriger <résumé court>
+
+- <cause>
+- <fix>
+
+Gitflow: hotfix/<nom-branch>
+Refs: #<issue>
+```
+
+Refactors:
+```
+♻️ Refactor <zone>
+
+- <avant>
+- <après>
+```
+

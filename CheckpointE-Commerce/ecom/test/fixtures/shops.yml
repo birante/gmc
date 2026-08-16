@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  vendor: one
+  currency_id: 1
+  slug: MyString
+  name: MyString
+  address: MyString
+  description: MyText
+  primary_color: MyString
+  secondary_color: MyString
+  status: MyString
+  code: MyString
+
+two:
+  vendor: two
+  currency_id: 1
+  slug: MyString
+  name: MyString
+  address: MyString
+  description: MyText
+  primary_color: MyString
+  secondary_color: MyString
+  status: MyString
+  code: MyString

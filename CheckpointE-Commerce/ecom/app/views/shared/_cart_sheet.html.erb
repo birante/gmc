@@ -1,0 +1,34 @@
+<div data-controller="cart-sheet">
+  <!-- Overlay -->
+  <div data-cart-sheet-target="overlay" 
+       data-action="click->cart-sheet#close"
+       class="hidden fixed inset-0 bg-gray-900/30 z-80 transition-opacity duration-300 backdrop-blur-xs"></div>
+
+  <!-- Sheet Container -->
+  <div data-cart-sheet-target="sheet"
+       class="hidden fixed top-2 right-2 bottom-2 rounded-[18px] w-[min(94vw,22rem)] sm:top-3 sm:right-3 sm:bottom-3 sm:w-[min(92vw,27rem)] bg-white border border-[#ebebee] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] z-90 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col h-[calc(100dvh-1rem)] sm:h-[calc(100vh-1.5rem)] max-h-[100dvh] overflow-hidden"
+       data-action="click->cart-sheet#stopPropagation">
+    
+    <!-- Header -->
+    <div class="h-[57px] flex-shrink-0 flex items-center justify-between px-4 border-b border-[#ebebee]">
+      <h2 class="text-[20px] font-medium text-[#212121] leading-[21px]"><%= t('navigation.my_cart') %></h2>
+      <button type="button"
+              data-action="click->cart-sheet#close"
+              class="w-[25px] h-[25px] flex items-center justify-center text-black hover:opacity-70 transition-opacity cursor-pointer">
+        <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Cart Content -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 min-h-0" id="cart-sheet-content" data-action="click->cart-sheet#stopPropagation">
+      <%= render 'shared/cart_sheet_items', cart: current_cart_readonly %>
+    </div>
+
+    <!-- Footer avec résumé et actions -->
+    <div id="cart-sheet-footer" class="flex-shrink-0 mt-auto">
+      <%= render 'shared/cart_sheet_footer', cart: current_cart_readonly %>
+    </div>
+  </div>
+</div>

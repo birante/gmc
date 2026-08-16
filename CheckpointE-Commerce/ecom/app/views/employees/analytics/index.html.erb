@@ -1,0 +1,32 @@
+<% content_for :title, "Analytics - #{@shop.name}" %>
+<% content_for :active_tab, 'analytics' %>
+
+<%
+  tab_url = ->(tab) {
+    employees_shop_analytics_path(@shop, tab: tab, start_date: @start_date, end_date: @end_date)
+  }
+%>
+
+<div class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Analytics</h1>
+    <p class="mt-2 text-gray-600"><%= @shop.name %></p>
+  </div>
+
+  <!-- Filtres de dates -->
+  <%= render "shared/analytics/date_filter", start_date: @start_date, end_date: @end_date, path: employees_shop_analytics_path(@shop) %>
+
+  <!-- Tabs Navigation -->
+  <%= render "shared/analytics/tabs", active_tab: @active_tab, tab_url: tab_url %>
+
+  <!-- Tab Content -->
+  <% if analytics_enabled?(@shop) %>
+    <%= render "shared/analytics/#{@active_tab}" %>
+  <% else %>
+    <%# Pas de bannière upgrade côté collaborateur (la gestion du plan revient au vendeur) %>
+    <div class="text-center py-12">
+      <p class="text-gray-400">Contenu non disponible — le plan de la boutique ne couvre pas les analytics. Demandez au gérant de la boutique de mettre à niveau.</p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,147 @@
+<%= render "shared/auth/auth_header", title: t('.create_title'), subtitle: t('.create_subtitle') %>
+
+<div class="w-full max-w-2xl mx-auto">
+  <%= form_with model: [:vendors, @shop], url: vendors_shop_path, local: true do |f| %>
+    <%= render "shared/auth/auth_errors", error_object: @shop %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-4">
+      <!-- Nom de la boutique -->
+      <div class="my-4 md:my-0">
+        <div class="mb-2 flex items-center gap-1">
+          <%= f.label :name, t('.shop_name'), class: "text-sm font-medium text-gray-700" %>
+          <span class="text-xs text-red-500">*</span>
+          <span class="text-xs text-gray-500">(<%= t('.required') %>)</span>
+        </div>
+        <%= f.text_field :name, placeholder: t('.placeholders.shop_name'), class: ["block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 md:py-3 mt-2 w-full text-base", { "border-gray-400 focus:outline-blue-600": @shop.errors[:name].none?, "border-red-400 focus:outline-red-600": @shop.errors[:name].any? }] %>
+      </div>
+      <!-- Informations légales -->
+      <%= f.fields_for :legal_info do |legal_f| %>
+        <div class="my-4 md:my-0">
+          <div class="mb-2 flex items-center gap-1">
+            <%= legal_f.label :rc_number, t('.rc_number'), class: "text-sm font-medium text-gray-700" %>
+            <span class="text-xs text-gray-500">(<%= t('.optional') %>)</span>
+          </div>
+          <%= legal_f.text_field :rc_number, placeholder: t('.placeholders.rc'), class: ["block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 md:py-3 mt-2 w-full text-base", { "border-gray-400 focus:outline-blue-600": true, "border-red-400 focus:outline-red-600": false }] %>
+        </div>
+            
+        <div class="my-4 md:my-0">
+          <div class="mb-2 flex items-center gap-1">
+            <%= legal_f.label :ninea_number, t('.ninea_number'), class: "text-sm font-medium text-gray-700" %>
+            <span class="text-xs text-gray-500">(<%= t('.optional') %>)</span>
+          </div>
+          <%= legal_f.text_field :ninea_number, placeholder: t('.placeholders.ninea'), class: ["block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 md:py-3 mt-2 w-full text-base", { "border-gray-400 focus:outline-blue-600": true, "border-red-400 focus:outline-red-600": false }] %>
+        </div>
+        
+        <!-- Message informatif -->
+        <div class="my-2 md:my-0 p-2 bg-blue-50 border border-blue-200 rounded-md md:col-span-2">
+          <p class="text-xs text-blue-700">
+            <svg class="inline-block w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+            </svg>
+            <%= t('.legal_info_note') %>
+          </p>
+        </div>
+      <% end %>
+
+      <!-- Adresse -->
+      <div class="my-4 md:my-0 md:col-span-2">
+        <div class="mb-2 flex items-center gap-1">
+          <%= f.label :address, t('.address'), class: "text-sm font-medium text-gray-700" %>
+          <span class="text-xs text-red-500">*</span>
+          <span class="text-xs text-gray-500">(<%= t('.required') %>)</span>
+        </div>
+        <%= f.text_area :address, rows: 2, placeholder: t('.placeholders.address'), class: ["block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 md:py-3 mt-2 w-full text-base", { "border-gray-400 focus:outline-blue-600": @shop.errors[:address].none?, "border-red-400 focus:outline-red-600": @shop.errors[:address].any? }] %>
+      </div>
+
+      <!-- Secteurs d'activité -->
+      <div class="my-3 md:my-0 md:col-span-2 w-full" 
+           data-controller="sector-selector"
+           data-action="click@window->sector-selector#handleClickOutside"
+           data-sector-selector-sectors-value="<%= @sectors.map { |s| { id: s.id, name: s.name } }.to_json %>"
+           data-sector-selector-selected-ids-value="<%= (@shop.sector_ids || []).to_json %>">
+        <div class="flex items-center justify-between gap-3 mb-2">
+          <%= f.label :sector_ids, t('.sectors'), class: "block text-sm font-semibold text-gray-800" %>
+          <span data-sector-selector-target="count" class="inline-flex items-center rounded-full bg-[#551694]/10 text-[#551694] text-xs font-medium px-2.5 py-1">
+            <%= (@shop.sector_ids || []).size %> sélectionné(s)
+          </span>
+        </div>
+      
+      <!-- Champ de recherche + liste (même largeur : dropdown ancré sur le conteneur du champ) -->
+      <div class="relative mt-1 mb-2 w-full">
+        <input type="text" 
+               data-sector-selector-target="search"
+               data-action="focus->sector-selector#openDropdown click->sector-selector#openDropdown input->sector-selector#search keydown.escape->sector-selector#closeDropdown"
+               placeholder="<%= t('.search_sector') %>" 
+               class="block bg-[#F9F9F9] rounded-md border border-[#E9E9E9] px-3 py-2.5 pr-10 w-full text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20 focus:border-[#551694] transition-all" />
+        <!-- Icône de recherche -->
+        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none z-10">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+
+        <!-- Liste des secteurs (dropdown : largeur = celle du champ, pas toute la colonne) -->
+        <div data-sector-selector-target="dropdown" class="hidden absolute left-0 right-0 top-full mt-1 z-20 w-full max-w-full min-w-0 bg-white rounded-md border border-gray-200 max-h-[min(28vh,10rem)] md:max-h-[min(24vh,8rem)] overflow-hidden shadow-lg">
+          <div data-sector-selector-target="list" class="overflow-y-auto max-h-[min(28vh,10rem)] md:max-h-[min(24vh,8rem)]">
+            <!-- Les secteurs seront rendus par JavaScript -->
+          </div>
+          <div data-sector-selector-target="empty" class="hidden px-4 py-6 text-center text-sm text-gray-500">
+            <%= t('.no_results') %>
+          </div>
+        </div>
+      </div>
+      <p class="text-xs text-gray-500 mt-2">Cliquez sur le champ pour afficher la liste des secteurs.</p>
+
+      <!-- Secteurs sélectionnés (tags) -->
+      <div data-sector-selector-target="selectedContainer" class="mt-2 flex flex-wrap gap-2 <%= 'hidden' unless @shop.sector_ids.present? %>">
+        <% if @shop.sector_ids.present? %>
+          <% @sectors.select { |s| @shop.sector_ids.include?(s.id) }.each do |sector| %>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-[#551694] text-white" data-tag-sector-id="<%= sector.id %>">
+              <%= sector.name %>
+              <button type="button" 
+                      data-action="click->sector-selector#removeSectorTag"
+                      data-sector-id="<%= sector.id %>"
+                      class="ml-2 text-white hover:text-gray-200 focus:outline-none transition-colors">
+                ×
+              </button>
+              <%= hidden_field_tag "shop[sector_ids][]", sector.id, id: "sector_#{sector.id}" %>
+            </span>
+          <% end %>
+        <% end %>
+      </div>
+
+      <p class="text-xs text-gray-500 mt-2"><%= t('.select_sectors') %></p>
+      </div>
+
+      <!-- Contact -->
+      <%= f.fields_for :contacts do |contact_f| %>
+        <div class="my-4 md:my-0">
+          <%= render "shared/phone_field",
+              form: contact_f,
+              error_object: contact_f.object,
+              label_text: t('.phone_number'),
+              placeholder: t('.placeholders.phone'),
+              required: false %>
+        </div>
+        
+        <div class="my-4 md:my-0 md:flex md:items-end">
+          <div class="flex items-center pb-2">
+            <%= contact_f.check_box :is_whatsapp, class: "mr-2 w-5 h-5 accent-[#551694]" %>
+            <%= contact_f.label :is_whatsapp, t('.whatsapp_available'), class: "text-sm font-medium" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="mt-6">
+      <%= f.submit t('.submit'), class: "btn w-full rounded-lg bg-[#551694] px-4 py-3 text-base font-medium text-white hover:bg-[#451384] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#551694] focus-visible:ring-offset-2 transition-colors cursor-pointer" %>
+    </div>
+    
+    <%# Afficher la progress bar uniquement lors de la création de la première boutique (onboarding) %>
+    <% if @vendor.shops.count == 0 %>
+      <div class="py-4">
+        <%= render "vendors/shared/progress_bar", current_step: 3 %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

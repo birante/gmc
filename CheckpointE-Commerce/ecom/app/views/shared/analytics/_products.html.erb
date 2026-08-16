@@ -1,0 +1,87 @@
+<%# Partial partagé : Analytics produits (vendor + employees) %>
+<%# Variables d'instance attendues : @products_stats (Kaminari-paginated), @start_date, @end_date %>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900">Performance des Produits</h3>
+    <p class="text-sm text-gray-600 mt-1">Analyse détaillée de chaque produit</p>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Produit</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Vues</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ajouts Panier</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Commandes</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Revenu</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Taux Conversion</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @products_stats.each do |stat| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="flex items-center">
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900"><%= stat[:item].name %></div>
+                  <div class="text-sm text-gray-500"><%= stat[:item].product_sub_category&.name %></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#551694]/10 text-[#551694]">
+                <%= stat[:views] %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#7c1fc4]/10 text-[#7c1fc4]">
+                <%= stat[:added_to_cart] %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-[#551694]/10 text-[#551694]">
+                <%= stat[:orders] %>
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right text-sm font-medium text-gray-900">
+              <%= number_to_currency(stat[:revenue], unit: "FCFA", format: "%n %u") %>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <% conversion = stat[:views] > 0 ? ((stat[:added_to_cart].to_f / stat[:views]) * 100).round(2) : 0 %>
+              <span class="text-sm font-medium <%= conversion > 5 ? 'text-[#551694]' : 'text-gray-600' %>">
+                <%= conversion %>%
+              </span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @products_stats.empty? %>
+    <div class="px-6 py-12 text-center">
+      <p class="text-gray-500">Aucune donnée produit pour cette période</p>
+    </div>
+  <% end %>
+</div>
+
+<!-- Pagination -->
+<% if @products_stats.present? %>
+  <div class="mt-6 flex items-center justify-between">
+    <div class="text-sm text-gray-700">
+      <%= t('analytics.pagination.displaying',
+            first: @products_stats.offset_value + 1,
+            last: [@products_stats.offset_value + @products_stats.size, @products_stats.total_count].min,
+            total: @products_stats.total_count) %>
+    </div>
+
+    <div class="flex gap-2">
+      <%= paginate @products_stats,
+          params: { tab: 'products', start_date: @start_date, end_date: @end_date },
+          outer_window: 1,
+          inner_window: 2 %>
+    </div>
+  </div>
+<% end %>

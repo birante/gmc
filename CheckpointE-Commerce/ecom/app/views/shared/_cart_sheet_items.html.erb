@@ -1,0 +1,23 @@
+<% if cart && cart.cart_items.any? %>
+  <div class="grid grid-cols-2 gap-3">
+    <% cart.cart_items.each do |cart_item| %>
+      <%= render partial: 'shared/cart_sheet_item', locals: { cart_item: cart_item } %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="flex flex-col items-center justify-center h-full text-center py-16 px-6">
+    <div class="w-32 h-32 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center mb-8 shadow-inner ring-1 ring-gray-200/50">
+      <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    </div>
+    <h3 class="text-xl font-bold text-gray-800 mb-3"><%= t('navigation.empty_cart') %></h3>
+    <p class="text-sm text-gray-500 mb-10 max-w-sm leading-relaxed"><%= t('navigation.start_shopping') %></p>
+    <button type="button"
+            data-action="click->cart-sheet#close"
+            class="px-8 py-4 bg-gradient-to-r from-[#551694] to-[#6a1fa8] text-white rounded-xl hover:from-[#6a1fa8] hover:to-[#7d2bc0] transition-all duration-200 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+      <%= t('navigation.continue_shopping') %>
+    </button>
+  </div>
+<% end %>
+

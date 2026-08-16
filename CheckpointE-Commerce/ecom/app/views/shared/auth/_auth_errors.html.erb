@@ -1,0 +1,11 @@
+<%# Liste d'erreurs de formulaire — typo normalisée %>
+<% if error_object&.errors&.any? %>
+  <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 mb-5 text-sm text-red-700" role="alert">
+    <h2 class="font-semibold mb-1"><%= t('common.errors', count: error_object.errors.count) %></h2>
+    <ul class="list-disc list-inside mt-1 space-y-0.5">
+      <% error_object.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

@@ -1,0 +1,99 @@
+<div class="bg-white border border-gray-200 rounded-lg p-5" 
+     data-controller="variant-manager"
+     data-variant-manager-item-id-value="<%= @item.id || 'NEW' %>">
+  
+  <!-- Données JSON pour les attributs -->
+  <script type="application/json" data-variant-manager-target="attributesData">
+    <%= raw json_escape(@product_attributes.to_json(include: { product_attribute_values: { only: [:id, :value] } }, only: [:id, :name])) %>
+  </script>
+  
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-sm font-semibold text-gray-900">Gestion des variantes</h3>
+  </div>
+  
+  <p class="text-xs text-gray-500 mb-4">
+    Ajoutez des attributs (Couleur, Taille, etc.) et leurs valeurs pour générer automatiquement toutes les combinaisons possibles.
+  </p>
+
+  <!-- Étape 1: Attributs et valeurs -->
+  <div class="mb-6">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+      <h4 class="text-sm font-medium text-gray-700">Étape 1 : Ajouter des attributs</h4>
+      <button type="button"
+              data-action="click->variant-manager#addAttribute"
+              class="w-full sm:w-auto px-3 py-1.5 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors flex items-center justify-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Ajouter un attribut
+      </button>
+    </div>
+
+    <!-- Container pour les attributs -->
+    <div class="space-y-3" data-variant-manager-target="attributesContainer">
+      <!-- Les attributs seront ajoutés ici dynamiquement -->
+    </div>
+  </div>
+
+  <!-- Étape 2: Générer les combinaisons -->
+  <div class="mb-6">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+      <h4 class="text-sm font-medium text-gray-700">Étape 2 : Générer les combinaisons</h4>
+      <button type="button"
+              data-action="click->variant-manager#generateCombinations"
+              data-variant-manager-target="generateButton"
+              disabled
+              class="w-full sm:w-auto px-4 py-2 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed">
+        Générer les combinaisons
+      </button>
+    </div>
+    
+    <p class="text-xs text-gray-500 mb-2" data-variant-manager-target="combinationsInfo">
+      Ajoutez des attributs pour voir le nombre de combinaisons possibles
+    </p>
+  </div>
+
+  <!-- Template pour un attribut -->
+  <template data-variant-manager-target="attributeTemplate">
+    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50" data-attribute-container>
+      <input type="hidden" name="item[item_attributes_attributes][NEW_ATTRIBUTE][_destroy]" value="0" />
+      <input type="hidden" name="item[item_attributes_attributes][NEW_ATTRIBUTE][position]" value="0" />
+      
+      <div class="mb-3">
+        <div class="flex items-center gap-2 mb-2">
+          <label class="block text-sm font-medium text-gray-700">Choisir un attribut</label>
+          <button type="button"
+                  data-action="click->variant-manager#removeAttribute"
+                  class="ml-auto text-red-600 hover:text-red-700 text-xs">
+            Supprimer
+          </button>
+        </div>
+        <select name="item[item_attributes_attributes][NEW_ATTRIBUTE][name]"
+                data-action="change->variant-manager#handleAttributeChange"
+                data-attribute-select
+                class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+          <option value="">-- Sélectionner un attribut --</option>
+          <% @product_attributes.each do |attr| %>
+            <option value="<%= attr.name %>" data-attribute-id="<%= attr.id %>"><%= attr.name %></option>
+          <% end %>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-medium text-gray-700">Sélectionner les valeurs</label>
+        </div>
+        
+        <div class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-3" data-values-container>
+          <p class="text-xs text-gray-500">Sélectionnez d'abord un attribut pour voir les valeurs disponibles</p>
+        </div>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- Matrice des variantes -->
+  <div class="hidden" data-variant-manager-target="matrixContainer">
+    <%= render 'variant_matrix', f: f %>
+  </div>
+</div>

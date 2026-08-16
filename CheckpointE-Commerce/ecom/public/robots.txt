@@ -1,0 +1,41 @@
+# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /vendors/
+Disallow: /employees/
+Disallow: /rails/
+
+# Disallow cart and checkout
+Disallow: /*/cart
+Disallow: /*/cart_items
+Disallow: /*/addresses
+
+# Disallow user session pages
+Disallow: /*/session
+Disallow: /*/registration
+Disallow: /*/passwords
+
+# Disallow internal/placeholder pages
+Disallow: /fr/soon
+Disallow: /en/soon
+
+# Allow important public pages
+Allow: /fr/
+Allow: /en/
+Allow: /fr/produits
+Allow: /en/products
+Allow: /fr/boutiques
+Allow: /en/shops
+Allow: /fr/categories
+Allow: /en/categories
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://sn.aa.com/sitemap.xml.gz

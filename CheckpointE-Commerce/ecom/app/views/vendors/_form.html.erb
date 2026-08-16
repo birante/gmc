@@ -1,0 +1,62 @@
+<%= form_with(model: vendor, class: "contents") do |form| %>
+    <% if vendor.errors.any? %>
+        <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+            <h2>
+                <%= pluralize(vendor.errors.count, "error") %> prohibited this vendor from being saved:</h2>
+
+            <ul class="list-disc ml-6">
+                <% vendor.errors.each do |error| %>
+                    <li>
+                        <%= error.full_message %>
+                    </li>
+                    <% end %>
+            </ul>
+        </div>
+        <% end %>
+
+            <div class="my-5">
+                <%= form.label :first_name %>
+                    <%= form.text_field :first_name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:first_name].none?, "border-red-400 focus:outline-red-600": vendor.errors[:first_name].any?}] %>
+            </div>
+
+            <div class="my-5">
+                <%= form.label :last_name %>
+                    <%= form.text_field :last_name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:last_name].none?, "border-red-400 focus:outline-red-600": vendor.errors[:last_name].any?}] %>
+            </div>
+
+            <div class="my-5">
+                <%= form.label :phone_number %>
+                    <%= form.telephone_field :phone_number, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:phone_number].none?, "border-red-400 focus:outline-red-600": vendor.errors[:phone_number].any?}] %>
+            </div>
+
+            <div class="my-5">
+                <%= form.label :country_code %>
+                    <%= form.country_select :country_code, { format: :with_alpha2, selected: 'SN', priority_countries: ['SN'] }, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:country_code].none?, "border-red-400 focus:outline-red-600": vendor.errors[:country_code].any?}] %>
+            </div>
+
+            <div class="my-5">
+                <%= form.label :email %>
+                    <%= form.email_field :email, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:email].none?, "border-red-400 focus:outline-red-600": vendor.errors[:email].any?}] %>
+            </div>
+
+            <% if vendor.new_record? %>
+              <div class="my-5">
+                  <%= form.label :password %>
+                      <%= form.password_field :password, required: true, minlength: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:password].none?, "border-red-400 focus:outline-red-600": vendor.errors[:password].any?}] %>
+              </div>
+  
+              <div class="my-5">
+                  <%= form.label :password_confirmation %>
+                      <%= form.password_field :password_confirmation, required: true, minlength: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": vendor.errors[:password_confirmation].none?, "border-red-400 focus:outline-red-600": vendor.errors[:password_confirmation].any?}] %>
+              </div>
+            <% end %>
+
+            <div class="my-5 flex items-center gap-2">
+                <%= form.label :status %>
+                    <%= form.checkbox :status, class: ["block shadow-sm rounded-md border order-first h-5 w-5", {"border-gray-400 focus:outline-blue-600": vendor.errors[:status].none?, "border-red-400 focus:outline-red-600": vendor.errors[:status].any?}] %>
+            </div>
+
+            <div class="inline">
+                <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+            </div>
+            <% end %>

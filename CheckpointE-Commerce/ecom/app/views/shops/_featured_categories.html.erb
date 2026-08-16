@@ -1,0 +1,89 @@
+<%# Catégories Mises en Avant - Section compacte %>
+<div class="py-6 md:py-8">
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-lg font-semibold text-gray-900 mb-4" style="color: var(--primary-color);">Explorer par catégorie</h2>
+
+    <%# Slider horizontal de catégories %>
+    <% if shop.sectors.any? %>
+      <div class="relative" data-controller="horizontal-scroll">
+        <nav data-horizontal-scroll-target="scrollable"
+             class="flex gap-4 overflow-x-auto pb-4 px-6 md:px-8 scrollbar-hide"
+             style="scrollbar-width: none; -ms-overflow-style: none;"
+             role="list"
+             aria-label="<%= t('storefront.categories.nav_label', default: 'Catégories de produits') %>">
+          <% shop.sectors.each_with_index do |sector, index| %>
+            <a href="<%= shop_path(shop, category: sector.slug) %>"
+               class="flex-shrink-0 group relative overflow-hidden rounded-xl p-4 w-[180px] transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+               style="background: linear-gradient(135deg, <%= primary_color %>15, <%= secondary_color %>10); border: 2px solid <%= primary_color %>40;"
+               role="listitem">
+              <%# Élément décoratif d'arrière-plan %>
+              <div class="absolute -right-8 -bottom-8 w-32 h-32 rounded-full opacity-20 group-hover:opacity-40 transition-opacity"
+                   style="background-color: <%= primary_color %>;"></div>
+
+              <div class="relative z-10">
+                <%# Icône de catégorie %>
+                <div class="inline-flex items-center justify-center w-10 h-10 rounded-lg mb-3 text-xl" style="background-color: <%= primary_color %>20;">
+                  <% emojis = ["🛍️", "📱", "👕", "👟", "💄", "🏠", "📚", "🎮"] %>
+                  <%= emojis[index % emojis.length] %>
+                </div>
+
+                <%# Texte de catégorie %>
+                <h3 class="text-lg font-bold text-gray-900 mb-1 group-hover:text-white transition-colors">
+                  <%= sector.name %>
+                </h3>
+                <p class="text-sm text-gray-600 group-hover:text-gray-100 transition-colors">
+                  <%= shop.available_items_count > 0 ? "#{shop.available_items_count} article#{shop.available_items_count > 1 ? 's' : ''}" : "Découvrez notre offre" %>
+                </p>
+
+                <%# Flèche interactive %>
+                <div class="flex items-center gap-2 mt-3">
+                  <span class="text-2xl transition-transform duration-300 group-hover:translate-x-1">→</span>
+                </div>
+              </div>
+
+              <%# Hover overlay gradient %>
+              <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl pointer-events-none"
+                   style="background: linear-gradient(135deg, <%= primary_color %>, <%= secondary_color %>);"></div>
+            </a>
+          <% end %>
+        </nav>
+
+        <%# Boutons de défilement %>
+        <button type="button"
+                data-horizontal-scroll-target="leftButton"
+                data-action="click->horizontal-scroll#scrollLeft"
+                aria-label="<%= t('storefront.categories.scroll_left', default: 'Faire défiler les catégories vers la gauche') %>"
+                class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2"
+                style="color: var(--primary-color);">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button type="button"
+                data-horizontal-scroll-target="rightButton"
+                data-action="click->horizontal-scroll#scrollRight"
+                aria-label="<%= t('storefront.categories.scroll_right', default: 'Faire défiler les catégories vers la droite') %>"
+                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-[#551694] hover:shadow-xl transition-all z-10 focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2"
+                style="color: var(--primary-color);">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+
+      <%# Alternative: si moins de 4 catégories, afficher plus grand %>
+      <% if shop.sectors.count < 4 %>
+        <div class="mt-8 p-6 rounded-xl text-center" style="background-color: <%= primary_color %>08; border: 2px dashed <%= primary_color %>30;">
+          <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+          <p class="text-gray-600 text-lg">Plus de catégories à venir...</p>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="text-center py-12">
+        <p class="text-gray-600 text-lg">Aucune catégorie n'a été définie pour cette boutique.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

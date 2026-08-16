@@ -1,0 +1,42 @@
+<% content_for :title, t("pages.coming_soon.page_title", default: "Cette page arrive bientôt | aa") %>
+<% content_for :meta_description, t("pages.coming_soon.meta_description", default: "Cette section de aa 2.0 sera bientôt disponible. Revenez vite !") %>
+<% content_for :robots, "noindex, nofollow" %>
+<section class="bg-gradient-to-b from-[#f7f4ff] via-white to-white min-h-[70vh] flex items-center justify-center px-4 py-12 sm:py-16">
+  <div class="max-w-2xl w-full text-center">
+    <%# Logo "yeux" aa %>
+    <div class="flex justify-center mb-8">
+      <%= image_tag "soon/eye.png",
+          alt: "aa arrive bientôt",
+          class: "w-32 sm:w-40 md:w-48 h-auto",
+          loading: "eager",
+          fetchpriority: "high" %>
+    </div>
+    <%# Titre principal %>
+    <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">
+      <%= t("pages.coming_soon.title", default: "Cette page arrive bientôt.") %>
+    </h1>
+    <%# Sous-titre — séparé par des filets fins comme dans le mockup %>
+    <div class="border-t border-gray-200 pt-6 sm:pt-8 mb-6 sm:mb-8">
+      <p class="text-base sm:text-lg text-gray-500 leading-relaxed">
+        <%= t("pages.coming_soon.lead_line_1", default: "Vous explorez aa 2.0 en avant-première.") %><br>
+        <%= t("pages.coming_soon.lead_line_2", default: "Certaines sections sont encore en cours de finalisation.") %>
+      </p>
+    </div>
+    <div class="border-t border-gray-200 pt-6 sm:pt-8 mb-8 sm:mb-10">
+      <p class="text-base sm:text-lg font-medium text-gray-700">
+        <%= t("pages.coming_soon.thanks", default: "Merci de faire partie des premiers utilisateurs.") %>
+      </p>
+    </div>
+    <%# CTAs %>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+      <%= link_to root_path,
+          class: "w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-3.5 bg-[#551694] text-white rounded-xl font-semibold text-base hover:bg-[#451384] transition-colors shadow-sm" do %>
+        <%= t("pages.coming_soon.back_home", default: "Retour à l'accueil") %>
+      <% end %>
+      <%= link_to items_path,
+          class: "w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-3.5 bg-white text-[#551694] border-2 border-[#551694] rounded-xl font-semibold text-base hover:bg-[#551694]/5 transition-colors" do %>
+        <%= t("pages.coming_soon.explore_products", default: "Explorer les produits") %>
+      <% end %>
+    </div>
+  </div>
+</section>

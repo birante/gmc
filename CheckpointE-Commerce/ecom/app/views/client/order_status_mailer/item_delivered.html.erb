@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Un article de votre commande a été livré</h1>
+    <p>Bonjour <%= @user.first_name %>,</p>
+    <p>Nous vous informons qu'un article de votre commande <strong>#{@order.order_number}</strong> a été livré avec succès :</p>
+    <ul>
+      <li><strong><%= @order_item.item.name %></strong></li>
+      <% if @order_item.item_variant %>
+        <li>Variante : <%= @order_item.item_variant.display_name %></li>
+      <% end %>
+      <li>Quantité : <%= @order_item.quantity %></li>
+    </ul>
+    <% 
+      # Optimisation : utiliser count au lieu de charger tous les items
+      delivered_count = @order.order_items.where(delivery_status: "delivered").count
+      total_count = @order.order_items.count
+    %>
+    <% unless delivered_count == total_count %>
+      <p>Les autres articles de votre commande sont encore en cours de livraison. Nous vous tiendrons informé de leur arrivée.</p>
+    <% end %>
+    <p>Merci d'avoir fait vos achats chez nous !</p>
+  </body>
+</html>

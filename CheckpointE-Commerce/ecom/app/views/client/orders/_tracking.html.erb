@@ -1,0 +1,84 @@
+<!-- Suivi de commande -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md transition-shadow duration-200">
+  <!-- Barre de progression -->
+  <div class="mb-6">
+    <div class="overflow-x-auto -mx-2 px-2">
+    <div class="flex items-center justify-between mb-4 min-w-[260px]">
+      <% 
+        steps = [
+          { key: 'pending', label: 'Commande', status: order.status },
+          { key: 'processing', label: 'Traitement', status: order.status },
+          { key: 'shipped', label: 'Expédition', status: order.status },
+          { key: 'delivered', label: 'Livré', status: order.status }
+        ]
+        
+        completed_steps = case order.status
+        when 'pending' then ['pending']
+        when 'processing' then ['pending', 'processing']
+        when 'shipped' then ['pending', 'processing', 'shipped']
+        when 'delivered' then ['pending', 'processing', 'shipped', 'delivered']
+        else []
+        end
+        
+        current_step = order.status
+      %>
+      
+      <% steps.each_with_index do |step, index| %>
+        <div class="flex items-center flex-1">
+          <div class="flex flex-col items-center flex-1">
+            <!-- Cercle de statut -->
+            <div class="relative">
+              <% if completed_steps.include?(step[:key]) %>
+                <!-- Étape complétée -->
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-500 flex items-center justify-center border-4 border-white shadow-lg">
+                  <svg class="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+              <% elsif step[:key] == current_step %>
+                <!-- Étape actuelle -->
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-indigo-500 flex items-center justify-center border-4 border-white shadow-lg animate-pulse">
+                  <div class="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-white"></div>
+                </div>
+              <% else %>
+                <!-- Étape à venir -->
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center border-4 border-white">
+                  <div class="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-gray-400"></div>
+                </div>
+              <% end %>
+            </div>
+            <!-- Label -->
+            <p class="mt-2 text-xs sm:text-sm font-medium text-center <%= completed_steps.include?(step[:key]) ? 'text-green-600' : (step[:key] == current_step ? 'text-indigo-600' : 'text-gray-400') %>">
+              <%= step[:label] %>
+            </p>
+          </div>
+          
+          <!-- Ligne de connexion -->
+          <% unless index == steps.length - 1 %>
+            <div class="flex-1 h-1 mx-2 <%= completed_steps.include?(steps[index + 1][:key]) ? 'bg-green-500' : 'bg-gray-300' %>"></div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    </div>
+  </div>
+
+     <!-- Historique de suivi -->
+     <% if status_history.any? %>
+       <div class="mt-6 pt-6 border-t border-gray-200">
+         <h3 class="text-base sm:text-lg font-semibold text-gray-900 mb-4">
+           Historique de suivi
+         </h3>
+         <div class="space-y-2">
+           <% status_history.each do |history| %>
+             <p class="text-sm text-gray-600">
+               <span class="font-semibold text-gray-900"><%= history.status_label %></span>
+               <span class="text-gray-500 ml-2"><%= l(history.created_at, format: "%d %b, %Y %H:%M") %></span>
+               <span class="ml-2"><%= history.note.presence || history.status_message %></span>
+             </p>
+           <% end %>
+         </div>
+       </div>
+     <% end %>
+</div>
+

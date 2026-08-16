@@ -1,0 +1,47 @@
+<% content_for :title, t('users.new.title') %>
+<% content_for :meta_description, t('users.new.meta_description', default: "Créez votre compte aa pour acheter sur la marketplace e-commerce du Sénégal.") %>
+<% content_for :robots, "noindex, follow" %>
+<% content_for :canonical_url, request.original_url.split("?").first %>
+<h1><%= t('users.new.title') %></h1>
+<%= form_with model: @user, url: users_path do |f| %>
+  <div>
+    <%= f.label :first_name, t('users.new.first_name') %><br>
+    <%= f.text_field :first_name, required: true, autofocus: true %>
+  </div>
+  <div>
+    <%= f.label :last_name, t('users.new.last_name') %><br>
+    <%= f.text_field :last_name, required: true %>
+  </div>
+  <%= render "shared/phone_field",
+      form: f,
+      error_object: f.object,
+      label_text: t('users.new.phone_number'),
+      placeholder: t('users.new.phone_placeholder'),
+      required: true,
+      show_label: true %>
+  <div>
+    <%= f.label :email_address, t('users.new.email_optional') %><br>
+    <%= f.email_field :email_address %>
+  </div>
+  <div>
+    <%= f.label :password, t('users.new.password') %><br>
+    <%= f.password_field :password, required: true, minlength: 4 %>
+  </div>
+  <div>
+    <%= f.label :password_confirmation, t('users.new.password_confirmation') %><br>
+    <%= f.password_field :password_confirmation, required: true, minlength: 4 %>
+  </div>
+  <% if @user.errors.any? %>
+    <div>
+      <p><strong><%= pluralize(@user.errors.count, t('users.new.errors_prevent'), t('users.new.errors_prevent_plural')) %></strong></p>
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div>
+    <%= f.submit t('users.new.submit') %>
+  </div>
+<% end %>

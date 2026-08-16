@@ -1,0 +1,220 @@
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    NOUVELLE INTERFACE DE PAIEMENT                        ║
+║                          Vue Desktop (≥640px)                            ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────────────┐
+│  💳 Mode de paiement                                                   │
+│  Choisissez votre mode de paiement préféré pour finaliser votre       │
+│  commande en toute sécurité.                                           │
+│                                                                        │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │  ○  ┌─────┐  Orange Money              ┌──────────┐         │    │
+│  │     │ 🍊  │  Sénégal                    │Populaire │         │    │
+│  │     └─────┘                             └──────────┘         │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+│   Hover: Bordure orange + Ombre portée + Icône agrandie              │
+│                                                                        │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │  ○  ┌─────┐  Free Money                                      │    │
+│  │     │ 💵  │  Sénégal                                         │    │
+│  │     └─────┘                                                  │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+│   Hover: Bordure bleue + Ombre portée + Icône agrandie               │
+│                                                                        │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │  ○  ┌─────┐  Expresso                                        │    │
+│  │     │ 📱  │  Sénégal                                         │    │
+│  │     └─────┘                                                  │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+│   Hover: Bordure violette + Ombre portée + Icône agrandie            │
+│                                                                        │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │  ○  ┌─────┐  Wave                                            │    │
+│  │     │ 💱  │  Sénégal                                         │    │
+│  │     └─────┘                                                  │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+│   Hover: Bordure verte + Ombre portée + Icône agrandie               │
+│                                                                        │
+│  ┌──────────────────────────────────────────────────────────────┐    │
+│  │  ○  ┌─────┐  Carte Bancaire            ┌─────────┐          │    │
+│  │     │ 💳  │  Visa, Mastercard           │Sécurisé │          │    │
+│  │     └─────┘                             └─────────┘          │    │
+│  └──────────────────────────────────────────────────────────────┘    │
+│   Hover: Bordure grise foncée + Ombre portée + Icône agrandie        │
+│                                                                        │
+│  ┌────────────────────────────────────────────────────────────┐      │
+│  │  🛡️  Paiement 100% sécurisé                                │      │
+│  │                                                             │      │
+│  │  ✓ Transaction protégée par PayDunya                       │      │
+│  │  ✓ Confirmation immédiate de votre paiement                │      │
+│  │  ✓ Vos données bancaires ne sont jamais stockées          │      │
+│  └────────────────────────────────────────────────────────────┘      │
+└────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                         Vue Mobile (<640px)                              ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────┐
+│  💳 Mode de paiement                    │
+│  Choisissez votre mode de paiement...  │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │  ○  [🍊]  Orange Money            │ │
+│  │          Sénégal                  │ │
+│  └───────────────────────────────────┘ │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │  ○  [💵]  Free Money              │ │
+│  │          Sénégal                  │ │
+│  └───────────────────────────────────┘ │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │  ○  [📱]  Expresso                │ │
+│  │          Sénégal                  │ │
+│  └───────────────────────────────────┘ │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │  ○  [💱]  Wave                    │ │
+│  │          Sénégal                  │ │
+│  └───────────────────────────────────┘ │
+│                                         │
+│  ┌───────────────────────────────────┐ │
+│  │  ○  [💳]  Carte Bancaire          │ │
+│  │          Visa, Mastercard         │ │
+│  └───────────────────────────────────┘ │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │  🛡️ Paiement 100% sécurisé      │   │
+│  │  ✓ Transaction protégée          │   │
+│  │  ✓ Confirmation immédiate        │   │
+│  │  ✓ Données non stockées          │   │
+│  └─────────────────────────────────┘   │
+└─────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                       DÉTAILS DES COULEURS                               ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+Orange Money:
+  Icône: Dégradé Orange (#fb923c → #ea580c)
+  Bordure Hover: Orange (#f97316)
+  Badge: Fond orange clair (#fed7aa) / Texte orange foncé (#c2410c)
+
+Free Money:
+  Icône: Dégradé Bleu (#60a5fa → #2563eb)
+  Bordure Hover: Bleu (#3b82f6)
+  Pas de badge
+
+Expresso:
+  Icône: Dégradé Violet (#c084fc → #9333ea)
+  Bordure Hover: Violet (#a855f7)
+  Pas de badge
+
+Wave:
+  Icône: Dégradé Vert (#4ade80 → #16a34a)
+  Bordure Hover: Vert (#22c55e)
+  Pas de badge
+
+Carte Bancaire:
+  Icône: Dégradé Gris (#4b5563 → #1f2937)
+  Bordure Hover: Gris foncé (#374151)
+  Badge: Fond gris clair (#f3f4f6) / Texte gris foncé (#374151)
+
+Section Sécurité:
+  Fond: Bleu clair (#eff6ff)
+  Bordure: Bleu (#bfdbfe)
+  Texte: Bleu foncé (#1e3a8a)
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                          INTERACTIONS                                    ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+État Normal:
+  • Bordure grise (#e5e7eb)
+  • Ombre: Aucune
+  • Icône: Taille normale
+  • Cursor: pointer
+
+État Hover (Survol):
+  • Bordure: Couleur de l'opérateur
+  • Ombre: shadow-md
+  • Icône: Scale 1.1 (agrandissement)
+  • Transition: smooth
+
+État Sélectionné:
+  • Radio button coché
+  • Bordure: Couleur de l'opérateur
+  • Fond: Légère teinte de la couleur (optionnel)
+
+État Focus (Clavier):
+  • Ring autour du radio button
+  • Couleur du ring: selon l'opérateur
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    AVANTAGES DE LA NOUVELLE UI                           ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+✅ Visuel Attractif
+   → Design moderne avec gradients et animations
+
+✅ Meilleure Conversion
+   → Interface claire = moins d'abandons de panier
+
+✅ Plus de Choix
+   → Ajout du paiement par carte bancaire
+
+✅ Confiance Accrue
+   → Section sécurité bien visible
+
+✅ Responsive
+   → Adapté mobile et desktop
+
+✅ Accessible
+   → Navigation au clavier préservée
+
+✅ Performance
+   → CSS pur, pas de JavaScript
+
+✅ Maintenance Simple
+   → Code structuré et facile à modifier
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                         COMPATIBILITÉ                                    ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+Navigateurs Desktop:
+  ✅ Chrome 90+
+  ✅ Firefox 88+
+  ✅ Safari 14+
+  ✅ Edge 90+
+
+Navigateurs Mobile:
+  ✅ Chrome Mobile
+  ✅ Safari iOS
+  ✅ Samsung Internet
+  ✅ Firefox Mobile
+
+Résolutions:
+  ✅ Mobile: 320px - 639px
+  ✅ Tablet: 640px - 1023px
+  ✅ Desktop: 1024px+
+
+
+╔══════════════════════════════════════════════════════════════════════════╗
+║                    PROCHAINES ÉTAPES SUGGÉRÉES                           ║
+╚══════════════════════════════════════════════════════════════════════════╝
+
+1. Tester l'interface dans le navigateur
+2. Vérifier le responsive sur mobile
+3. Tester tous les modes de paiement
+4. Collecter les retours utilisateurs
+5. Ajuster si nécessaire
+
+🎉 L'interface est prête à l'emploi !

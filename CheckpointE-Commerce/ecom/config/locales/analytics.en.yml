@@ -1,0 +1,70 @@
+en:
+  analytics:
+    pagination:
+      displaying: "Displaying %{first} to %{last} of %{total} products"
+      displaying_pages: "Displaying %{first} to %{last} of %{total} pages"
+    
+    page_names:
+      # Public pages
+      home: "🏠 Home"
+      about: "ℹ️ About"
+      contact: "📧 Contact"
+      terms: "📄 Terms of Service"
+      privacy: "🔒 Privacy Policy"
+      
+      # Shops
+      shops_index: "🏪 Shops List"
+      shops_show: "🏪 Shop Details"
+      shops_search: "🔍 Search Shops"
+      
+      # Products
+      items_index: "🏷️ Products List"
+      items_show: "🏷️ Product Details"
+      items_search: "🔍 Search Products"
+      
+      # Cart & Checkout
+      cart: "🛒 Cart"
+      checkout: "💳 Checkout"
+      checkout_delivery: "🚚 Delivery Options"
+      checkout_payment: "💰 Payment Method"
+      checkout_confirmation: "✅ Order Confirmation"
+      order_success: "🎉 Order Successful"
+      
+      # User account
+      user_profile: "👤 My Profile"
+      user_orders: "📦 My Orders"
+      user_addresses: "📍 My Addresses"
+      user_favorites: "❤️ My Favorites"
+      
+      # Vendor account
+      vendor_dashboard: "📊 Vendor Dashboard"
+      vendor_products: "🏷️ My Products"
+      vendor_product_new: "➕ New Product"
+      vendor_product_edit: "✏️ Edit Product"
+      vendor_orders: "📦 My Orders"
+      vendor_order_show: "📦 Order Details"
+      vendor_settings: "⚙️ Settings"
+      vendor_shop_edit: "🏪 Edit Shop"
+      vendor_analytics: "📊 Analytics"
+      
+      # Employee account
+      employee_dashboard: "📊 Employee Dashboard"
+      employee_products: "🏷️ Products"
+      employee_product_new: "➕ New Product"
+      employee_product_edit: "✏️ Edit Product"
+      employee_orders: "📦 Orders"
+      employee_order_show: "📦 Order Details"
+      employee_analytics: "📊 Analytics"
+      
+      # Authentication
+      sign_in: "🔑 Sign In"
+      sign_up: "📝 Sign Up"
+      password_reset: "🔐 Reset Password"
+      
+      # Maintenance
+      maintenance: "🚧 Maintenance Page"
+      maintenance_confirmation: "✅ Maintenance Signup Confirmation"
+      
+      # Fallback
+      unknown: "Unnamed Page"
+

@@ -1,0 +1,260 @@
+<%# Partial partagé : détail d'une commande (vendor + employees).
+     Locals attendus :
+       back_to_orders_path                String   URL pour le lien retour et fallbacks
+       update_item_delivery_status_path   String   Action du form de changement de statut d'un order_item
+       signup_path                        String?  Lien d'inscription pour la branche d'erreur (vendor uniquement)
+       signup_label                       String?  Libellé du bouton ci-dessus
+     Instance vars : @vendor, @order, @order_items %>
+<%
+  signup_path  = local_assigns[:signup_path]
+  signup_label = local_assigns[:signup_label]
+%>
+
+<% if @vendor && @order %>
+  <!-- En-tête avec bouton retour -->
+  <div class="mb-6">
+    <%= link_to back_to_orders_path, class: "inline-flex items-center text-sm text-gray-600 hover:text-[#551694] mb-3" do %>
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      <%= t('vendors.orders.show.back_to_orders') %>
+    <% end %>
+
+    <!-- En-tête commande avec statut -->
+    <div class="bg-white rounded-lg shadow-md p-6 border-2 <%= case @order.status
+      when 'pending' then 'border-yellow-300'
+      when 'processing' then 'border-blue-300'
+      when 'shipped' then 'border-indigo-300'
+      when 'partial_delivery' then 'border-purple-300'
+      when 'delivered' then 'border-green-300'
+      when 'canceled' then 'border-red-300'
+      else 'border-gray-300'
+    end %>">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+            <%= t('vendors.orders.show.order_number', id: @order.id) %>
+          </h1>
+          <p class="text-sm text-gray-500 mt-1">
+            <%= t('vendors.orders.show.placed_on', date: @order.created_at.strftime("%d/%m/%Y à %H:%M")) %>
+          </p>
+        </div>
+
+        <div class="text-right">
+          <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+            <%= t('vendors.orders.show.order_status_label', default: 'Statut de la commande') %>
+          </p>
+          <span class="inline-flex items-center px-4 py-2 rounded-lg text-base font-bold <%= case @order.status
+            when 'pending' then 'bg-yellow-100 text-yellow-900'
+            when 'processing' then 'bg-blue-100 text-blue-900'
+            when 'shipped' then 'bg-indigo-100 text-indigo-900'
+            when 'partial_delivery' then 'bg-purple-100 text-purple-900'
+            when 'delivered' then 'bg-green-100 text-green-900'
+            when 'canceled' then 'bg-red-100 text-red-900'
+            else 'bg-gray-100 text-gray-900'
+          end %>">
+            <%= t("vendors.orders.index.#{@order.status}", default: @order.status.humanize) %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Détails de la commande -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <!-- Colonne principale : Articles commandés -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Client et Adresse de livraison côte à côte -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Client -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.orders.show.client_info') %></h2>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold">
+                <%= @order.user.first_name&.first&.upcase %>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900">
+                  <%= @order.user.first_name %> <%= @order.user.last_name %>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Adresse de livraison -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.orders.show.delivery_address') %></h2>
+          <div class="prose prose-sm max-w-none">
+            <p class="text-gray-700 whitespace-pre-line"><%= @order.delivery_address %></p>
+          </div>
+          <% if @order.delivery_zone %>
+            <div class="mt-3 pt-3 border-t border-gray-200">
+              <p class="text-sm text-gray-600">
+                <%= t('vendors.orders.show.zone') %>: <strong><%= @order.delivery_zone.name %></strong>
+              </p>
+            </div>
+          <% end %>
+          <% if @order.delivery_slot %>
+            <div class="mt-2">
+              <p class="text-sm text-gray-600">
+                <%= t('vendors.orders.show.slot') %>: <strong><%= @order.delivery_slot.start_time.strftime("%H:%M") %> - <%= @order.delivery_slot.end_time.strftime("%H:%M") %></strong>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Articles de la commande -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b">
+          <h2 class="text-lg font-semibold text-gray-900"><%= t('vendors.orders.show.ordered_items') %></h2>
+        </div>
+        <div class="divide-y divide-gray-200">
+          <% @order_items.each do |order_item| %>
+            <div class="px-6 py-4 hover:bg-gray-50">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div class="flex items-start gap-4 flex-1">
+                  <!-- Image du produit (placeholder pour l'instant) -->
+                  <div class="w-16 h-16 bg-gray-200 rounded flex-shrink-0 overflow-hidden">
+                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Détails du produit -->
+                  <div class="flex-1">
+                    <h3 class="font-medium text-gray-900"><%= order_item.item.name %></h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                      <%= t('vendors.orders.show.article') %>: <%= order_item.item.slug %>
+                    </p>
+                    <div class="flex items-center gap-4 mt-2">
+                      <span class="text-sm text-gray-600"><%= t('vendors.orders.show.quantity') %>: <strong><%= order_item.quantity %></strong></span>
+                      <span class="text-sm text-gray-600"><%= t('vendors.orders.show.unit_price') %>: <strong><%= number_with_delimiter(order_item.unit_price, delimiter: ' ') %> <%= @order.currency.code %></strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Prix total et statut de livraison de l'article -->
+                <div class="w-full sm:w-auto text-left sm:text-right sm:ml-4">
+                  <p class="font-semibold text-gray-900 mb-3">
+                    <%= number_with_delimiter(order_item.total_price, delimiter: ' ') %> <%= @order.currency.code %>
+                  </p>
+
+                  <!-- Statut de livraison de l'article (modifiable) -->
+                  <div class="bg-gray-50 rounded-md p-3 border border-gray-200 w-full sm:min-w-[280px]">
+                    <p class="text-xs font-semibold text-gray-600 mb-2">
+                      <%= t('vendors.orders.show.item_delivery_status', default: 'Statut de livraison') %>
+                    </p>
+                    <% available_item_statuses = order_item.available_next_delivery_statuses %>
+                    <% if available_item_statuses.any? %>
+                      <%= form_with url: update_item_delivery_status_path, method: :patch, local: true, class: "flex flex-col gap-2" do |form| %>
+                        <%= form.hidden_field :item_id, value: order_item.id %>
+                        <%
+                          # Construire les options : statut actuel + statuts disponibles
+                          options = [ [ t("vendors.orders.show.#{order_item.delivery_status}", default: order_item.delivery_status.humanize), order_item.delivery_status ] ]
+                          available_item_statuses.each do |status|
+                            options << [ t("vendors.orders.show.#{status}", default: status.humanize), status ]
+                          end
+                        %>
+                        <%= form.select :new_status,
+                            options_for_select(options, order_item.delivery_status),
+                            {},
+                            { class: "text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#551694] bg-white w-full" } %>
+                        <%= form.submit t('vendors.orders.show.update_item_status', default: 'Mettre à jour'), class: "text-xs px-4 py-2 bg-[#551694] text-white rounded-md hover:bg-[#451384] cursor-pointer transition-colors font-medium shadow-sm w-full" %>
+                      <% end %>
+                    <% else %>
+                      <div class="text-sm text-gray-700 font-medium">
+                        <%= t("vendors.orders.show.#{order_item.delivery_status}", default: order_item.delivery_status.humanize) %>
+                        <span class="text-gray-400 italic text-xs ml-1">(état final)</span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Colonne latérale : Résumé -->
+    <div class="space-y-6">
+      <!-- Résumé financier -->
+      <div class="bg-white rounded-lg shadow p-6 sticky top-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.orders.show.summary') %></h2>
+        <div class="space-y-3">
+          <div class="border-t border-gray-200 pt-3 flex justify-between">
+            <span class="text-base font-semibold text-gray-900"><%= t('vendors.orders.show.total') %></span>
+            <span class="text-base font-bold text-[#551694]">
+              <%= number_with_delimiter(order_items_scope_for_context(@order).sum(:total_price), delimiter: ' ') %> <%= @order.currency.code %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations de paiement -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.orders.show.payment') %></h2>
+        <% if @order.payments.any? %>
+          <% @order.payments.each do |payment| %>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600"><%= t('vendors.orders.show.method') %></span>
+                <span class="font-medium text-gray-900"><%= payment.payment_method.name %></span>
+              </div>
+              <% if payment.transaction_id %>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600"><%= t('vendors.orders.show.transaction_id') %></span>
+                  <span class="font-medium text-gray-900 font-mono text-xs"><%= payment.transaction_id %></span>
+                </div>
+              <% end %>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600"><%= t('vendors.orders.index.status') %></span>
+                <span class="font-medium text-gray-900"><%= t('vendors.orders.show.paid') %></span>
+              </div>
+              <% if payment.paid_at %>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600"><%= t('vendors.orders.show.date') %></span>
+                  <span class="font-medium text-gray-900"><%= payment.paid_at.strftime("%d/%m/%Y") %></span>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-sm text-gray-500"><%= t('vendors.orders.show.no_payment') %></p>
+        <% end %>
+      </div>
+
+      <!-- Notes -->
+      <% if @order.notes.present? %>
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.orders.show.notes') %></h2>
+          <p class="text-sm text-gray-700 whitespace-pre-line"><%= @order.notes %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+<% elsif @vendor %>
+  <!-- Commande non trouvée -->
+  <div class="text-center py-12">
+    <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <p class="text-gray-500 text-lg font-medium"><%= t('vendors.orders.show.order_not_found') %></p>
+    <p class="text-gray-400 text-sm mt-1"><%= t('vendors.orders.show.order_not_found_message') %></p>
+    <%= link_to t('vendors.orders.show.back_to_orders'), back_to_orders_path, class: "mt-4 inline-block px-6 py-3 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors" %>
+  </div>
+<% else %>
+  <!-- Vendeur non trouvé (branche vendor uniquement) -->
+  <div class="text-center py-12">
+    <p class="text-gray-500 mb-4"><%= t('vendors.orders.show.error_vendor_not_found') %></p>
+    <% if signup_path.present? %>
+      <%= link_to (signup_label || t('vendors.orders.show.signup')), signup_path, class: "inline-block px-6 py-3 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors" %>
+    <% end %>
+  </div>
+<% end %>

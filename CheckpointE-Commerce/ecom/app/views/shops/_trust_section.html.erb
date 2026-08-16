@@ -1,0 +1,32 @@
+<%# Barre de confiance - Compacte, une seule ligne %>
+<% primary_color = local_assigns[:primary_color] || "#551694" %>
+<section class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-10 py-6 px-4 rounded-2xl bg-white border" style="border-color: <%= primary_color %>15;" aria-label="<%= t('shops.trust_label', default: 'Garanties et services') %>">
+  <div class="flex items-center gap-2 text-gray-700">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-blue-50">📦</div>
+    <div>
+      <div class="font-semibold text-gray-900 text-sm">Livraison 24-48h</div>
+      <div class="text-xs text-gray-500">Partout au Sénégal</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 text-gray-700">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-emerald-50">✓</div>
+    <div>
+      <div class="font-semibold text-gray-900 text-sm">98% satisfaits</div>
+      <div class="text-xs text-gray-500">Avis clients</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 text-gray-700">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-amber-50">🔒</div>
+    <div>
+      <div class="font-semibold text-gray-900 text-sm">Paiement sécurisé</div>
+      <div class="text-xs text-gray-500">SSL & PCI DSS</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 text-gray-700">
+    <div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg bg-purple-50">💬</div>
+    <div>
+      <div class="font-semibold text-gray-900 text-sm">Support 24/7</div>
+      <div class="text-xs text-gray-500">Nous sommes là</div>
+    </div>
+  </div>
+</section>

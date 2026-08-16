@@ -1,0 +1,30 @@
+fr:
+  client:
+    carts:
+      show:
+        title: "Mon Panier"
+        item_count:
+          one: "%{count} article"
+          other: "%{count} articles"
+        continue_shopping: "Continuer mes achats"
+        summary: "Résumé de commande"
+        subtotal: "Sous-total"
+        delivery: "Livraison"
+        to_calculate: "Calculée lors du passage de la commande"
+        total: "Total"
+        place_order: "Passer commande"
+        login_to_checkout: "Connectez-vous ou créez un compte pour finaliser votre commande."
+        login: "Se connecter"
+        signup: "Créer un compte"
+        clear_cart: "Vider le panier"
+        clear_cart_confirm: "Êtes-vous sûr de vouloir vider le panier ?"
+        empty_cart_title: "Votre panier est vide"
+        empty_cart_message: "Commencez vos achats dès maintenant !"
+        view_catalog: "Voir le catalogue"
+        remove_item: "Retirer"
+        remove_item_confirm: "Êtes-vous sûr de vouloir retirer cet article ?"
+        unit_price: "Prix unitaire"
+        quantity: "Qté"
+        item_total: "Total"
+        product: "Produit"
+

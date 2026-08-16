@@ -1,0 +1,60 @@
+<%# Promo Banners - 4 bannières promos horizontales avec accessibilité %>
+<% return unless defined?(@promo_banners) && @promo_banners.present? %>
+
+<section class="container mx-auto px-4 lg:px-[50px]" aria-labelledby="promo-banners-heading">
+  <h2 id="promo-banners-heading" class="sr-only"><%= t('storefront.promo_banners.title', default: 'Offres promotionnelles') %></h2>
+
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3.5" role="list">
+    <% @promo_banners.each do |banner| %>
+      <% desktop_image = banner.image.attached? ? banner.image : (banner.image_mobile.attached? ? banner.image_mobile : nil) %>
+      <% mobile_image = banner.image_mobile.attached? ? banner.image_mobile : desktop_image %>
+      <article class="relative h-[140px] sm:h-[180px] lg:h-[215px] rounded-lg overflow-hidden group" role="listitem">
+
+        <%# Image de fond — variantes WebP %>
+        <% if mobile_image.present? %>
+          <%= image_tag webp_variant(mobile_image, max_width: 480, max_height: 360),
+              alt: "",
+              role: "presentation",
+              class: "absolute inset-0 w-full h-full object-cover z-0 md:hidden",
+              loading: "lazy",
+              decoding: "async",
+              width: 300,
+              height: 215 %>
+          <%= image_tag webp_variant(desktop_image, max_width: 600, max_height: 430),
+              alt: "",
+              role: "presentation",
+              class: "absolute inset-0 hidden w-full h-full object-cover z-0 md:block",
+              loading: "lazy",
+              decoding: "async",
+              width: 300,
+              height: 215 %>
+        <% else %>
+          <div class="absolute inset-0 bg-[#f9f9f9] z-0" aria-hidden="true"></div>
+        <% end %>
+
+        <%# Dégradé de lisibilité %>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent z-[1]" aria-hidden="true"></div>
+
+        <%# Image overlay produit (droite) %>
+        <% if banner.overlay_image.attached? %>
+          <div class="absolute right-0 top-2 w-1/2 h-full z-[2]" aria-hidden="true">
+            <%= image_tag webp_variant(banner.overlay_image, max_width: 300, max_height: 360, quality: 75),
+                alt: "",
+                class: "absolute right-0 top-0 h-[100px] sm:h-[140px] lg:h-[180px] object-contain object-right",
+                loading: "lazy",
+                decoding: "async",
+                width: 150,
+                height: 180 %>
+          </div>
+        <% end %>
+
+        <%# Lien transparent couvrant toute la carte (stretched link) %>
+        <%= link_to "", banner.cta_link,
+            class: "absolute inset-0 z-[3] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#551694]",
+            "aria-label": "#{banner.title} – #{banner.cta_text}" %>
+
+
+      </article>
+    <% end %>
+  </div>
+</section>

@@ -1,0 +1,62 @@
+<%# Tendances du moment - Les nouveautés avec accessibilité %>
+<%
+  groups = defined?(@trending_groups) ? @trending_groups : []
+  groups = groups.to_a if groups.respond_to?(:to_a)
+  groups = groups.first(4)
+
+  # Optimisé : utiliser select Ruby au lieu de SQL query
+  ready_groups = groups.select do |group|
+    group.home_page_section_group_items.any? { |item| item.is_active? }
+  end
+%>
+
+<% return unless ready_groups.any? %>
+
+<section class="bg-[rgba(75,86,117,0.09)] py-8 md:py-12" aria-labelledby="trending-heading">
+  <div class="container mx-auto px-4 lg:px-[50px]">
+    <!-- Section Header -->
+    <header class="mb-6">
+      <h2 id="trending-heading" class="text-xl md:text-2xl font-semibold text-[#362526]">
+        <%= t('storefront.trending.title', default: 'Tendances du moment - Les nouveautés') %>
+      </h2>
+    </header>
+
+    <!-- Grid 4 colonnes de cartes catégories -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3" role="list">
+      <% ready_groups.first(4).each do |group| %>
+        <% # Optimisé : filtrer en Ruby plutôt qu'en SQL pour utiliser l'eager loading %>
+        <% group_items = group.home_page_section_group_items
+                              .select(&:is_active?)
+                              .sort_by(&:position)
+                              .first(4) %>
+        <article class="bg-white rounded-lg p-2.5" role="listitem">
+          <!-- Grille 2x2 d'images avec titres individuels -->
+          <div class="grid grid-cols-2 gap-3">
+            <% group_items.each do |item| %>
+              <div class="flex flex-col">
+                <%= link_to item.link,
+                    class: "block focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-offset-2 rounded-[10px]",
+                    "aria-label": t('storefront.trending.view_category', category: item.title, default: "Voir #{item.title}") do %>
+                  <div class="rounded-[10px] aspect-square overflow-hidden flex items-center justify-center">
+                    <%= storage_image_tag(item.image, variant_name: :card, alt: item.title,
+                        class: "w-full h-full object-cover",
+                        width: 400,
+                        height: 400) %>
+                  </div>
+                <% end %>
+                <!-- Titre de l'item -->
+                <div class="mt-2 text-center">
+                  <%= link_to item.link,
+                      class: "text-[11px] text-[#464e5f] hover:text-[#551694] transition-colors focus:outline-none focus:ring-2 focus:ring-[#551694] rounded block",
+                      "aria-label": t('storefront.trending.view_category', category: item.title, default: "Voir #{item.title}") do %>
+                    <%= item.title %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  </div>
+</section>

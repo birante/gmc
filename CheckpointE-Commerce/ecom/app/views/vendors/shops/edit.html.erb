@@ -1,0 +1,612 @@
+<% content_for :active_tab, 'parametres' %>
+<!-- Container principal -->
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <% if @vendor && @shop %>
+      <!-- En-tête -->
+      <div class="mb-6">
+        <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+          <%= t('vendors.shops.edit.title') %>
+        </h1>
+        <p class="text-sm text-gray-500 mt-1">
+          <%= t('vendors.shops.edit.subtitle') %>
+        </p>
+      </div>
+      <!-- Carte récapitulative de la boutique -->
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div class="flex items-center gap-4 min-w-0">
+            <!-- Logo de la boutique -->
+            <div class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0" id="logo-summary">
+              <% if @shop.logo&.attached? && @shop.logo.blob&.persisted? %>
+                <%= image_tag url_for(@shop.logo), alt: @shop.name, class: "w-full h-full object-cover" %>
+              <% else %>
+                <%= image_tag "logo-mini.png", alt: @shop.name, class: "w-full h-full object-cover" %>
+              <% end %>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-3 mb-2 flex-wrap">
+                <h2 class="text-xl font-semibold text-gray-900 truncate"><%= @shop.name %></h2>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium <%= @shop.active? ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800' %>">
+                  <%= @shop.active? ? '●' : '○' %> <%= @shop.status&.humanize || 'Non défini' %>
+                </span>
+              </div>
+              <p class="text-sm text-gray-600 mb-2"><%= @shop.description || "Aucune description" %></p>
+              <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                <span><%= t('vendors.shops.edit.categories') %>: <strong><%= @shop.items.joins(:product_sub_category).select("DISTINCT product_sub_categories.product_category_id").count %></strong></span>
+                <span><%= t('vendors.shops.edit.subcategories') %>: <strong><%= @shop.items.joins(:product_sub_category).select("DISTINCT product_sub_categories.id").count %></strong></span>
+                <span><%= t('vendors.shops.edit.products') %>: <strong><%= @shop.items_count %></strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Mes collaborateurs -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-sm text-gray-600 mb-3"><%= t('vendors.shops.edit.my_collaborators') %></p>
+          <div class="flex -space-x-2">
+            <div class="h-10 w-10 rounded-full bg-[#551694] flex items-center justify-center text-white font-semibold border-2 border-white">
+              <%= @vendor.first_name&.first&.upcase || 'V' %>
+            </div>
+            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-semibold border-2 border-white">
+              +0
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Section Offres et Mise à niveau - Séparée pour plus de visibilité -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex items-center gap-3 mb-4">
+          <h2 class="text-xl font-bold text-gray-900">Offres et Mise à niveau</h2>
+        </div>
+        <% if @shop.current_subscription %>
+          <div class="bg-gradient-to-br from-purple-50 to-[#551694]/5 rounded-lg p-6 border border-purple-200">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <h3 class="text-lg font-semibold text-gray-900">Votre offre actuelle</h3>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    ● Actif
+                  </span>
+                </div>
+                <div class="mb-3">
+                  <span class="text-3xl font-bold text-[#551694]"><%= @shop.current_subscription.plan.name %></span>
+                </div>
+                <p class="text-sm text-gray-700 mb-3"><%= @shop.current_subscription.plan.description %></p>
+                <% if @shop.current_subscription.ends_at %>
+                  <p class="text-xs text-gray-600">
+                    <span class="font-medium">Valide jusqu'au :</span> <%= l(@shop.current_subscription.ends_at, format: :long) %>
+                  </p>
+                <% end %>
+              </div>
+              <div class="flex-shrink-0">
+                <%= link_to new_vendors_plan_path(shop_slug: @shop.slug, upgrade: true), 
+                    class: "inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#551694] to-[#7c1fc4] text-white rounded-lg hover:from-[#451384] hover:to-[#6a1fa8] transition-all font-medium shadow-md hover:shadow-lg" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                  </svg>
+                  Mettre à niveau
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <div class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-6">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-3">
+                  <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                  </svg>
+                  <h3 class="text-lg font-semibold text-yellow-900">Aucune offre active</h3>
+                </div>
+                <p class="text-sm text-yellow-800 mb-2">Vous devez sélectionner une offre pour accéder à toutes les fonctionnalités de aa.</p>
+                <p class="text-xs text-yellow-700">Choisissez un plan adapté à vos besoins pour commencer à vendre en ligne.</p>
+              </div>
+              <div class="flex-shrink-0">
+                <%= link_to new_vendors_plan_path(shop_slug: @shop.slug), 
+                    class: "inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#551694] to-[#7c1fc4] text-white rounded-lg hover:from-[#451384] hover:to-[#6a1fa8] transition-all font-medium shadow-md hover:shadow-lg" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Choisir une offre
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <!-- Résumé des fonctionnalités et limites du plan -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Fonctionnalités incluses -->
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Fonctionnalités incluses</h3>
+              <ul class="space-y-2 text-sm">
+                <li class="flex items-center justify-between">
+                  <span class="text-gray-700">Analytics</span>
+                  <% if analytics_enabled?(@shop) %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Activée</span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Désactivée</span>
+                  <% end %>
+                </li>
+                <li class="flex items-center justify-between">
+                  <span class="text-gray-700">Collaborateurs</span>
+                  <% if multi_users_enabled?(@shop) %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Activée</span>
+                  <% else %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Désactivée</span>
+                  <% end %>
+                </li>
+              </ul>
+            </div>
+            <!-- Limites d'utilisation -->
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <h3 class="text-sm font-semibold text-gray-900 mb-3">Limites d'utilisation</h3>
+              <% current_products = @shop.items_count %>
+              <% max_products = max_products_for(@shop) %>
+              <% products_pct = max_products.present? ? usage_percentage(current_products, max_products) : 0 %>
+              <div class="mb-4">
+                <div class="flex items-center justify-between text-sm mb-1">
+                  <span class="text-gray-700">Produits</span>
+                  <span class="text-gray-600"><%= format_limit(max_products, current_products) %></span>
+                </div>
+                <% if max_products.present? %>
+                  <div class="w-full h-2 bg-gray-200 rounded">
+                    <div class="h-2 rounded <%= products_pct >= 95 ? 'bg-red-500' : products_pct >= 80 ? 'bg-yellow-500' : 'bg-green-500' %>" style="width: <%= products_pct %>%"></div>
+                  </div>
+                <% else %>
+                  <p class="text-xs text-gray-500">Illimité</p>
+                <% end %>
+              </div>
+              <% current_employees = @shop.employees.active.count %>
+              <% max_employees = max_employees_for(@shop) %>
+              <% employees_pct = max_employees.present? ? usage_percentage(current_employees, max_employees) : 0 %>
+              <div>
+                <div class="flex items-center justify-between text-sm mb-1">
+                  <span class="text-gray-700">Employés</span>
+                  <span class="text-gray-600"><%= format_limit(max_employees, current_employees) %></span>
+                </div>
+                <% if max_employees.present? %>
+                  <div class="w-full h-2 bg-gray-200 rounded">
+                    <div class="h-2 rounded <%= employees_pct >= 95 ? 'bg-red-500' : employees_pct >= 80 ? 'bg-yellow-500' : 'bg-green-500' %>" style="width: <%= employees_pct %>%"></div>
+                  </div>
+                <% else %>
+                  <p class="text-xs text-gray-500">Illimité</p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <% needs_upgrade_hint = (!multi_users_enabled?(@shop) || (max_products_for(@shop).present? && near_limit?(current_products, max_products_for(@shop))) || (max_employees_for(@shop).present? && near_limit?(current_employees, max_employees_for(@shop)))) %>
+          <% if needs_upgrade_hint %>
+            <div class="mt-4 p-4 border border-purple-200 bg-purple-50 rounded-lg text-sm text-purple-900 flex items-start gap-3">
+              <svg class="w-5 h-5 mt-0.5 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+              </svg>
+              <p>
+                Débloquez plus de fonctionnalités ou augmentez vos limites en mettant à niveau votre offre.
+                <%= link_to 'Voir les offres', new_vendors_plan_path(shop_slug: @shop.slug, upgrade: true), class: 'underline font-medium hover:text-purple-700' %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <!-- Formulaire de modification -->
+      <%= form_with model: [:vendors, @shop], url: url_for(controller: 'vendors/shops', action: :update, id: @shop, locale: I18n.locale), method: :patch, local: true, html: { multipart: true }, data: { controller: "tabs" } do |f| %>
+        <!-- Onglets -->
+        <div class="bg-white rounded-lg shadow mb-6">
+          <div class="px-4 md:px-6 py-4">
+            <div class="flex gap-6 overflow-x-auto scrollbar-hide">
+              <button type="button" data-tabs-target="tab" data-index="0" data-action="click->tabs#select" class="flex items-center gap-2 pb-3 border-b-2 border-[#551694] text-gray-900 font-medium whitespace-nowrap flex-shrink-0">
+                <span class="text-sm"><%= t('vendors.shops.edit.general_settings') %></span>
+              </button>
+              <button type="button" data-tabs-target="tab" data-index="1" data-action="click->tabs#select" class="flex items-center gap-2 pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap flex-shrink-0">
+                <span class="text-sm"><%= t('vendors.shops.edit.payments_deliveries') %></span>
+              </button>
+              <button type="button" data-tabs-target="tab" data-index="2" data-action="click->tabs#select" class="flex items-center gap-2 pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 whitespace-nowrap flex-shrink-0">
+                <span class="text-sm"><%= t('vendors.shops.edit.social_networks') %></span>
+              </button>
+            </div>
+          </div>
+          <!-- Messages d'erreur -->
+          <% if @shop.errors.any? %>
+            <div class="mx-4 md:mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+              <p class="font-semibold mb-2"><%= t('vendors.shops.edit.validation_errors') %></p>
+              <ul class="list-disc list-inside">
+                <% @shop.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <!-- Panel 1 : Paramètres généraux -->
+          <div data-tabs-target="panel" class="p-4 md:p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.shops.edit.general_settings') %></h3>
+            <!-- Nom de la boutique -->
+            <div class="mb-6">
+              <%= f.label :name, t('vendors.shops.edit.shop_name'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.text_field :name, class: "block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+            </div>
+            <!-- Description -->
+            <div class="mb-6">
+              <%= f.label :description, t('vendors.shops.edit.description'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= f.text_area :description, rows: 3, class: "block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+            </div>
+            <!-- Adresse -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Adresse</label>
+              <%= f.text_field :address, class: "block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+            </div>
+            <!-- Logo -->
+            <div class="mb-6" id="logo-section" data-controller="logo-uploader">
+              <label class="block text-sm font-medium text-gray-700 mb-2"><%= t('vendors.shops.edit.logo') %></label>
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0 border border-gray-200">
+                  <% if @shop.logo&.attached? && @shop.logo.blob&.persisted? %>
+                    <img data-logo-uploader-target="previewImg" src="<%= url_for(@shop.logo) %>" alt="Logo" class="w-full h-full object-cover" />
+                  <% else %>
+                    <img data-logo-uploader-target="previewImg" alt="Logo" class="w-full h-full object-cover hidden" />
+                    <div data-logo-uploader-target="placeholder" class="flex flex-col items-center justify-center text-gray-400 select-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mb-1" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V7.414A2 2 0 0017.414 6L14 2.586A2 2 0 0012.586 2H4z" />
+                      </svg>
+                      <span class="text-xs">Aucun logo</span>
+                    </div>
+                  <% end %>
+                </div>
+                <div class="flex-1">
+                  <div
+                    data-logo-uploader-target="dropzone"
+                    data-action="dragover->logo-uploader#onDragOver dragleave->logo-uploader#onDragLeave drop->logo-uploader#onDrop click->logo-uploader#choose"
+                    class="w-full p-3 border-2 border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:border-[#551694] hover:bg-purple-50/40 cursor-pointer transition-colors">
+                    <span class="font-medium text-[#551694]">Glissez-déposez</span> ou cliquez pour choisir une image.
+                    <div class="text-xs text-gray-500 mt-1">PNG/JPG/WEBP, max 2 Mo. Idéal ≥ 256×256.</div>
+                  </div>
+                  <%= f.file_field :logo, direct_upload: true, class: "hidden", data: { logo_uploader_target: "fileInput", action: "change->logo-uploader#onFileChange" }, accept: "image/png,image/jpeg,image/webp" %>
+                </div>
+              </div>
+            </div>
+            <!-- Couleurs de la boutique -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Couleurs de la boutique</label>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                  <%= f.label :primary_color, "Couleur primaire", class: "block text-xs text-gray-600 mb-1" %>
+                  <div class="flex items-center gap-2">
+                    <%= f.color_field :primary_color, value: @shop.primary_color.presence || "#551694", class: "w-16 h-10 rounded border border-gray-300 cursor-pointer" %>
+                    <%= f.text_field :primary_color, placeholder: "#551694", class: "flex-1 bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">Couleur principale utilisée pour le thème</p>
+                </div>
+                <div>
+                  <%= f.label :secondary_color, "Couleur secondaire", class: "block text-xs text-gray-600 mb-1" %>
+                  <div class="flex items-center gap-2">
+                    <%= f.color_field :secondary_color, value: @shop.secondary_color.presence || "#7c1fc4", class: "w-16 h-10 rounded border border-gray-300 cursor-pointer" %>
+                    <%= f.text_field :secondary_color, placeholder: "#7c1fc4", class: "flex-1 bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">Couleur secondaire utilisée pour les dégradés</p>
+                </div>
+              </div>
+            </div>
+            <!-- URL de la boutique -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2"><%= t('vendors.shops.edit.shop_url') %></label>
+              <div class="relative">
+                <input type="text" value="<%= root_url %>shop/<%= @shop.slug %>" readonly class="block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-500 pr-20" />
+                <button type="button" class="absolute right-2 top-1.5 px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 transition-colors" onclick="navigator.clipboard.writeText('<%= root_url %>shop/<%= @shop.slug %>').then(() => alert('<%= t('vendors.shops.edit.copy') %>'))">
+                  <%= t('vendors.shops.edit.copy') %>
+                </button>
+              </div>
+            </div>
+            <!-- Secteurs d'activité -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 mb-2"><%= t('vendors.shops.edit.activity_sectors') %></label>
+              <div class="flex flex-wrap gap-2">
+                <% @shop.sectors.each do |sector| %>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-[#551694] text-white">
+                    <%= sector.name %>
+                    <button type="button" class="ml-2 text-white hover:text-gray-200" onclick="this.parentElement.remove()">
+                      ×
+                    </button>
+                  </span>
+                <% end %>
+              </div>
+              <p class="text-xs text-gray-500 mt-2"><%= t('vendors.shops.edit.manage_sectors') %></p>
+            </div>
+            <hr class="my-6 border-gray-200" />
+            <h3 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.shops.edit.contact') %></h3>
+            <!-- Contacts -->
+            <%= f.fields_for :contacts do |contact_f| %>
+              <div class="grid md:grid-cols-2 gap-6 mb-4">
+                <%= render "shared/phone_field", form: contact_f, label_text: t('vendors.shops.edit.phone_number'), required: false %>
+              </div>
+              <div class="mb-6">
+                <%= contact_f.label :is_whatsapp, class: "flex items-center gap-2" do %>
+                  <%= contact_f.check_box :is_whatsapp, class: "w-4 h-4 text-[#551694] border-gray-300 rounded focus:ring-[#551694]" %>
+                  <span class="text-sm text-gray-700"><%= t('vendors.shops.edit.whatsapp_available') %></span>
+                <% end %>
+              </div>
+            <% end %>
+            <hr class="my-6 border-gray-200" />
+            <h3 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.shops.edit.legal_info') %></h3>
+            <%= f.fields_for :legal_info do |legal_f| %>
+              <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                  <%= legal_f.label :legal_form, t('vendors.shops.edit.legal_form'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= legal_f.text_field :legal_form, class: "block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                </div>
+                <div>
+                  <%= legal_f.label :rc_number, t('vendors.shops.edit.rc_number'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= legal_f.text_field :rc_number, class: "block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                </div>
+                <div>
+                  <%= legal_f.label :ninea_number, t('vendors.shops.edit.ninea_number'), class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= legal_f.text_field :ninea_number, class: "block w-full bg-gray-50 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                </div>
+              </div>
+            <% end %>
+            <hr class="my-6 border-gray-200" />
+            <!-- Bannières de la boutique -->
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Bannières</h3>
+            <div class="space-y-4" data-controller="nested-form">
+              <%= f.fields_for :shop_banners do |banner_f| %>
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200" data-nested-form-target="item">
+                  <%= banner_f.hidden_field :id if banner_f.object.persisted? %>
+                  <%= banner_f.hidden_field :_destroy, data: { nested_form_target: "destroyInput" } %>
+                  <div class="flex items-start justify-between mb-4">
+                    <h4 class="text-sm font-semibold text-gray-900">Bannière #<%= banner_f.object.persisted? ? banner_f.object.position : (banner_f.options[:child_index] + 1) %></h4>
+                    <button type="button" data-action="click->nested-form#remove" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                      Supprimer
+                    </button>
+                  </div>
+                  <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <%= banner_f.label :title, "Titre", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                      <%= banner_f.text_field :title, class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                    </div>
+                    <div>
+                      <%= banner_f.label :position, "Position", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                      <%= banner_f.number_field :position, min: 0, class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    <%= banner_f.label :cta_text, "Texte du bouton CTA", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                    <%= banner_f.text_field :cta_text, placeholder: "Ex: Découvrir", class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                  </div>
+                  <div class="mb-4" data-controller="cta-link-selector" 
+                       data-cta-link-selector-locale-value="<%= I18n.locale %>"
+                       data-cta-link-selector-categories-value='<%= @categories_json %>'
+                       data-cta-link-selector-items-value='<%= @items_json %>'>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Lien du bouton CTA</label>
+                    <!-- Type de lien -->
+                    <div class="mb-3">
+                      <select data-cta-link-selector-target="linkType" 
+                              data-action="change->cta-link-selector#linkTypeChanged"
+                        class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                        <option value="">-- Sélectionner un type de lien --</option>
+                        <option value="custom">Lien personnalisé</option>
+                        <option value="category">Catégorie</option>
+                        <option value="sub_category">Sous-catégorie</option>
+                        <option value="item">Produit</option>
+                      </select>
+                    </div>
+                    <!-- Sélecteur de catégorie (pour catégorie et sous-catégorie) -->
+                    <div class="mb-3 hidden" data-cta-link-selector-target="categorySelect">
+                      <label class="block text-xs text-gray-600 mb-1">Catégorie</label>
+                      <select data-cta-link-selector-target="categorySelect" 
+                              data-action="change->cta-link-selector#categoryChanged"
+                        class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                        <option value="">-- Sélectionner une catégorie --</option>
+                        <% @product_categories.each do |category| %>
+                          <option value="<%= category.id %>"><%= category.name %></option>
+                        <% end %>
+                      </select>
+                    </div>
+                    <!-- Sélecteur de sous-catégorie -->
+                    <div class="mb-3 hidden" data-cta-link-selector-target="subCategorySelect">
+                      <label class="block text-xs text-gray-600 mb-1">Sous-catégorie</label>
+                      <select data-cta-link-selector-target="subCategorySelect" 
+                              data-action="change->cta-link-selector#subCategoryChanged"
+                        class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                        <option value="">-- Sélectionner une sous-catégorie --</option>
+                      </select>
+                    </div>
+                    <!-- Sélecteur de produit -->
+                    <div class="mb-3 hidden" data-cta-link-selector-target="itemSelect">
+                      <label class="block text-xs text-gray-600 mb-1">Produit</label>
+                      <select data-cta-link-selector-target="itemSelect" 
+                              data-action="change->cta-link-selector#itemChanged"
+                        class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                        <option value="">-- Sélectionner un produit --</option>
+                        <% @shop_items&.each do |item| %>
+                          <option value="<%= item.id %>"><%= item.name %></option>
+                        <% end %>
+                      </select>
+                    </div>
+                    <!-- Champ de lien (généré automatiquement ou saisie manuelle) -->
+                    <%= banner_f.text_field :cta_link, placeholder: "Ex: /fr/categories/electronique", 
+                        data: { cta_link_selector_target: "linkInput" },
+                        class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                    <p class="text-xs text-gray-500 mt-1">Le lien sera généré automatiquement selon votre sélection, ou vous pouvez le saisir manuellement</p>
+                  </div>
+                  <div class="mb-4">
+                    <%= banner_f.label :image, "Image de la bannière", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                    <% if banner_f.object.image.attached? %>
+                      <div class="mb-2">
+                        <%= image_tag url_for(banner_f.object.image), alt: "Bannière", class: "max-w-full h-32 object-cover rounded border border-gray-200" %>
+                      </div>
+                    <% end %>
+                    <%= banner_f.file_field :image, direct_upload: true, accept: "image/png,image/jpeg,image/webp", class: "block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#551694] file:text-white hover:file:bg-[#451384]" %>
+                    <p class="text-xs text-gray-500 mt-1">Format recommandé: 1920x600px (ratio 16:5)</p>
+                  </div>
+                </div>
+              <% end %>
+              <template data-nested-form-target="template">
+                <%= f.fields_for :shop_banners, @shop.shop_banners.build, child_index: "NEW_RECORD" do |banner_f| %>
+                  <div class="p-4 bg-gray-50 rounded-lg border border-gray-200" data-nested-form-target="item">
+                    <%= banner_f.hidden_field :id %>
+                    <%= banner_f.hidden_field :_destroy, data: { nested_form_target: "destroyInput" } %>
+                    <div class="flex items-start justify-between mb-4">
+                      <h4 class="text-sm font-semibold text-gray-900">Nouvelle bannière</h4>
+                      <button type="button" data-action="click->nested-form#remove" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                        Supprimer
+                      </button>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <%= banner_f.label :title, "Titre", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                        <%= banner_f.text_field :title, class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                      </div>
+                      <div>
+                        <%= banner_f.label :position, "Position", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                        <%= banner_f.number_field :position, min: 0, class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                      </div>
+                    </div>
+                    <div class="mb-4">
+                      <%= banner_f.label :cta_text, "Texte du bouton CTA", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                      <%= banner_f.text_field :cta_text, placeholder: "Ex: Découvrir", class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                    </div>
+                    <div class="mb-4" data-controller="cta-link-selector" 
+                         data-cta-link-selector-locale-value="<%= I18n.locale %>"
+                         data-cta-link-selector-categories-value='<%= @categories_json %>'
+                         data-cta-link-selector-items-value='<%= @items_json %>'>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Lien du bouton CTA</label>
+                      <!-- Type de lien -->
+                      <div class="mb-3">
+                        <select data-cta-link-selector-target="linkType" 
+                                data-action="change->cta-link-selector#linkTypeChanged"
+                          class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                          <option value="">-- Sélectionner un type de lien --</option>
+                          <option value="custom">Lien personnalisé</option>
+                          <option value="category">Catégorie</option>
+                          <option value="sub_category">Sous-catégorie</option>
+                          <option value="item">Produit</option>
+                        </select>
+                      </div>
+                      <!-- Sélecteur de catégorie (pour catégorie et sous-catégorie) -->
+                      <div class="mb-3 hidden" data-cta-link-selector-target="categorySelect">
+                        <label class="block text-xs text-gray-600 mb-1">Catégorie</label>
+                        <select data-cta-link-selector-target="categorySelect" 
+                                data-action="change->cta-link-selector#categoryChanged"
+                          class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                          <option value="">-- Sélectionner une catégorie --</option>
+                          <% @product_categories.each do |category| %>
+                            <option value="<%= category.id %>"><%= category.name %></option>
+                          <% end %>
+                        </select>
+                      </div>
+                      <!-- Sélecteur de sous-catégorie -->
+                      <div class="mb-3 hidden" data-cta-link-selector-target="subCategorySelect">
+                        <label class="block text-xs text-gray-600 mb-1">Sous-catégorie</label>
+                        <select data-cta-link-selector-target="subCategorySelect" 
+                                data-action="change->cta-link-selector#subCategoryChanged"
+                          class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                          <option value="">-- Sélectionner une sous-catégorie --</option>
+                        </select>
+                      </div>
+                      <!-- Sélecteur de produit -->
+                      <div class="mb-3 hidden" data-cta-link-selector-target="itemSelect">
+                        <label class="block text-xs text-gray-600 mb-1">Produit</label>
+                        <select data-cta-link-selector-target="itemSelect" 
+                                data-action="change->cta-link-selector#itemChanged"
+                          class="block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]">
+                          <option value="">-- Sélectionner un produit --</option>
+                          <% @shop_items&.each do |item| %>
+                            <option value="<%= item.id %>"><%= item.name %></option>
+                          <% end %>
+                        </select>
+                      </div>
+                      <!-- Champ de lien (généré automatiquement ou saisie manuelle) -->
+                      <%= banner_f.text_field :cta_link, placeholder: "Ex: /fr/categories/electronique", 
+                          data: { cta_link_selector_target: "linkInput" },
+                          class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                      <p class="text-xs text-gray-500 mt-1">Le lien sera généré automatiquement selon votre sélection, ou vous pouvez le saisir manuellement</p>
+                    </div>
+                    <div class="mb-4">
+                      <%= banner_f.label :image, "Image de la bannière", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                      <%= banner_f.file_field :image, direct_upload: true, accept: "image/png,image/jpeg,image/webp", class: "block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#551694] file:text-white hover:file:bg-[#451384]" %>
+                      <p class="text-xs text-gray-500 mt-1">Format recommandé: 1920x600px (ratio 16:5)</p>
+                    </div>
+                  </div>
+                <% end %>
+              </template>
+              <button type="button" data-action="click->nested-form#add" class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium">
+                + Ajouter une bannière
+              </button>
+            </div>
+          </div>
+          <!-- Panel 2 : Paiements et livraisons -->
+          <div data-tabs-target="panel" class="hidden p-4 md:p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.shops.edit.authorized_payment_methods') %></h3>
+            <div class="space-y-3">
+              <% @payment_methods.each do |payment_method| %>
+                <% existing_payment = @shop.shop_payment_methods.find_by(payment_method_id: payment_method.id) || @shop.shop_payment_methods.build(payment_method_id: payment_method.id) %>
+                <%= f.fields_for :shop_payment_methods, existing_payment do |payment_f| %>
+                  <%= payment_f.hidden_field :payment_method_id %>
+                  <%= payment_f.hidden_field :id if existing_payment.persisted? %>
+                  <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div class="flex items-center gap-3">
+                      <%= payment_f.check_box :is_active, { class: "w-4 h-4 text-[#551694] border-gray-300 rounded focus:ring-[#551694]", checked: existing_payment.is_active } %>
+                      <div>
+                        <p class="font-medium text-gray-900"><%= payment_method.name %></p>
+                        <p class="text-xs text-gray-500"><%= payment_method.code.upcase %> - <%= payment_method.provider %></p>
+                      </div>
+                    </div>
+                    <span class="text-xs font-medium <%= existing_payment.is_active? ? 'text-[#551694]' : 'text-gray-400' %>">
+                      <%= existing_payment.is_active? ? t('vendors.shops.edit.enabled') : t('vendors.shops.edit.disabled') %>
+                    </span>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+            <p class="text-xs text-gray-500 mt-4"><%= t('vendors.shops.edit.select_payment_methods') %></p>
+          </div>
+          <!-- Panel 3 : Réseaux sociaux -->
+          <div data-tabs-target="panel" class="hidden p-4 md:p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4"><%= t('vendors.shops.edit.social_networks_title') %></h3>
+            <div class="space-y-4">
+              <%= f.fields_for :social_links do |social_f| %>
+                <%= social_f.hidden_field :social_platform_id %>
+                <%= social_f.hidden_field :id if social_f.object.persisted? %>
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div class="flex items-center gap-3 flex-1">
+                    <div class="w-10 h-10 bg-[#551694] rounded-lg flex items-center justify-center">
+                      <span class="text-white font-semibold"><%= social_f.object.social_platform&.name&.first&.upcase || 'S' %></span>
+                    </div>
+                    <div class="flex-1">
+                      <label class="block text-sm font-medium text-gray-900 mb-1"><%= social_f.object.social_platform&.name || t('vendors.shops.edit.platform') %></label>
+                      <%= social_f.text_field :url, placeholder: t('vendors.shops.edit.social_url_placeholder'), class: "block w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#551694] focus:border-[#551694]" %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            <p class="text-xs text-gray-500 mt-4"><%= t('vendors.shops.edit.add_social_links') %></p>
+          </div>
+          <!-- Bouton de sauvegarde -->
+          <div class="px-4 md:px-6 py-4 border-t bg-gray-50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <%= link_to t('vendors.shops.edit.cancel'), vendors_dashboard_path, class: "w-full sm:w-auto text-center px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors font-medium" %>
+            <%= f.submit t('vendors.shops.edit.save_changes'), class: "w-full sm:w-auto px-6 py-2 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors font-medium cursor-pointer" %>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <!-- État d'erreur si pas de vendeur -->
+      <div class="text-center py-12">
+        <p class="text-gray-500 mb-4"><%= t('vendors.shops.edit.error_vendor_shop_not_found') %></p>
+        <%= link_to t('vendors.shops.edit.back_to_dashboard'), vendors_dashboard_path, class: "inline-block px-6 py-3 bg-[#551694] text-white rounded-md hover:bg-[#451384] transition-colors" %>
+      </div>
+    <% end %>
+  </main>
+  <!-- Footer -->
+  <%= render "vendors/shared/footer" %>
+</div>
+<style>
+  /* Masquer la scrollbar des onglets */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

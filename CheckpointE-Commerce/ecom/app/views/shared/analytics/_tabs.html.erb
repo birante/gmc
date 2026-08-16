@@ -1,0 +1,18 @@
+<%# Partial partagé : navigation par onglets analytics (vendor + employees) %>
+<%# Locals : active_tab (String), tab_url (Proc qui prend le slug d'onglet) %>
+
+<div class="border-b border-gray-200 mb-6 overflow-x-auto scrollbar-hide">
+  <nav class="-mb-px flex space-x-6 min-w-max">
+    <% [
+         [ "overview", "Vue d'ensemble" ],
+         [ "products", "Produits" ],
+         [ "orders",   "Commandes" ],
+         [ "traffic",  "Trafic" ]
+       ].each do |tab, label| %>
+      <%= link_to tab_url.call(tab),
+          class: "#{active_tab == tab ? 'border-[#551694] text-[#551694]' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm" do %>
+        <%= label %>
+      <% end %>
+    <% end %>
+  </nav>
+</div>

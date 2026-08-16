@@ -1,0 +1,43 @@
+fr:
+  services:
+    items:
+      create_item:
+        limit_reached: "Limite de produits atteinte"
+        limit_reached_with_max: "Limite de %{max} produits atteinte. Vous avez actuellement %{current} produits."
+        limit_reached_unlimited: "Impossible de créer le produit"
+        creation_failed: "Échec de la création du produit"
+        product_created: "Produit créé avec succès"
+    vendors:
+      item_creation:
+        limit_reached: "Limite de produits atteinte"
+        limit_reached_with_max: "Limite de produits atteinte. Maximum: %{max}"
+        limit_reached_unlimited: "Limite de produits atteinte. Maximum: illimité"
+        creation_failed: "Échec de la création du produit"
+        product_created: "Produit créé avec succès"
+        product_created_and_published: "Produit créé et publié avec succès"
+    employees:
+      limit_reached: "Limite de collaborateurs atteinte"
+      limit_reached_with_max: "Limite de %{max} collaborateurs atteinte pour la boutique \"%{shop_name}\". Vous avez actuellement %{current} collaborateur(s)."
+      limit_reached_unlimited: "Impossible d'ajouter un collaborateur"
+    orders:
+      order_management_disabled: "La gestion des commandes n'est pas activée pour votre plan. Veuillez mettre à niveau votre abonnement."
+    rules:
+      limit_reached: "Limite atteinte"
+      unlimited: "illimité"
+    errors:
+      limit_reached: "Limite atteinte"
+      creation_failed: "Échec de la création"
+      update_failed: "Échec de la mise à jour"
+      deletion_failed: "Échec de la suppression"
+      validation_failed: "Échec de la validation"
+  vendors:
+    items:
+      shop_required: "Boutique requise"
+      product_created_success: "Produit créé avec succès avec %{count} variante(s) !"
+      product_created_no_variant: "Produit créé mais aucune variante. Veuillez vérifier les prix et le stock."
+      product_updated_success: "Produit modifié avec succès. Il repasse en attente de validation par aa."
+      variants_generated: "%{count} variante(s) générée(s) avec succès!"
+      ai_preview_unavailable: "Preview IA non disponible pour cette boutique"
+      ai_enrichment_relaunched: "Enrichissement IA relancé avec succès!"
+      updated: "Produit modifié avec succès"
+

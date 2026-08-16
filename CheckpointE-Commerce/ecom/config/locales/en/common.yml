@@ -1,0 +1,16 @@
+en:
+  common:
+    confirm: "Are you sure?"
+    save: "Save"
+    cancel: "Cancel"
+    delete: "Delete"
+    edit: "Edit"
+    back: "Back"
+    loading: "Loading..."
+    select_country: "Select a country"
+    search_countries: "Search for countries"
+    errors:
+      one: "%{count} error"
+      other: "%{count} errors"
+    logout_confirm: "Are you sure you want to log out?"
+

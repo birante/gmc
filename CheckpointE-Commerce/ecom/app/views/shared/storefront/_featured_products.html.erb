@@ -1,0 +1,109 @@
+<%# Featured Products - Produits en vedette avec sidebar bannière %>
+<%
+  # Utiliser les produits passés ou charger des produits disponibles
+  featured_items = local_assigns[:featured_items] || Item.available_for_sale.includes(:variants, :currency, :shop).limit(12)
+%>
+
+<div class="container mx-auto px-4 lg:px-[50px] py-8">
+  <!-- Section Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl md:text-3xl font-bold text-gray-900">
+      Produits en vedette ⭐
+    </h2>
+    <%= link_to items_path, class: "text-[#551694] font-semibold text-sm hover:underline inline-flex items-center gap-1" do %>
+      Voir tout
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+      </svg>
+    <% end %>
+  </div>
+
+  <!-- Layout: Products Grid + Sidebar Banner -->
+  <div class="flex gap-6">
+    <!-- Products Grid -->
+    <div class="flex-1">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <% featured_items.each do |item| %>
+          <% variant = item.variants.first %>
+          <div class="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow group">
+            <%= link_to item_path(item), class: "block" do %>
+              <!-- Product Image -->
+              <div class="relative h-[160px] bg-gray-50 flex items-center justify-center overflow-hidden">
+                <% if item.has_image? %>
+                  <%= storage_image_tag(item.display_image,
+                      variant_name: :card,
+                      alt: item.name,
+                      class: "w-full h-full object-contain p-2",
+                      width: 400,
+                      height: 400) %>
+                <% else %>
+                  <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                <% end %>
+              </div>
+              
+              <!-- Product Info -->
+              <div class="p-3">
+                <h3 class="text-sm font-medium text-gray-900 line-clamp-2 mb-2 group-hover:text-[#551694] transition-colors min-h-[40px]">
+                  <%= item.name %>
+                </h3>
+                
+                <!-- Price -->
+                <div class="text-base font-bold text-[#551694]">
+                  <% if variant %>
+                    <%= number_to_currency(current_price_for(variant), unit: item.currency&.symbol || "FCFA", precision: 0) %>
+                  <% else %>
+                    N/A
+                  <% end %>
+                </div>
+                
+                <!-- Stock status -->
+                <% if variant && variant.stock_quantity > 0 %>
+                  <div class="mt-1 text-xs text-green-600">En stock</div>
+                <% else %>
+                  <div class="mt-1 text-xs text-red-500">Rupture de stock</div>
+                <% end %>
+              </div>
+            <% end %>
+            
+            <!-- Add to Cart Button -->
+            <div class="px-3 pb-3">
+              <%= render "shared/add_to_cart_button", item: item, variant: variant, size: "sm", style: "outline", show_icon: false %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Sidebar Banner (hidden on mobile) -->
+    <div class="hidden lg:block w-[280px] flex-shrink-0">
+      <div class="sticky top-[180px]">
+        <div class="h-[600px] bg-gradient-to-br from-[#551694] to-[#8B5CF6] rounded-xl overflow-hidden relative">
+          <!-- Content -->
+          <div class="absolute inset-0 p-6 flex flex-col justify-between">
+            <div>
+              <div class="inline-block bg-yellow-400 text-gray-900 text-[10px] font-bold uppercase px-3 py-1 rounded-full mb-4">
+                Offre spéciale
+              </div>
+              <h3 class="text-white text-2xl font-bold leading-tight mb-2">
+                Jusqu'à 50% de réduction
+              </h3>
+              <p class="text-white/80 text-sm">
+                Sur une sélection de produits électroniques
+              </p>
+            </div>
+            
+            <%= link_to items_path, class: "inline-flex items-center gap-2 bg-white text-[#551694] font-bold text-sm px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors" do %>
+              Profiter
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

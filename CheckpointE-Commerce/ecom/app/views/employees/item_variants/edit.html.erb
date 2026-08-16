@@ -1,0 +1,178 @@
+<% content_for :active_tab, 'catalogue' %>
+<% is_xof_currency = @item.currency&.code == "XOF" %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+  <main class="flex-1 px-4 sm:px-6 lg:px-12 xl:px-28 py-6">
+    <nav class="mb-4 text-sm" aria-label="Fil d'Ariane">
+      <ol class="flex flex-wrap items-center gap-2 text-gray-500">
+        <li>
+          <%= link_to t('vendors.items.index.title'), url_with_shop(employees_items_path, @current_shop), class: "hover:text-gray-900 transition-colors" %>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <%= link_to @item.name, url_with_shop(employees_item_path(@item), @current_shop), class: "hover:text-gray-900 transition-colors truncate max-w-xs" %>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li>
+          <%= link_to "Variantes", url_with_shop(employees_item_variants_path(@item), @current_shop), class: "hover:text-gray-900 transition-colors" %>
+        </li>
+        <li aria-hidden="true">/</li>
+        <li class="text-gray-700 font-medium">Modifier variante #<%= @variant.id %></li>
+      </ol>
+    </nav>
+
+    <div class="mb-6 space-y-3">
+      <%= link_to url_with_shop(employees_item_variants_path(@item), @current_shop),
+          class: "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-colors text-sm font-medium" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Retour aux variantes
+      <% end %>
+
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Modifier la variante</h1>
+          <p class="text-sm sm:text-base text-gray-600 mt-1">Produit: <span class="font-medium text-gray-800"><%= @item.name %></span></p>
+        </div>
+        <span class="inline-flex items-center self-start sm:self-auto px-3 py-1 rounded-full text-xs font-semibold bg-[#551694]/10 text-[#551694]">
+          Variante #<%= @variant.id %>
+        </span>
+      </div>
+    </div>
+
+    <%= form_with model: @variant, url: url_with_shop(employees_item_variant_path(@item, @variant), @current_shop), method: :patch, local: true, class: "w-full" do |f| %>
+      <% if @variant.errors.any? %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <h3 class="font-bold mb-2"><%= pluralize(@variant.errors.count, 'erreur') %> :</h3>
+          <ul class="list-disc list-inside">
+            <% @variant.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-900 mb-5">Informations de la variante</h2>
+
+            <% if @variant.attribute_values.any? %>
+              <div class="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                <p class="text-xs uppercase tracking-wide font-semibold text-gray-500 mb-3">Attributs (lecture seule)</p>
+                <div class="flex flex-wrap gap-2.5">
+                  <% @variant.attribute_values.includes(:item_attribute).each do |attr_value| %>
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-full text-xs sm:text-sm bg-[#551694]/10 text-[#551694] border border-[#551694]/20">
+                      <span class="font-semibold"><%= attr_value.item_attribute.name %>:</span>
+                      <span class="ml-1"><%= attr_value.value %></span>
+                    </span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <%= f.label :sku, "SKU (Référence)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.text_field :sku, class: "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20", placeholder: "Ex: PROD-001-ROUGE-M" %>
+              </div>
+
+              <div>
+                <%= f.label :stock_quantity, "Quantité en stock", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.number_field :stock_quantity, min: 0, class: "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20", placeholder: "0" %>
+              </div>
+
+              <div>
+                <%= f.label :price, "Prix normal (#{@item.currency.symbol})", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                <%= f.number_field :price,
+                    step: (is_xof_currency ? 1 : 0.01),
+                    min: (is_xof_currency ? 1 : 0.01),
+                    value: (is_xof_currency ? @variant.price.to_d.round(0).to_i : @variant.price),
+                    class: "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20",
+                    placeholder: (is_xof_currency ? "0" : "0.00") %>
+              </div>
+
+              <% if @item.is_on_sale? %>
+                <div>
+                  <%= f.label :sale_price, "Prix promotionnel (#{@item.currency.symbol})", class: "block text-sm font-medium text-gray-700 mb-2" %>
+                  <%= f.number_field :sale_price,
+                      step: (is_xof_currency ? 1 : 0.01),
+                      min: (is_xof_currency ? 1 : 0.01),
+                      value: (@variant.sale_price.present? && is_xof_currency ? @variant.sale_price.to_d.round(0).to_i : @variant.sale_price),
+                      class: "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#551694] focus:ring-opacity-20",
+                      placeholder: "Laisser vide pour la remise globale" %>
+                </div>
+              <% end %>
+            </div>
+
+            <% if @item.is_on_sale? %>
+              <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                <p class="text-xs text-yellow-800">
+                  Laisser le prix promotionnel vide pour appliquer la remise globale du produit (<%= @item.sale_discount_percent || 0 %>%).
+                </p>
+                <% if @variant.on_sale? %>
+                  <p class="text-xs text-green-700 mt-2">
+                    Prix promo actuel: <strong><%= number_to_currency(@variant.current_price, unit: @item.currency.symbol, precision: 0) %></strong>
+                    (<%= @variant.discount_percentage %>% de réduction)
+                  </p>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600">
+                Activez la promotion au niveau du produit pour définir un prix promo spécifique à cette variante.
+              </div>
+            <% end %>
+
+            <div class="pt-5 mt-5 border-t border-gray-200">
+              <% unless @variant.is_default? %>
+                <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                  <%= f.check_box :is_default, class: "w-4 h-4 text-[#551694] border-gray-300 rounded focus:ring-[#551694]" %>
+                  <span>Définir comme variante par défaut</span>
+                </label>
+              <% else %>
+                <div class="inline-flex items-center px-3 py-2 rounded-lg text-sm bg-blue-50 border border-blue-200 text-blue-700">
+                  ✓ Cette variante est actuellement la variante par défaut
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 space-y-4 lg:sticky lg:top-6">
+            <h3 class="text-base font-semibold text-gray-900">Résumé rapide</h3>
+
+            <dl class="space-y-3 text-sm">
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-gray-500">SKU actuel</dt>
+                <dd class="font-medium text-gray-900"><%= @variant.sku.presence || "—" %></dd>
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-gray-500">Prix</dt>
+                <dd class="font-medium text-gray-900"><%= number_to_currency(@variant.price, unit: @item.currency.symbol, precision: 0) %></dd>
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-gray-500">Stock</dt>
+                <dd class="font-medium <%= @variant.stock_quantity.to_i > 0 ? 'text-green-700' : 'text-red-700' %>"><%= @variant.stock_quantity %></dd>
+              </div>
+              <div class="flex items-center justify-between gap-3">
+                <dt class="text-gray-500">Devise</dt>
+                <dd class="font-medium text-gray-900"><%= @item.currency.symbol %></dd>
+              </div>
+            </dl>
+
+            <div class="pt-4 border-t border-gray-200 space-y-2">
+              <%= f.submit "Enregistrer les modifications",
+                  class: "w-full px-4 py-2.5 bg-[#551694] text-white rounded-lg hover:bg-[#451384] transition-colors font-medium" %>
+              <%= link_to "Annuler",
+                  url_with_shop(employees_item_variants_path(@item), @current_shop),
+                  class: "block w-full px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium text-center" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </main>
+
+</div>

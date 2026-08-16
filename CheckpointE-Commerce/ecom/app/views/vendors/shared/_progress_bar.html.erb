@@ -1,0 +1,12 @@
+<% current_step = local_assigns.fetch(:current_step, 1).to_i %>
+<% total_steps = 3 %>
+
+<div class="mt-6 flex gap-2">
+  <% (1..total_steps).each do |step| %>
+    <% if step <= current_step %>
+      <div class="flex-1 rounded bg-[#551694] h-1.5"></div>
+    <% else %>
+      <div class="flex-1 rounded bg-[#E9E9E9] h-1.5"></div>
+    <% end %>
+  <% end %>
+</div>

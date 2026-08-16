@@ -1,0 +1,46 @@
+<%= turbo_stream.replace "cart-navbar-section" do %>
+  <div id="cart-navbar-section">
+    <%= render 'shared/cart_navbar_section' %>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "cart-sheet-content" do %>
+  <div class="flex-1 overflow-y-auto overflow-x-hidden px-4 py-4 min-h-0" id="cart-sheet-content" data-action="click->cart-sheet#stopPropagation">
+    <%= render 'shared/cart_sheet_items', cart: current_cart %>
+  </div>
+<% end %>
+
+<%= turbo_stream.append "flash-notifications" do %>
+  <%= render "shared/flash_notification_toast", message: t("storefront.products.added_to_cart", default: "Article ajouté au panier"), type: "success" %>
+<% end %>
+
+<%= turbo_stream.replace "cart-sheet-footer" do %>
+  <%= render 'shared/cart_sheet_footer', cart: current_cart %>
+<% end %>
+
+<% if current_cart.cart_items.any? %>
+  <%= turbo_stream.replace "cart-subtotal" do %>
+    <span id="cart-subtotal" data-cart-total-target="subtotal" class="font-semibold text-gray-900">
+      <%= number_to_currency(current_cart.total_amount, unit: current_cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </span>
+  <% end %>
+
+  <%= turbo_stream.replace "cart-total" do %>
+    <span id="cart-total" data-cart-total-target="total" class="text-2xl sm:text-3xl font-bold text-[#551694]">
+      <%= number_to_currency(current_cart.total_amount, unit: current_cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </span>
+  <% end %>
+
+  <%# Mettre à jour le total dans le footer du cart sheet %>
+  <%= turbo_stream.replace "cart-sheet-total" do %>
+    <p class="text-[18px] font-bold text-[#18181b]" id="cart-sheet-total">
+      <%= number_to_currency(current_cart.total_amount, unit: current_cart.cart_items.first&.item&.currency&.symbol || 'FCFA', precision: 0) %>
+    </p>
+  <% end %>
+<% end %>
+
+<%# Remplacer le bouton "Ajouter au panier" par le sélecteur − qty + sur la page %>
+<%= turbo_stream.replace "add-to-cart-#{@item.id}-#{@variant.id}" do %>
+  <%= render "shared/add_to_cart_button", item: @item, variant: @variant, size: params[:size].presence || "md", style: params[:style].presence || "outline", show_icon: true, full_width: true %>
+<% end %>
+

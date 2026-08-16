@@ -1,0 +1,115 @@
+require "active_support/core_ext/integer/time"
+
+Rails.application.configure do
+  # Settings specified here will take precedence over those in config/application.rb.
+
+  # Code is not reloaded between requests.
+  config.enable_reloading = false
+
+  # Eager load code on boot for better performance and memory savings (ignored by Rake tasks).
+  config.eager_load = true
+
+  # Full error reports are disabled.
+  config.consider_all_requests_local = false
+
+  # Turn on fragment caching in view templates (env toggleable).
+  cache_enabled = ENV.fetch("CACHE_ENABLED", "false") == "true"
+  config.action_controller.perform_caching = cache_enabled
+
+  # Cache assets for far-future expiry since they are all digest stamped.
+  assets_cache_max_age = ENV.fetch("CACHE_ASSETS_MAX_AGE_SECONDS", 1.year.to_i).to_i
+  config.public_file_server.headers = if cache_enabled
+    { "cache-control" => "public, max-age=#{assets_cache_max_age}" }
+  else
+    { "cache-control" => "no-store" }
+  end
+
+  # Enable serving of images, stylesheets, and JavaScripts from an asset server.
+  # config.asset_host = "http://assets.example.com"
+
+  # Store uploaded files on the local file system (see config/storage.yml for options).
+  config.active_storage.service = :hetzner
+
+  # Assume all access to the app is happening through a SSL-terminating reverse proxy (Kamal/Traefik).
+  # Without this, request.ssl? is false for proxied HTTP, which breaks secure session cookies and CSRF.
+  config.assume_ssl = true
+
+  # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+  config.force_ssl = true
+
+  # Skip http-to-https redirect for the default health check endpoint.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+
+  # Log to STDOUT with the current request id as a default log tag.
+  config.log_tags = [ :request_id ]
+  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+
+  # Change to "debug" to log everything (including potentially personally-identifiable information!)
+  config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
+
+  # Prevent health checks from clogging up the logs.
+  config.silence_healthcheck_path = "/up"
+
+  # Don't log any deprecations.
+  config.active_support.report_deprecations = false
+
+  # Replace the default in-process memory cache store with a durable alternative.
+  config.cache_store = cache_enabled ? :solid_cache_store : :null_store
+
+  # Replace the default in-process and non-durable queuing backend for Active Job.
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
+
+  # Ignore bad email addresses and do not raise email delivery errors.
+  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
+  # config.action_mailer.raise_delivery_errors = false
+
+  # Set host to be used by links generated in mailer templates.
+  config.action_mailer.default_url_options = { host: "okemamy.com" }
+
+  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
+  # config.action_mailer.smtp_settings = {
+  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
+  #   password: Rails.application.credentials.dig(:smtp, :password),
+  #   address: "smtp.example.com",
+  #   port: 587,
+  #   authentication: :plain
+  # }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("SMTP_ADDRESS", ""),
+    port: ENV.fetch("SMTP_PORT", 465).to_i,
+    domain: ENV.fetch("SMTP_DOMAIN", ""),
+    user_name: ENV.fetch("SMTP_USERNAME", nil),
+    password: ENV.fetch("SMTP_PASSWORD", nil),
+    authentication: :plain,
+    ssl: true,
+    enable_starttls_auto: false
+  }
+
+  # Ne pas lever d'erreur si l'email ne peut pas être envoyé (pour éviter de bloquer l'application)
+  config.action_mailer.raise_delivery_errors = false
+
+  # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
+  # the I18n.default_locale when a translation cannot be found).
+  config.i18n.fallbacks = true
+
+  # Do not dump schema after migrations.
+  config.active_record.dump_schema_after_migration = false
+
+  # Only use :id for inspections in production.
+  config.active_record.attributes_for_inspect = [ :id ]
+
+  # Enable DNS rebinding protection and other `Host` header attacks.
+  # config.hosts = [
+  #   "example.com",     # Allow requests from example.com
+  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
+  # ]
+  #
+  # Skip DNS rebinding protection for the default health check endpoint.
+  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  #
+  config.active_record.encryption.primary_key = ENV["ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY"]
+  config.active_record.encryption.deterministic_key = ENV["ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY"]
+  config.active_record.encryption.key_derivation_salt = ENV["ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT"]
+end

@@ -1,0 +1,7 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station
+IDFM:463640,,Gare de Lyon,Grand pôle intermodal Paris 12,48.8447,2.3736,,,1,
+IDFM:463641,,Gare de Lyon Quai 1,,48.8446,2.3735,,,0,IDFM:463640
+IDFM:463642,,Gare de Lyon Quai 2,,48.8448,2.3737,,,0,IDFM:463640
+IDFM:463650,,Châtelet Les Halles,Correspondance RER A/B/D + M1/M4/M7/M11/M14,48.8613,2.3467,,,1,
+IDFM:463660,,République,Correspondance M3/M5/M8/M9/M11,48.8676,2.3634,,,1,
+IDFM:463670,,Nation,Correspondance RER A + M1/M2/M6/M9,48.8482,2.3960,,,1,

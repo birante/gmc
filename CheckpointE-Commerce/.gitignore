@@ -18,7 +18,8 @@ ecom/.kamal/secrets*
 
 # Third-party runtime configs that carry API keys / tokens in Yoonema.
 # GitHub push-protection flagged real secrets in these files — keep out.
-ecom/config/active_agent.yml       # contains OpenAI API keys
+# (Contains OpenAI API keys.)
+ecom/config/active_agent.yml
 
 # Production ops docs that ship real Docker PATs / DB passwords inline.
 # The docs are useful internally but must not be published.

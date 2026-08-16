@@ -1,0 +1,24 @@
+{
+  "name": "your-mern-app",
+  "version": "1.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start":       "node server/index.js",
+    "dev:server":  "nodemon server/index.js",
+    "dev:client":  "cd client && npm start",
+
+    "//":          "Kudu (App Service build) runs `npm install`, which triggers postinstall.",
+    "postinstall": "npm run build",
+
+    "//":          "Build the React app AND copy its output into server/public so",
+    "//":          "Express can serve it. Single-server pattern.",
+    "build":       "cd client && npm ci && npm run build && rm -rf ../server/public && cp -R build ../server/public"
+  },
+  "dependencies": {
+    "express":  "^4.19.2",
+    "mongoose": "^8.5.2",
+    "dotenv":   "^16.4.5"
+  }
+}

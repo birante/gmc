@@ -1,0 +1,26 @@
+{
+  "name": "mern-users-app",
+  "version": "1.0.0",
+  "description": "Minimal MERN app — Express + Mongoose + Vite React — deployable on Azure App Service.",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "//":                "Kudu (App Service) runs npm install after upload -> postinstall builds React.",
+    "postinstall":       "npm --prefix client install && npm --prefix client run build && rm -rf server/public && cp -R client/dist server/public",
+
+    "//":                "Local dev — two commands, two terminals: backend + Vite dev server.",
+    "dev:server":        "node --watch server/index.js",
+    "dev:client":        "npm --prefix client run dev",
+
+    "//":                "Single-server production start — Express serves server/public + /api routes.",
+    "start":             "node server/index.js"
+  },
+  "dependencies": {
+    "cors":     "^2.8.5",
+    "dotenv":   "^16.4.5",
+    "express":  "^4.19.2",
+    "mongoose": "^8.5.2"
+  }
+}

@@ -1,0 +1,5 @@
+node_modules
+dist
+.env
+coverage
+.kamal/secrets-common

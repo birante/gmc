@@ -1,0 +1,106 @@
+// VaxTrack data model.
+// Run `npm run db:migrate` after editing to create a new migration.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  CLINICIAN
+}
+
+enum Sex {
+  F
+  M
+}
+
+/// A primary health care facility (poste de sante, centre de sante, hospital).
+model Clinic {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  name      String
+  region    String
+  district  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     User[]
+  patients  Patient[]
+}
+
+model User {
+  id                     String         @id @default(cuid())
+  email                  String         @unique
+  name                   String
+  passwordHash           String
+  role                   Role           @default(CLINICIAN)
+  active                 Boolean        @default(true)
+  clinicId               String?
+  clinic                 Clinic?        @relation(fields: [clinicId], references: [id], onDelete: SetNull)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  administeredDoses      Immunization[]
+
+  @@index([clinicId])
+}
+
+/// A child (or adult) followed by a clinic. `referenceCode` is printed on the
+/// vaccination card and is used by caregivers for the public lookup.
+model Patient {
+  id            String         @id @default(cuid())
+  referenceCode String         @unique
+  firstName     String
+  lastName      String
+  sex           Sex
+  dateOfBirth   DateTime       @db.Date
+  guardianName  String
+  guardianPhone String
+  address       String?
+  clinicId      String
+  clinic        Clinic         @relation(fields: [clinicId], references: [id], onDelete: Restrict)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  immunizations Immunization[]
+
+  @@index([clinicId, lastName])
+}
+
+/// One dose of the national EPI schedule (e.g. "PENTA-1" given at 6 weeks).
+model Vaccine {
+  id                 String         @id @default(cuid())
+  code               String         @unique
+  antigen            String
+  name               String
+  doseNumber         Int
+  recommendedAgeDays Int
+  description        String?
+  sortOrder          Int            @default(0)
+  immunizations      Immunization[]
+}
+
+/// A scheduled (and, once given, administered) dose for a patient.
+model Immunization {
+  id               String    @id @default(cuid())
+  patientId        String
+  patient          Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  vaccineId        String
+  vaccine          Vaccine   @relation(fields: [vaccineId], references: [id], onDelete: Restrict)
+  scheduledDate    DateTime  @db.Date
+  administeredDate DateTime? @db.Date
+  administeredById String?
+  administeredBy   User?     @relation(fields: [administeredById], references: [id], onDelete: SetNull)
+  lotNumber        String?
+  notes            String?
+  reminderSentAt   DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([patientId, vaccineId])
+  @@index([scheduledDate, administeredDate])
+}

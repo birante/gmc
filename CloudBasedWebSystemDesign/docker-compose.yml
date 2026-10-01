@@ -1,0 +1,39 @@
+# Local full stack:  docker compose up --build   ->  http://localhost:4000
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: vaxtrack
+      POSTGRES_PASSWORD: vaxtrack
+      POSTGRES_DB: vaxtrack
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vaxtrack"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://vaxtrack:vaxtrack@db:5432/vaxtrack?schema=public
+      JWT_SECRET: docker-local-secret-change-me-0123456789abcdef
+      CORS_ORIGINS: http://localhost:4000,http://localhost:5173
+      SEED_ON_START: "true"
+      SEED_DEMO_DATA: "true"
+      ADMIN_EMAIL: admin@vaxtrack.sn
+      ADMIN_PASSWORD: ChangeMe!2026
+      LOG_LEVEL: info
+    ports:
+      - "4000:4000"
+
+volumes:
+  pgdata:

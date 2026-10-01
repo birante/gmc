@@ -1,0 +1,59 @@
+# Render Blueprint - VaxTrack (single web service + managed PostgreSQL).
+# The API serves the compiled React app, so there is one public URL and no CORS setup.
+#
+# Render dashboard -> New -> Blueprint -> pick the repo -> Blueprint path:
+#   CloudBasedWebSystemDesign/render.yaml
+# See docs/DEPLOYMENT.md for the full procedure.
+
+databases:
+  - name: vaxtrack-db
+    plan: free
+    databaseName: vaxtrack
+    user: vaxtrack
+    region: frankfurt          # closest Render region to West Africa
+    postgresMajorVersion: "17"
+
+services:
+  - type: web
+    name: vaxtrack
+    runtime: node
+    plan: free
+    region: frankfurt
+    rootDir: CloudBasedWebSystemDesign
+    buildCommand: npm ci --include=dev && npm run build
+    # Free plan has no pre-deploy hook: migrations run right before the server starts.
+    startCommand: npm run start:prod
+    healthCheckPath: /health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - CloudBasedWebSystemDesign/**
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vaxtrack-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true          # Render generates a random 256-bit secret
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: WEB_DIST_DIR
+        value: ../web/dist
+      - key: CORS_ORIGINS
+        value: https://vaxtrack.onrender.com
+      - key: SEED_ON_START
+        value: "true"                # idempotent: schedule + admin (+ demo data)
+      - key: SEED_DEMO_DATA
+        value: "true"                # set to "false" for a real deployment
+      - key: ADMIN_EMAIL
+        value: admin@vaxtrack.sn
+      - key: ADMIN_PASSWORD
+        sync: false                  # you are prompted for it when the Blueprint is created
+      - key: LOG_LEVEL
+        value: info
+      - key: REMINDER_WINDOW_DAYS
+        value: "3"

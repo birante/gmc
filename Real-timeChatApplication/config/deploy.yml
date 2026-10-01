@@ -1,0 +1,41 @@
+service: waxtaan
+image: birantesy/waxtaan
+servers:
+  web:
+    - 142.93.114.9
+proxy:
+  ssl: true
+  host: waxtaan.okemamy.com
+  app_port: 3000
+  healthcheck:
+    path: /up
+    interval: 3
+    timeout: 3
+registry:
+  # Docker Hub (birantesy/<app>) si ~/.config/okemamy/registry_token existe,
+  # sinon registry local Kamal (tunnel SSH, aucun identifiant requis).
+<% if File.exist?(File.expand_path("~/.config/okemamy/registry_token")) %>
+  username: birantesy
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+<% else %>
+  server: localhost:5555
+<% end %>
+builder:
+  arch: amd64
+  context: .
+env:
+  clear:
+    NODE_ENV: production
+    PORT: 3000
+    MONGODB_URI: mongodb://waxtaan-mongo:27017/waxtaan
+    SEED_ON_START: "true"
+  secret:
+    - JWT_SECRET
+accessories:
+  mongo:
+    image: mongo:7
+    host: 142.93.114.9
+    cmd: --wiredTigerCacheSizeGB 0.25
+    directories:
+      - data:/data/db

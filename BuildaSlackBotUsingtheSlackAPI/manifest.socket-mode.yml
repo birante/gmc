@@ -1,0 +1,30 @@
+# Slack app manifest - Socket Mode (recommended for local development: no public URL needed).
+# After importing, create an App-Level Token with the connections:write scope (SLACK_APP_TOKEN).
+display_information:
+  name: GMC Bolt Bot
+  description: GoMyCode checkpoint bot - replies to messages, handles /hello and logs channel messages.
+  background_color: "#2c2d30"
+features:
+  bot_user:
+    display_name: gmc-bolt-bot
+    always_online: true
+  slash_commands:
+    - command: /hello
+      description: Say hello to the bot
+      usage_hint: "[name]"
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - channels:history
+      - commands
+settings:
+  event_subscriptions:
+    bot_events:
+      - message.channels
+  interactivity:
+    is_enabled: false
+  org_deploy_enabled: false
+  socket_mode_enabled: true
+  token_rotation_enabled: false

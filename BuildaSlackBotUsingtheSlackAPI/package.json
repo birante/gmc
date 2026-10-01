@@ -1,0 +1,25 @@
+{
+  "name": "slack-bot-bolt",
+  "version": "1.0.0",
+  "description": "GoMyCode checkpoint: a Slack bot built with @slack/bolt that replies to channel messages, handles /hello and logs messages from the Events API.",
+  "main": "bot.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "node --watch bot.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "keywords": [
+    "slack",
+    "bolt",
+    "bot",
+    "events-api"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@slack/bolt": "^5.1.0"
+  }
+}

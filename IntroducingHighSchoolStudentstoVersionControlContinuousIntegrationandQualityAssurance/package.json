@@ -1,0 +1,39 @@
+{
+  "name": "student-gradebook",
+  "version": "1.0.0",
+  "description": "A beginner-friendly student gradebook (module + CLI) used to practise Git, CI and QA.",
+  "type": "module",
+  "main": "src/gradebook.js",
+  "bin": {
+    "gradebook": "src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "node --test tests/*.test.js",
+    "test:coverage": "c8 --check-coverage --lines 90 --functions 90 --branches 85 --reporter=text --reporter=lcov --reporter=json-summary node --test tests/*.test.js",
+    "build": "node scripts/build.js"
+  },
+  "keywords": [
+    "education",
+    "git",
+    "ci",
+    "qa"
+  ],
+  "license": "MIT",
+  "author": "Birante SY",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "c8": "^12.0.0",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9"
+  }
+}

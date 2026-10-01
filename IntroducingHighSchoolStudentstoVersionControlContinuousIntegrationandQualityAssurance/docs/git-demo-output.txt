@@ -1,0 +1,113 @@
+
+========== 0. A shared 'remote' (stands in for GitHub) ==========
+$ git init --quiet --bare --initial-branch=main <tmp>/remote.git
+Bare remote created at <tmp>/remote.git
+
+========== 1. Student A: init, stage, commit, push ==========
+$ git init --quiet --initial-branch=main
+$ git status --short
+?? README.md
+?? grades.js
+$ git add grades.js README.md
+$ git commit --quiet -m "Initial commit: letterGrade function"
+$ git remote add origin <tmp>/remote.git
+$ git push --quiet -u origin main
+$ git log --oneline
+27edbd2 Initial commit: letterGrade function
+
+========== 2. Student B: clone the shared repository ==========
+$ git clone --quiet <tmp>/remote.git <tmp>/bob
+$ git log --oneline
+27edbd2 Initial commit: letterGrade function
+
+========== 3. Feature branches developed in isolation ==========
+$ git switch --quiet -c feature/add-d-grade
+$ git commit --quiet -am "Add D grade below 70"
+$ git push --quiet -u origin feature/add-d-grade
+$ git switch --quiet -c feature/add-f-grade
+$ git commit --quiet -am "Add F grade below 60"
+$ git commit --quiet -am "Document the project in README"
+$ git branch -a
+* feature/add-f-grade
+  main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/main
+
+========== 4. Merge Alice's feature into main (clean merge, like a merged PR) ==========
+$ git switch --quiet main
+$ git merge --no-ff --quiet -m "Merge pull request #1 from feature/add-d-grade" feature/add-d-grade
+$ git push --quiet origin main
+$ cat grades.js
+export function letterGrade(score) {
+  if (score >= 90) return 'A';
+  if (score >= 80) return 'B';
+  if (score >= 70) return 'C';
+  return 'D';
+}
+
+========== 5. Bob pulls the new main and merges it into his branch -> CONFLICT ==========
+$ git switch --quiet main
+$ git pull --quiet origin main
+$ git switch --quiet feature/add-f-grade
+$ git merge main
+Auto-merging grades.js
+CONFLICT (content): Merge conflict in grades.js
+Automatic merge failed; fix conflicts and then commit the result.
+$ git status --short
+UU grades.js
+--- grades.js with conflict markers ---
+export function letterGrade(score) {
+  if (score >= 90) return 'A';
+  if (score >= 80) return 'B';
+<<<<<<< HEAD
+  if (score >= 60) return 'C';
+  return 'F';
+=======
+  if (score >= 70) return 'C';
+  return 'D';
+>>>>>>> main
+}
+
+========== 6. Resolve the conflict (keep BOTH ideas: C >= 70, D >= 60, otherwise F) ==========
+$ cat grades.js
+export function letterGrade(score) {
+  if (score >= 90) return 'A';
+  if (score >= 80) return 'B';
+  if (score >= 70) return 'C';
+  if (score >= 60) return 'D';
+  return 'F';
+}
+$ git add grades.js
+$ git commit --quiet --no-edit
+$ git push --quiet -u origin feature/add-f-grade
+
+========== 7. Pull request #2 reviewed and merged into main ==========
+$ git switch --quiet main
+$ git merge --no-ff --quiet -m "Merge pull request #2 from feature/add-f-grade" feature/add-f-grade
+$ git push --quiet origin main
+$ git branch -d feature/add-f-grade
+Deleted branch feature/add-f-grade (was db9f0ef).
+
+========== 8. Alice pulls the final main ==========
+$ git pull --quiet origin main
+$ git branch -d feature/add-d-grade
+Deleted branch feature/add-d-grade (was e139450).
+
+========== 9. Final history ==========
+$ git log --graph --oneline --decorate --all
+*   66a372b (HEAD -> main, origin/main) Merge pull request #2 from feature/add-f-grade
+|\  
+| *   db9f0ef Merge branch 'main' into feature/add-f-grade
+| |\  
+| |/  
+|/|   
+* |   afdf044 Merge pull request #1 from feature/add-d-grade
+|\ \  
+| * | e139450 (origin/feature/add-d-grade) Add D grade below 70
+|/ /  
+| * d83afc8 Document the project in README
+| * b90f4af Add F grade below 60
+|/  
+* 27edbd2 Initial commit: letterGrade function
+
+Demo finished. Temporary directory will be removed.

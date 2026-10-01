@@ -1,0 +1,9 @@
+{
+  "className": "Grade 10 - Computer Science",
+  "students": {
+    "Awa": [95, 88, 92],
+    "Moussa": [72, 65, 80],
+    "Fatou": [58, 61, 49],
+    "Ibrahima": [85, 90, 78]
+  }
+}

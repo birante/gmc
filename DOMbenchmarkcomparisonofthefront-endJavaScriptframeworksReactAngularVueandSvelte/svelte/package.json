@@ -1,0 +1,17 @@
+{
+  "name": "todo-svelte",
+  "version": "1.0.0",
+  "description": "To-do list app (svelte) for the DOM benchmark",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "svelte": "^5.57.1",
+    "vite": "^8.3.1"
+  },
+  "private": true,
+  "type": "module"
+}

@@ -1,0 +1,42 @@
+<main id="app" class="container" data-framework="angular">
+  <h1>To-Do List <small>(Angular)</small></h1>
+
+  <form id="add-form" data-testid="add-form" (ngSubmit)="addTask()">
+    <input id="task-name" data-testid="task-name" name="name" placeholder="Task name" [(ngModel)]="name" />
+    <select id="task-priority" data-testid="task-priority" name="priority" [(ngModel)]="priority">
+      @for (p of priorities; track p) {
+        <option [value]="p">{{ p }}</option>
+      }
+    </select>
+    <button id="add-task" data-testid="add-task" type="submit">Add</button>
+  </form>
+
+  <div id="bench" class="bench" data-testid="bench">
+    <button id="run-100" data-testid="run-100" type="button" (click)="run(100)">Render 100</button>
+    <button id="run-500" data-testid="run-500" type="button" (click)="run(500)">Render 500</button>
+    <button id="run-1000" data-testid="run-1000" type="button" (click)="run(1000)">Render 1000</button>
+    <button id="update-50" data-testid="update-50" type="button" (click)="update50()">Update 50</button>
+    <button id="delete-50" data-testid="delete-50" type="button" (click)="delete50()">Delete 50</button>
+    <button id="clear" data-testid="clear" type="button" (click)="clear()">Clear</button>
+  </div>
+
+  <p id="task-count" data-testid="task-count">{{ tasks().length }} tasks</p>
+
+  <ul id="task-list" data-testid="task-list">
+    <!-- @for is Angular's built-in successor of *ngFor; `track task.id` plays the role of trackBy. -->
+    @for (task of tasks(); track task.id) {
+      <li
+        app-task-item
+        [task]="task"
+        [editing]="task.id === editingId()"
+        (edit)="editingId.set($event)"
+        (save)="onSave($event)"
+        (cancel)="editingId.set(null)"
+        (remove)="onRemove($event)"
+      ></li>
+    }
+  </ul>
+  @if (tasks().length === 0) {
+    <p class="empty" data-testid="empty">No tasks yet.</p>
+  }
+</main>

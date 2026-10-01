@@ -1,0 +1,8 @@
+# Angular build output and caches (not committed)
+/dist
+/.angular
+/out-tsc
+/tmp
+/node_modules
+npm-debug.log
+.DS_Store

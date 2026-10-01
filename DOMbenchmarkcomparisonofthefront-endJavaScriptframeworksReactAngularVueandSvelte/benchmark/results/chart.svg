@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="560" viewBox="0 0 980 560" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+<rect width="980" height="560" fill="#fcfcfb"/>
+<text x="20" y="30" font-size="18" font-weight="600" fill="#0b0b0b">DOM benchmark - median of 15 runs (lower is better)</text>
+<rect x="20" y="44" width="12" height="12" rx="3" fill="#2a78d6"/><text x="38" y="54" font-size="13" fill="#52514e">React</text>
+<rect x="120" y="44" width="12" height="12" rx="3" fill="#eb6834"/><text x="138" y="54" font-size="13" fill="#52514e">Angular</text>
+<rect x="220" y="44" width="12" height="12" rx="3" fill="#1baf7a"/><text x="238" y="54" font-size="13" fill="#52514e">Vue</text>
+<rect x="320" y="44" width="12" height="12" rx="3" fill="#eda100"/><text x="338" y="54" font-size="13" fill="#52514e">Svelte</text>
+<rect x="20" y="70" width="300" height="220" rx="10" fill="#ffffff" stroke="#e4e3df"/>
+<text x="32" y="92" font-size="13" font-weight="600" fill="#0b0b0b">Render 100 tasks (median ms)</text>
+<line x1="40" x2="300" y1="260" y2="260" stroke="#c9c8c2"/>
+<path d="M50.5,260 V158.1614906832298 Q50.5,154.1614906832298 54.5,154.1614906832298 H90.5 Q94.5,154.1614906832298 94.5,158.1614906832298 V260 Z" fill="#2a78d6"><title>React: 4.8 ms</title></path>
+<text x="72.5" y="148.1614906832298" font-size="12" text-anchor="middle" fill="#52514e">4.8</text>
+<text x="72.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">React</text>
+<path d="M115.5,260 V153.75155279503105 Q115.5,149.75155279503105 119.5,149.75155279503105 H155.5 Q159.5,149.75155279503105 159.5,153.75155279503105 V260 Z" fill="#eb6834"><title>Angular: 5 ms</title></path>
+<text x="137.5" y="143.75155279503105" font-size="12" text-anchor="middle" fill="#52514e">5.0</text>
+<text x="137.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Angular</text>
+<path d="M180.5,260 V140.52173913043478 Q180.5,136.52173913043478 184.5,136.52173913043478 H220.5 Q224.5,136.52173913043478 224.5,140.52173913043478 V260 Z" fill="#1baf7a"><title>Vue: 5.6 ms</title></path>
+<text x="202.5" y="130.52173913043478" font-size="12" text-anchor="middle" fill="#52514e">5.6</text>
+<text x="202.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Vue</text>
+<path d="M245.5,260 V144.93167701863354 Q245.5,140.93167701863354 249.5,140.93167701863354 H285.5 Q289.5,140.93167701863354 289.5,144.93167701863354 V260 Z" fill="#eda100"><title>Svelte: 5.4 ms</title></path>
+<text x="267.5" y="134.93167701863354" font-size="12" text-anchor="middle" fill="#52514e">5.4</text>
+<text x="267.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Svelte</text>
+<rect x="340" y="70" width="300" height="220" rx="10" fill="#ffffff" stroke="#e4e3df"/>
+<text x="352" y="92" font-size="13" font-weight="600" fill="#0b0b0b">Render 500 tasks (median ms)</text>
+<line x1="360" x2="620" y1="260" y2="260" stroke="#c9c8c2"/>
+<path d="M370.5,260 V169.49429196016519 Q370.5,165.49429196016519 374.5,165.49429196016519 H410.5 Q414.5,165.49429196016519 414.5,169.49429196016519 V260 Z" fill="#2a78d6"><title>React: 13.7 ms</title></path>
+<text x="392.5" y="159.49429196016519" font-size="12" text-anchor="middle" fill="#52514e">13.7</text>
+<text x="392.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">React</text>
+<path d="M435.5,260 V141.90138450327908 Q435.5,137.90138450327908 439.5,137.90138450327908 H475.5 Q479.5,137.90138450327908 479.5,141.90138450327908 V260 Z" fill="#eb6834"><title>Angular: 17.7 ms</title></path>
+<text x="457.5" y="131.90138450327908" font-size="12" text-anchor="middle" fill="#52514e">17.7</text>
+<text x="457.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Angular</text>
+<path d="M500.5,260 V157.07748360456642 Q500.5,153.07748360456642 504.5,153.07748360456642 H540.5 Q544.5,153.07748360456642 544.5,157.07748360456642 V260 Z" fill="#1baf7a"><title>Vue: 15.5 ms</title></path>
+<text x="522.5" y="147.07748360456642" font-size="12" text-anchor="middle" fill="#52514e">15.5</text>
+<text x="522.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Vue</text>
+<path d="M565.5,260 V140.52173913043475 Q565.5,136.52173913043475 569.5,136.52173913043475 H605.5 Q609.5,136.52173913043475 609.5,140.52173913043475 V260 Z" fill="#eda100"><title>Svelte: 17.9 ms</title></path>
+<text x="587.5" y="130.52173913043475" font-size="12" text-anchor="middle" fill="#52514e">17.9</text>
+<text x="587.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Svelte</text>
+<rect x="660" y="70" width="300" height="220" rx="10" fill="#ffffff" stroke="#e4e3df"/>
+<text x="672" y="92" font-size="13" font-weight="600" fill="#0b0b0b">Render 1000 tasks (median ms)</text>
+<line x1="680" x2="940" y1="260" y2="260" stroke="#c9c8c2"/>
+<path d="M690.5,260 V176.52221300793747 Q690.5,172.52221300793747 694.5,172.52221300793747 H730.5 Q734.5,172.52221300793747 734.5,176.52221300793747 V260 Z" fill="#2a78d6"><title>React: 26 ms</title></path>
+<text x="712.5" y="166.52221300793747" font-size="12" text-anchor="middle" fill="#52514e">26.0</text>
+<text x="712.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">React</text>
+<path d="M755.5,260 V151.9611420447814 Q755.5,147.9611420447814 759.5,147.9611420447814 H795.5 Q799.5,147.9611420447814 799.5,151.9611420447814 V260 Z" fill="#eb6834"><title>Angular: 33.3 ms</title></path>
+<text x="777.5" y="141.9611420447814" font-size="12" text-anchor="middle" fill="#52514e">33.3</text>
+<text x="777.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Angular</text>
+<path d="M820.5,260 V161.38182679777276 Q820.5,157.38182679777276 824.5,157.38182679777276 H860.5 Q864.5,157.38182679777276 864.5,161.38182679777276 V260 Z" fill="#1baf7a"><title>Vue: 30.5 ms</title></path>
+<text x="842.5" y="151.38182679777276" font-size="12" text-anchor="middle" fill="#52514e">30.5</text>
+<text x="842.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Vue</text>
+<path d="M885.5,260 V140.52173913043475 Q885.5,136.52173913043475 889.5,136.52173913043475 H925.5 Q929.5,136.52173913043475 929.5,140.52173913043475 V260 Z" fill="#eda100"><title>Svelte: 36.7 ms</title></path>
+<text x="907.5" y="130.52173913043475" font-size="12" text-anchor="middle" fill="#52514e">36.7</text>
+<text x="907.5" y="278" font-size="12" text-anchor="middle" fill="#52514e">Svelte</text>
+<rect x="20" y="310" width="300" height="220" rx="10" fill="#ffffff" stroke="#e4e3df"/>
+<text x="32" y="332" font-size="13" font-weight="600" fill="#0b0b0b">Update 50 tasks (of 1000) (median ms)</text>
+<line x1="40" x2="300" y1="500" y2="500" stroke="#c9c8c2"/>
+<path d="M50.5,500 V392.2815734989648 Q50.5,388.2815734989648 54.5,388.2815734989648 H90.5 Q94.5,388.2815734989648 94.5,392.2815734989648 V500 Z" fill="#2a78d6"><title>React: 1.9 ms</title></path>
+<text x="72.5" y="382.2815734989648" font-size="12" text-anchor="middle" fill="#52514e">1.9</text>
+<text x="72.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">React</text>
+<path d="M115.5,500 V380.52173913043475 Q115.5,376.52173913043475 119.5,376.52173913043475 H155.5 Q159.5,376.52173913043475 159.5,380.52173913043475 V500 Z" fill="#eb6834"><title>Angular: 2.1 ms</title></path>
+<text x="137.5" y="370.52173913043475" font-size="12" text-anchor="middle" fill="#52514e">2.1</text>
+<text x="137.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Angular</text>
+<path d="M180.5,500 V404.04140786749485 Q180.5,400.04140786749485 184.5,400.04140786749485 H220.5 Q224.5,400.04140786749485 224.5,404.04140786749485 V500 Z" fill="#1baf7a"><title>Vue: 1.7 ms</title></path>
+<text x="202.5" y="394.04140786749485" font-size="12" text-anchor="middle" fill="#52514e">1.7</text>
+<text x="202.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Vue</text>
+<path d="M245.5,500 V398.16149068322983 Q245.5,394.16149068322983 249.5,394.16149068322983 H285.5 Q289.5,394.16149068322983 289.5,398.16149068322983 V500 Z" fill="#eda100"><title>Svelte: 1.8 ms</title></path>
+<text x="267.5" y="388.16149068322983" font-size="12" text-anchor="middle" fill="#52514e">1.8</text>
+<text x="267.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Svelte</text>
+<rect x="340" y="310" width="300" height="220" rx="10" fill="#ffffff" stroke="#e4e3df"/>
+<text x="352" y="332" font-size="13" font-weight="600" fill="#0b0b0b">Delete 50 tasks (of 1000) (median ms)</text>
+<line x1="360" x2="620" y1="500" y2="500" stroke="#c9c8c2"/>
+<path d="M370.5,500 V417.10789049919487 Q370.5,413.10789049919487 374.5,413.10789049919487 H410.5 Q414.5,413.10789049919487 414.5,417.10789049919487 V500 Z" fill="#2a78d6"><title>React: 1.9 ms</title></path>
+<text x="392.5" y="407.10789049919487" font-size="12" text-anchor="middle" fill="#52514e">1.9</text>
+<text x="392.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">React</text>
+<path d="M435.5,500 V430.8276972624799 Q435.5,426.8276972624799 439.5,426.8276972624799 H475.5 Q479.5,426.8276972624799 479.5,430.8276972624799 V500 Z" fill="#eb6834"><title>Angular: 1.6 ms</title></path>
+<text x="457.5" y="420.8276972624799" font-size="12" text-anchor="middle" fill="#52514e">1.6</text>
+<text x="457.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Angular</text>
+<path d="M500.5,500 V380.52173913043475 Q500.5,376.52173913043475 504.5,376.52173913043475 H540.5 Q544.5,376.52173913043475 544.5,380.52173913043475 V500 Z" fill="#1baf7a"><title>Vue: 2.7 ms</title></path>
+<text x="522.5" y="370.52173913043475" font-size="12" text-anchor="middle" fill="#52514e">2.7</text>
+<text x="522.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Vue</text>
+<path d="M565.5,500 V380.52173913043475 Q565.5,376.52173913043475 569.5,376.52173913043475 H605.5 Q609.5,376.52173913043475 609.5,380.52173913043475 V500 Z" fill="#eda100"><title>Svelte: 2.7 ms</title></path>
+<text x="587.5" y="370.52173913043475" font-size="12" text-anchor="middle" fill="#52514e">2.7</text>
+<text x="587.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Svelte</text>
+<rect x="660" y="310" width="300" height="220" rx="10" fill="#ffffff" stroke="#e4e3df"/>
+<text x="672" y="332" font-size="13" font-weight="600" fill="#0b0b0b">JS heap with 1000 tasks (median MB)</text>
+<line x1="680" x2="940" y1="500" y2="500" stroke="#c9c8c2"/>
+<path d="M690.5,500 V446.3405477877801 Q690.5,442.3405477877801 694.5,442.3405477877801 H730.5 Q734.5,442.3405477877801 734.5,446.3405477877801 V500 Z" fill="#2a78d6"><title>React: 3.18 MB</title></path>
+<text x="712.5" y="436.3405477877801" font-size="12" text-anchor="middle" fill="#52514e">3.18</text>
+<text x="712.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">React</text>
+<path d="M755.5,500 V380.52173913043475 Q755.5,376.52173913043475 759.5,376.52173913043475 H795.5 Q799.5,376.52173913043475 799.5,380.52173913043475 V500 Z" fill="#eb6834"><title>Angular: 6.81 MB</title></path>
+<text x="777.5" y="370.52173913043475" font-size="12" text-anchor="middle" fill="#52514e">6.81</text>
+<text x="777.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Angular</text>
+<path d="M820.5,500 V412.2525697503671 Q820.5,408.2525697503671 824.5,408.2525697503671 H860.5 Q864.5,408.2525697503671 864.5,412.2525697503671 V500 Z" fill="#1baf7a"><title>Vue: 5.06 MB</title></path>
+<text x="842.5" y="402.2525697503671" font-size="12" text-anchor="middle" fill="#52514e">5.06</text>
+<text x="842.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Vue</text>
+<path d="M885.5,500 V411.88993168613933 Q885.5,407.88993168613933 889.5,407.88993168613933 H925.5 Q929.5,407.88993168613933 929.5,411.88993168613933 V500 Z" fill="#eda100"><title>Svelte: 5.08 MB</title></path>
+<text x="907.5" y="401.88993168613933" font-size="12" text-anchor="middle" fill="#52514e">5.08</text>
+<text x="907.5" y="518" font-size="12" text-anchor="middle" fill="#52514e">Svelte</text>
+</svg>

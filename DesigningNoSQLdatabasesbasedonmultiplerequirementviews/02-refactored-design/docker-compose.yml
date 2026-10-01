@@ -1,0 +1,78 @@
+# -----------------------------------------------------------------------------
+# Small sharded + replicated MongoDB cluster for the refactored design.
+#
+#   cfg1                 config server replica set "cfgRS" (1 member for the demo; 3 in prod)
+#   shardA-1/2/3         shard replica set "shardA" (3rd member = analytics, priority 0)
+#   shardB-1/2/3         shard replica set "shardB" (3rd member = analytics, priority 0)
+#   mongos               query router, published on localhost:27017
+#   init                 one-shot container: rs.initiate + sh.addShard
+#
+#   docker compose up -d
+#   docker compose logs -f init        # wait for "Cluster ready"
+#   mongosh mongodb://localhost:27017  # then run schema.js, sharding.js, ...
+#
+# All members run on one Docker host here; in production each member of a
+# replica set is placed in a different availability zone (see design.md).
+# -----------------------------------------------------------------------------
+x-mongod: &mongod
+  image: mongo:8.0
+  restart: unless-stopped
+  networks: [mongo]
+
+services:
+  cfg1:
+    <<: *mongod
+    command: ["mongod", "--configsvr", "--replSet", "cfgRS", "--port", "27019", "--bind_ip_all"]
+    volumes: ["cfg1:/data/configdb"]
+
+  shardA-1:
+    <<: *mongod
+    command: ["mongod", "--shardsvr", "--replSet", "shardA", "--port", "27018", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: ["shardA-1:/data/db"]
+  shardA-2:
+    <<: *mongod
+    command: ["mongod", "--shardsvr", "--replSet", "shardA", "--port", "27018", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: ["shardA-2:/data/db"]
+  shardA-3:
+    <<: *mongod
+    command: ["mongod", "--shardsvr", "--replSet", "shardA", "--port", "27018", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: ["shardA-3:/data/db"]
+
+  shardB-1:
+    <<: *mongod
+    command: ["mongod", "--shardsvr", "--replSet", "shardB", "--port", "27018", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: ["shardB-1:/data/db"]
+  shardB-2:
+    <<: *mongod
+    command: ["mongod", "--shardsvr", "--replSet", "shardB", "--port", "27018", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: ["shardB-2:/data/db"]
+  shardB-3:
+    <<: *mongod
+    command: ["mongod", "--shardsvr", "--replSet", "shardB", "--port", "27018", "--bind_ip_all", "--wiredTigerCacheSizeGB", "0.25"]
+    volumes: ["shardB-3:/data/db"]
+
+  mongos:
+    <<: *mongod
+    command: ["mongos", "--configdb", "cfgRS/cfg1:27019", "--port", "27017", "--bind_ip_all"]
+    ports: ["27017:27017"]
+    depends_on: [cfg1, shardA-1, shardA-2, shardA-3, shardB-1, shardB-2, shardB-3]
+
+  init:
+    image: mongo:8.0
+    restart: "no"
+    networks: [mongo]
+    depends_on: [mongos]
+    volumes: ["./cluster/init-cluster.sh:/init-cluster.sh:ro"]
+    entrypoint: ["bash", "/init-cluster.sh"]
+
+networks:
+  mongo: {}
+
+volumes:
+  cfg1: {}
+  shardA-1: {}
+  shardA-2: {}
+  shardA-3: {}
+  shardB-1: {}
+  shardB-2: {}
+  shardB-3: {}
